@@ -1,5 +1,6 @@
 package example.demo.domain.member;
 
+import example.demo.domain.company.Company;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -28,4 +29,9 @@ public class Member {
     @Column(name = "member_status")
     @Enumerated(EnumType.STRING)
     private MemberStatus memberStatus;
+
+    //Company랑 양방향
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Company company;
+
 }
