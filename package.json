@@ -1,0 +1,19 @@
+{
+  "name": "demo-3",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "jira-prepare-commit-msg": {
+    "messagePattern": "[$J] $M",
+    "allowEmptyCommitMessage": false,
+    "ignoredBranchesPattern": "^(master|main|dev|develop|development|release)$"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7"
+  }
+}
