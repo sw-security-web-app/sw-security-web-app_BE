@@ -12,5 +12,8 @@
     "messagePattern": "[$J] $M",
     "allowEmptyCommitMessage": false,
     "ignoredBranchesPattern": "^(master|main|dev|develop|development|release)$"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7"
   }
 }
