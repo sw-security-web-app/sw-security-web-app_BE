@@ -28,7 +28,7 @@ public class Company extends BaseEntity {
     private String companyPosition;
 
     //Member랑 양방향
-    @OneToMany(mappedBy = "member",cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "company",cascade = CascadeType.ALL)
     private List<Member> members=new ArrayList<>();
 }
 

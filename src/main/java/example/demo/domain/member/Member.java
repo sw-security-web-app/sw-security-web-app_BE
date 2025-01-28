@@ -14,9 +14,6 @@ public class Member {
     @Column(name = "member_id")
     private Long memberId;
 
-    @Column(name = "company_id")
-    private Long companyId;
-
     @Column(name = "member_email")
     private String email;
 
@@ -32,6 +29,7 @@ public class Member {
 
     //Company랑 양방향
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "company_id")
     private Company company;
 
     public Member(String email, String userName, String password, MemberStatus memberStatus) {
