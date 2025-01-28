@@ -21,57 +21,38 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(RestApiException.class)
     public ResponseEntity<Object> handleCustomException(RestApiException e) {
         ErrorCode errorCode = e.getErrorCode();
-        return handleExceptionInternal(errorCode, errorCode.getMessage());
+        return handleExceptionInternal(errorCode);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Object> handleIllegalArgument(IllegalArgumentException e) {
-        log.warn("IllegalArgumentException: {}", e.getMessage(), e);
+        log.warn("handleIllegalArgument", e);
         ErrorCode errorCode = CommonErrorCode.INVALID_PARAMETER;
         return handleExceptionInternal(errorCode, e.getMessage());
     }
 
-    // 이 부분에서 @Override를 제거하고 메서드명을 수정하여 명확히 메서드를 오버라이드 하지 않도록 합니다.
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Object> handleMethodArgumentNotValid(
-            MethodArgumentNotValidException e, HttpHeaders headers, HttpStatus status, WebRequest request) {
-        log.warn("MethodArgumentNotValidException: {}", e.getMessage(), e);
-        ErrorCode errorCode = CommonErrorCode.INVALID_PARAMETER;
-        List<ErrorResponse.ValidationError> validationErrors = e.getBindingResult()
-                .getFieldErrors()
-                .stream()
-                .map(ErrorResponse.ValidationError::of)
-                .collect(Collectors.toList());
-        return handleExceptionInternal(errorCode, validationErrors);
-    }
-
-    @ExceptionHandler(BindException.class)
-    public ResponseEntity<Object> handleBindException(BindException e) {
-        log.warn("BindException: {}", e.getMessage(), e);
-        ErrorCode errorCode = CommonErrorCode.INVALID_PARAMETER;
-        List<ErrorResponse.ValidationError> validationErrors = e.getBindingResult()
-                .getFieldErrors()
-                .stream()
-                .map(ErrorResponse.ValidationError::of)
-                .collect(Collectors.toList());
-        return handleExceptionInternal(errorCode, validationErrors);
-    }
-
-    @ExceptionHandler(Exception.class)
+    @ExceptionHandler({Exception.class})
     public ResponseEntity<Object> handleAllException(Exception ex) {
-        log.warn("Unhandled Exception: {}", ex.getMessage(), ex);
+        log.warn("handleAllException", ex);
         ErrorCode errorCode = CommonErrorCode.INTERNAL_SERVER_ERROR;
-        return handleExceptionInternal(errorCode, errorCode.getMessage());
+        return handleExceptionInternal(errorCode);
+    }
+
+    private ResponseEntity<Object> handleExceptionInternal(ErrorCode errorCode) {
+        return ResponseEntity.status(errorCode.getHttpStatus())
+                .body(makeErrorResponse(errorCode));
+    }
+
+    private ErrorResponse makeErrorResponse(ErrorCode errorCode) {
+        return ErrorResponse.builder()
+                .code(errorCode.name())
+                .message(errorCode.getMessage())
+                .build();
     }
 
     private ResponseEntity<Object> handleExceptionInternal(ErrorCode errorCode, String message) {
         return ResponseEntity.status(errorCode.getHttpStatus())
                 .body(makeErrorResponse(errorCode, message));
-    }
-
-    private ResponseEntity<Object> handleExceptionInternal(ErrorCode errorCode, List<ErrorResponse.ValidationError> validationErrors) {
-        return ResponseEntity.status(errorCode.getHttpStatus())
-                .body(makeErrorResponse(errorCode, validationErrors));
     }
 
     private ErrorResponse makeErrorResponse(ErrorCode errorCode, String message) {
@@ -81,11 +62,23 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 .build();
     }
 
-    private ErrorResponse makeErrorResponse(ErrorCode errorCode, List<ErrorResponse.ValidationError> validationErrors) {
+    private ResponseEntity<Object> handleExceptionInternal(BindException e, ErrorCode errorCode) {
+        return ResponseEntity.status(errorCode.getHttpStatus())
+                .body(makeErrorResponse(e, errorCode));
+    }
+
+    private ErrorResponse makeErrorResponse(BindException e, ErrorCode errorCode) {
+        List<ErrorResponse.ValidationError> validationErrorList = e.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .map(ErrorResponse.ValidationError::of)
+                .collect(Collectors.toList());
+
         return ErrorResponse.builder()
                 .code(errorCode.name())
                 .message(errorCode.getMessage())
-                .errors(validationErrors)
+                .errors(validationErrorList)
                 .build();
     }
 }
+

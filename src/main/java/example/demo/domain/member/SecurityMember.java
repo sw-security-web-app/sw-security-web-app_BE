@@ -1,8 +1,7 @@
+/*
 package example.demo.domain.member;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
@@ -26,3 +25,4 @@ public class SecurityMember implements UserDetails {
     }
 
 }
+*/
