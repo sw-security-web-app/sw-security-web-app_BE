@@ -34,4 +34,10 @@ public class Member {
     @ManyToOne(fetch = FetchType.LAZY)
     private Company company;
 
+    public Member(String email, String userName, String password, MemberStatus memberStatus) {
+        this.email = email;
+        this.userName = userName;
+        this.password = password;
+        this.memberStatus = memberStatus;
+    }
 }

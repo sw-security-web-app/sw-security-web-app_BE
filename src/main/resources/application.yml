@@ -13,6 +13,18 @@ spring:
       ddl-auto: create
     show-sql: true
 
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: tkv0098@gmail.com
+    password: avse snuo mogq fnwp
+    properties:
+      mail:
+        smtp:
+          auth: true
+          timeout: 5000
+          starttls:
+            enable: true
 ## Testing 환경
 ---
 
