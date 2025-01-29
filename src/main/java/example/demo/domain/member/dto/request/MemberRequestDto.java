@@ -29,7 +29,7 @@ public class  MemberRequestDto{
             groups = ValidationGroups.PatternCheckGroup.class)
     private String password;
 
-    private MemberStatus memberStatus;
+    private String memberStatus;
 
     @NotBlank(message = "휴대폰 번호는 필수 입력 값입니다.",
             groups = ValidationGroups.NotEmptyGroup.class)
@@ -51,7 +51,7 @@ public class  MemberRequestDto{
                 .name(name)
                 .password(password)
                 .phoneNumber(phoneNumber)
-                .memberStatus(MemberStatus.GENERAL)
+                .memberStatus("GENERAL")
                 .build();
     }
 
@@ -65,7 +65,7 @@ public class  MemberRequestDto{
                 .companyName(companyName)
                 .companyDept(companyDept)
                 .companyPosition(companyPosition)
-                .memberStatus(MemberStatus.MANAGER)
+                .memberStatus("MANAGER")
                 .build();
     }
 
@@ -78,7 +78,7 @@ public class  MemberRequestDto{
                 .phoneNumber(phoneNumber)
                 .companyPosition(companyPosition)
                 .invitationCode(invitationCode)
-                .memberStatus(MemberStatus.EMPLOYEE)
+                .memberStatus("EMPLOYEE")
                 .build();
     }
 

@@ -24,10 +24,10 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final CompanyRepository companyRepository;
 
-    public void signUp(MemberRequestDto memberRequestDto,String memberStatus){
+    public void signup(MemberRequestDto memberRequestDto){
         Member newMember ;
         Company newCompany;
-        switch (memberStatus.toLowerCase()){
+        switch (memberRequestDto.getMemberStatus().toLowerCase()){
             //일반
             case "general":
                 newMember=Member.createGeneral(memberRequestDto);
@@ -62,4 +62,5 @@ public class MemberService {
         }
         memberRepository.save(newMember);
     }
+    //TODO:JWT Filter로 관리자 확인 로직 구현
 }

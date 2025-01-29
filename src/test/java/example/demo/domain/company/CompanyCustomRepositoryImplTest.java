@@ -1,6 +1,12 @@
 package example.demo.domain.company;
 
+import example.demo.domain.company.dto.CompanyCodeDto;
 import example.demo.domain.company.dto.CompanyInfoWithUuidDto;
+import example.demo.domain.member.Member;
+import example.demo.domain.member.MemberErrorCode;
+import example.demo.domain.member.MemberRepository;
+import example.demo.domain.member.api.MemberService;
+import example.demo.domain.member.dto.request.MemberRequestDto;
 import example.demo.error.RestApiException;
 import example.demo.util.CreateUuid;
 import org.assertj.core.api.Assertions;
@@ -17,11 +23,10 @@ import static org.junit.jupiter.api.Assertions.*;
 class CompanyCustomRepositoryImplTest {
     @Autowired
     private CompanyRepository companyRepository;
+    @Autowired
+    private MemberRepository memberRepository;
 
-    @AfterEach
-    void tearDown(){
-        companyRepository.deleteAllInBatch();
-    }
+
     @Test
     @DisplayName("초대코드로 회사이름과 회사부서명을 조회합니다.")
     void findCompanyInfoByInvitationCode() {
@@ -52,5 +57,31 @@ class CompanyCustomRepositoryImplTest {
         assertThatThrownBy(()->companyRepository.findCompanyInfoByInvitationCode(incorrectUuid))
                 .isInstanceOf(RestApiException.class)
                 .hasMessage("회사가 존재하지 않습니다.");
+    }
+
+    @Test
+    @DisplayName("해당 유저가 관리자인지 확인하고 회사 초대코드를 반환합니다.")
+    void returnCompanyCode() {
+       //given
+        String uuid=CreateUuid.createShortUuid();
+        MemberRequestDto memberRequestDto=MemberRequestDto.ofManager("tkv00@naver.com","김도연","rlaehdus00!!!","01012345678","삼성","개발","사장");
+        Company company=Company.builder()
+                .companyDept(memberRequestDto.getCompanyDept())
+                .companyPosition(memberRequestDto.getCompanyPosition())
+                .companyName(memberRequestDto.getCompanyName())
+                .invitationCode(uuid)
+                .build();
+        companyRepository.save(company);
+        Member member=Member.createManager(memberRequestDto,company);
+        memberRepository.save(member);
+
+        Long findMemberId=memberRepository.findByEmailAndPhoneNumber(memberRequestDto.getEmail(),memberRequestDto.getPhoneNumber())
+                .orElseThrow(()-> new RestApiException(MemberErrorCode.INVALID_MEMBER_STATUS)).getMemberId();
+        //when
+        CompanyCodeDto codeDto=companyRepository.findCompanyCode(findMemberId);
+
+       //then
+        assertThat(codeDto.getCompanyCode()).isEqualTo(uuid);
+
     }
 }

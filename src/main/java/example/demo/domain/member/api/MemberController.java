@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class MemberController {
     private final MemberService memberService;
     @PostMapping("/api/signup")
-    public ResponseEntity<?>signup(@Validated(ValidationGroups.class) @RequestBody MemberRequestDto memberRequestDto, @RequestParam String memberStatus){
-        memberService.signUp(memberRequestDto,memberStatus);
+    public ResponseEntity<?>signup(@Validated(ValidationGroups.class) @RequestBody MemberRequestDto memberRequestDto){
+        memberService.signup(memberRequestDto);
         return ResponseEntity.ok("회원가입 성공");
     }
 }

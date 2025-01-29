@@ -1,15 +1,20 @@
 package example.demo.domain.company;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import example.demo.domain.company.dto.CompanyCodeDto;
 import example.demo.domain.company.dto.CompanyInfoWithUuidDto;
+import example.demo.domain.company.dto.QCompanyCodeDto;
 import example.demo.domain.company.dto.QCompanyInfoWithUuidDto;
 import example.demo.domain.member.MemberRepositoryCustom;
+import example.demo.domain.member.MemberStatus;
+import example.demo.error.CommonErrorCode;
 import example.demo.error.RestApiException;
 import jakarta.persistence.EntityManager;
 
 import java.util.Optional;
 
 import static example.demo.domain.company.QCompany.*;
+import static example.demo.domain.member.QMember.*;
 
 public class CompanyCustomRepositoryImpl implements CompanyCustomRepository {
 
@@ -25,6 +30,19 @@ public class CompanyCustomRepositoryImpl implements CompanyCustomRepository {
                         .select(new QCompanyInfoWithUuidDto(company.companyName, company.companyDept))
                         .from(company)
                         .where(company.invitationCode.eq(inviteCode))
+                        .fetchOne()
+        ).orElseThrow(()->new RestApiException(CompanyErrorCode.NOT_EXIST_COMPANY));
+    }
+
+    @Override
+    public CompanyCodeDto findCompanyCode(Long memberId) {
+        return Optional.ofNullable(
+                queryFactory
+                        .select(new QCompanyCodeDto(company.invitationCode))
+                        .from(company)
+                        .leftJoin(member)
+                        .fetchJoin()
+                        .on(member.memberId.eq(memberId))
                         .fetchOne()
         ).orElseThrow(()->new RestApiException(CompanyErrorCode.NOT_EXIST_COMPANY));
     }
