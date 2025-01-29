@@ -96,15 +96,15 @@ class MemberServiceTest {
         Company findCompany2=findMember2.getCompany();
 
         //then
-        assertThat(findMember1).extracting("email","userName","password","phoneNumber","memberStatus")
-                .containsExactly("tkv00@naver.com","member1","rlaehdus00!!","01012345678",MANAGER);
-        assertThat(findCompany1).extracting("companyName","companyDept","companyPosition")
-                        .containsExactly("삼성","개발","사장");
+        assertThat(findMember1).extracting("email","userName","password","phoneNumber","memberStatus","companyPosition")
+                .containsExactly("tkv00@naver.com","member1","rlaehdus00!!","01012345678",MANAGER,"사장");
+        assertThat(findCompany1).extracting("companyName","companyDept")
+                        .containsExactly("삼성","개발");
 
-        assertThat(findMember2).extracting("email","userName","password","phoneNumber","memberStatus")
-                .containsExactly("tkv11@naver.com","member2","rlaehdus00!!","01012345611",MANAGER);
-        assertThat(findCompany2).extracting("companyName","companyDept","companyPosition")
-                .containsExactly("LG","디스플레이","부사장");
+        assertThat(findMember2).extracting("email","userName","password","phoneNumber","memberStatus","companyPosition")
+                .containsExactly("tkv11@naver.com","member2","rlaehdus00!!","01012345611",MANAGER,"부사장");
+        assertThat(findCompany2).extracting("companyName","companyDept")
+                .containsExactly("LG","디스플레이");
     }
 
     @Test
