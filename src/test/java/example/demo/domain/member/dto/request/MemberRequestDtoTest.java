@@ -82,12 +82,16 @@ class MemberRequestDtoTest {
         MemberRequestDto general4=MemberRequestDto.ofGeneral(
                 "tkv99@naver,com", "member1", "rlaehdus00!!", "01050299737"
         );
+        MemberRequestDto general5=MemberRequestDto.ofGeneral(
+                "tkv99@naver.com", "member1", "rlaehdus00!!", "01050299737"
+        );
 
         //when
         Set<ConstraintViolation<MemberRequestDto>> violations1 = getConstraintViolations(general1);
         Set<ConstraintViolation<MemberRequestDto>> violations2 = getConstraintViolations(general2);
         Set<ConstraintViolation<MemberRequestDto>> violations3 = getConstraintViolations(general3);
         Set<ConstraintViolation<MemberRequestDto>> violations4 = getConstraintViolations(general4);
+        Set<ConstraintViolation<MemberRequestDto>> violations5 = getConstraintViolations(general5);
 
 
         violations1.forEach(error ->
@@ -101,6 +105,9 @@ class MemberRequestDtoTest {
         );
         violations4.forEach(error->
                 assertThat(error.getMessage()).isEqualTo("잘못된 이메일 입력입니다.")
+        );
+        violations5.forEach(error->
+                assertThat(error.getMessage()).isEmpty()
         );
     }
 
@@ -117,11 +124,15 @@ class MemberRequestDtoTest {
         MemberRequestDto general3=MemberRequestDto.ofGeneral(
                 "tkv99@naver.com", " ", "rlaehdus00!!", "01050299737"
         );
+        MemberRequestDto general4=MemberRequestDto.ofGeneral(
+                "tkv99@naver.com", "김도연", "rlaehdus00!!", "01050299737"
+        );
 
         //when
         Set<ConstraintViolation<MemberRequestDto>> violations1 = getConstraintViolations(general1);
         Set<ConstraintViolation<MemberRequestDto>> violations2 = getConstraintViolations(general2);
         Set<ConstraintViolation<MemberRequestDto>> violations3 = getConstraintViolations(general3);
+        Set<ConstraintViolation<MemberRequestDto>> violations4 = getConstraintViolations(general4);
 
 
         violations1.forEach(error ->
@@ -132,6 +143,9 @@ class MemberRequestDtoTest {
         );
         violations3.forEach(error ->
                 assertThat(error.getMessage()).isEqualTo("이름은 필수 입력 값입니다.")
+        );
+        violations4.forEach(error->
+                assertThat(error.getMessage()).isEmpty()
         );
     }
 
@@ -164,6 +178,10 @@ class MemberRequestDtoTest {
         MemberRequestDto general7=MemberRequestDto.ofGeneral(
                 "tkv00@naver.com", "member1", "rlaehㅁㄴㅇㅁㄴㅇdus00", "01050299737"
         );
+        //올바른 값
+        MemberRequestDto general8=MemberRequestDto.ofGeneral(
+                "tkv00@naver.com", "member1", "avsdsfsd00!!", "01050299737"
+        );
 
 
         //when
@@ -174,6 +192,7 @@ class MemberRequestDtoTest {
         Set<ConstraintViolation<MemberRequestDto>> violations5 = getConstraintViolations(general5);
         Set<ConstraintViolation<MemberRequestDto>> violations6 = getConstraintViolations(general6);
         Set<ConstraintViolation<MemberRequestDto>> violations7 = getConstraintViolations(general7);
+        Set<ConstraintViolation<MemberRequestDto>> violations8 = getConstraintViolations(general8);
 
 
         violations1.forEach(error ->
@@ -197,7 +216,9 @@ class MemberRequestDtoTest {
         violations7.forEach(error->
                 assertThat(error.getMessage()).isEqualTo("잘못된 비밀번호 형식입니다.")
         );
-
+        violations8.forEach(error->
+                assertThat(error.getMessage()).isEmpty()
+        );
     }
 
     @Test
