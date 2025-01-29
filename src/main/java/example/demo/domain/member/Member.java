@@ -1,5 +1,6 @@
 package example.demo.domain.member;
 
+import example.demo.domain.BaseEntity;
 import example.demo.domain.company.Company;
 import example.demo.domain.member.dto.request.MemberRequestDto;
 import jakarta.persistence.*;
@@ -10,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class Member {
+public class Member extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "member_id")
     private Long memberId;
