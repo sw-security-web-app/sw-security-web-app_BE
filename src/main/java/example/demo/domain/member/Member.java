@@ -27,6 +27,9 @@ public class Member {
     @Enumerated(EnumType.STRING)
     private MemberStatus memberStatus;
 
+    @Column(name = "member_phone_number")
+    private String phoneNumber;
+
     //Company랑 양방향
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company_id")
