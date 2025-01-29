@@ -200,7 +200,70 @@ class MemberRequestDtoTest {
 
     }
 
+    @Test
+    @DisplayName("회원가입 시 휴대폰번호 유효성 검사를 실시합니다.")
+    void validationPhoneNumber(){
+        //given
+        MemberRequestDto general1=MemberRequestDto.ofGeneral(
+                "tkv00@naver.com", "member1", "rlaehdus00!!", null
+        );
+        MemberRequestDto general2=MemberRequestDto.ofGeneral(
+                "tkv00@naver.com", "member1", "rlaehdus00!!", ""
+        );
+        MemberRequestDto general3=MemberRequestDto.ofGeneral(
+                "tkv00@naver.com", "member1", "rlaehdus00!!",  " "
+        );
+        //11자미만
+        MemberRequestDto general4=MemberRequestDto.ofGeneral(
+                "tkv00@naver.com", "member1", "rlaehdus00!!",  "0100000000"
+        );
+        //11자초과
+        MemberRequestDto general5=MemberRequestDto.ofGeneral(
+                "tkv00@naver.com", "member1", "rlaehdus00!!",  "010502997371"
+        );
+        //하이픈 첨가
+        MemberRequestDto general6=MemberRequestDto.ofGeneral(
+                "tkv00@naver.com", "member1", "rlaehdus00!!", "010-5029-9737"
+        );
+        //올바른 값 입력
+        MemberRequestDto general7=MemberRequestDto.ofGeneral(
+                "tkv00@naver.com", "member1", "rlaehdus00!!", "01050299737"
+        );
 
+
+        //when
+        Set<ConstraintViolation<MemberRequestDto>> violations1 = getConstraintViolations(general1);
+        Set<ConstraintViolation<MemberRequestDto>> violations2 = getConstraintViolations(general2);
+        Set<ConstraintViolation<MemberRequestDto>> violations3 = getConstraintViolations(general3);
+        Set<ConstraintViolation<MemberRequestDto>> violations4 = getConstraintViolations(general4);
+        Set<ConstraintViolation<MemberRequestDto>> violations5 = getConstraintViolations(general5);
+        Set<ConstraintViolation<MemberRequestDto>> violations6 = getConstraintViolations(general6);
+        Set<ConstraintViolation<MemberRequestDto>> violations7 = getConstraintViolations(general7);
+
+
+        violations1.forEach(error ->
+                assertThat(error.getMessage()).isEqualTo("휴대폰 번호는 필수 입력 값입니다.")
+        );
+        violations2.forEach(error ->
+                assertThat(error.getMessage()).isEqualTo("휴대폰 번호는 필수 입력 값입니다.")
+        );
+        violations3.forEach(error ->
+                assertThat(error.getMessage()).isEqualTo("휴대폰 번호는 필수 입력 값입니다.")
+        );
+        violations4.forEach(error->
+                assertThat(error.getMessage()).isEqualTo("잘못된 휴대폰 번호 형식입니다.")
+        );
+        violations5.forEach(error->
+                assertThat(error.getMessage()).isEqualTo("잘못된 휴대폰 번호 형식입니다.")
+        );
+        violations6.forEach(error->
+                assertThat(error.getMessage()).isEqualTo("잘못된 휴대폰 번호 형식입니다.")
+        );
+        violations7.forEach(error->
+                assertThat(error.getMessage()).isEmpty()
+        );
+
+    }
     private static Set<ConstraintViolation<MemberRequestDto>> getConstraintViolations(MemberRequestDto general1) {
         Set<ConstraintViolation<MemberRequestDto>> violations=validator.validate(general1);
         return violations;
