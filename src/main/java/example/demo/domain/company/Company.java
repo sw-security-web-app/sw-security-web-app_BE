@@ -4,6 +4,7 @@ import example.demo.domain.BaseEntity;
 import example.demo.domain.member.Member;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -33,5 +34,14 @@ public class Company extends BaseEntity {
     //Member랑 양방향
     @OneToMany(mappedBy = "company",cascade = CascadeType.ALL)
     private List<Member> members=new ArrayList<>();
+
+
+    @Builder
+    public Company(String companyName, String companyDept, String companyPosition, String invitationCode) {
+        this.companyName = companyName;
+        this.companyDept = companyDept;
+        this.companyPosition = companyPosition;
+        this.invitationCode = invitationCode;
+    }
 }
 
