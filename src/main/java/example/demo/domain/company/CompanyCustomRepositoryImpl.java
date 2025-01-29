@@ -5,9 +5,6 @@ import example.demo.domain.company.dto.CompanyCodeDto;
 import example.demo.domain.company.dto.CompanyInfoWithUuidDto;
 import example.demo.domain.company.dto.QCompanyCodeDto;
 import example.demo.domain.company.dto.QCompanyInfoWithUuidDto;
-import example.demo.domain.member.MemberRepositoryCustom;
-import example.demo.domain.member.MemberStatus;
-import example.demo.error.CommonErrorCode;
 import example.demo.error.RestApiException;
 import jakarta.persistence.EntityManager;
 
@@ -39,10 +36,10 @@ public class CompanyCustomRepositoryImpl implements CompanyCustomRepository {
         return Optional.ofNullable(
                 queryFactory
                         .select(new QCompanyCodeDto(company.invitationCode))
-                        .from(company)
-                        .leftJoin(member)
-                        .fetchJoin()
-                        .on(member.memberId.eq(memberId))
+                        .from(member)
+                        .join(company)
+                        .on(member.company.companyId.eq(company.companyId))
+                        .where(member.memberId.eq(memberId))
                         .fetchOne()
         ).orElseThrow(()->new RestApiException(CompanyErrorCode.NOT_EXIST_COMPANY));
     }

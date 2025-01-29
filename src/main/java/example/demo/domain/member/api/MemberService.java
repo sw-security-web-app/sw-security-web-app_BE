@@ -24,7 +24,6 @@ public class MemberService {
     //TODO : 비밀번호 암호화 및 휴대폰,이메일 인증 여부 확인 로직 구현
     private final MemberRepository memberRepository;
     private final CompanyRepository companyRepository;
-    private final EntityManager em;
     public void signup(MemberRequestDto memberRequestDto){
         Member newMember ;
         Company newCompany;
@@ -38,7 +37,6 @@ public class MemberService {
                 //uuid생성
                 String companyCode= CreateUuid.createShortUuid();
                 newCompany=Company.builder()
-                        .companyPosition(memberRequestDto.getCompanyPosition())
                         .companyName(memberRequestDto.getCompanyName())
                         .companyDept(memberRequestDto.getCompanyDept())
                         .invitationCode(companyCode)
@@ -55,7 +53,6 @@ public class MemberService {
                 newCompany=Company.builder()
                         .companyName(companyName)
                         .companyDept(companyDept)
-                        .companyPosition(memberRequestDto.getCompanyPosition())
                         .build();
                 companyRepository.save(newCompany);
                 newMember=Member.createEmployee(memberRequestDto,newCompany);

@@ -45,6 +45,7 @@ dependencies {
 	testImplementation 'org.mockito:mockito-core:5.7.0'
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
 	implementation("org.springframework.boot:spring-boot-starter-validation")
+	implementation('org.bgee.log4jdbc-log4j2:log4jdbc-log4j2-jdbc4.1:1.16')
 
 	//querydsl
 	//QueryDsl
@@ -62,4 +63,8 @@ tasks.named('test') {
 tasks.named('asciidoctor') {
 	inputs.dir snippetsDir
 	dependsOn test
+}
+test {
+	// 테스트 실행 시 'test' 프로파일을 활성화
+	systemProperty 'spring.profiles.active', 'test'
 }

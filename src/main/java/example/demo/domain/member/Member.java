@@ -31,40 +31,43 @@ public class Member {
     @Column(name = "member_phone_number")
     private String phoneNumber;
 
+    @Column(name = "company_position")
+    private String companyPosition;
     //Company랑 양방향
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company_id")
     private Company company;
 
-    public Member(String email, String userName, String password, MemberStatus memberStatus, String phoneNumber, Company company) {
+    public Member(String email, String userName, String password, MemberStatus memberStatus, String phoneNumber, String companyPosition,Company company) {
         this.email = email;
         this.userName = userName;
         this.password = password;
         this.memberStatus = memberStatus;
         this.phoneNumber = phoneNumber;
         this.company = company;
+        this.companyPosition=companyPosition;
     }
 
     //일반 유저
     public static Member createGeneral(MemberRequestDto memberRequestDto){
         return new Member(memberRequestDto.getEmail(),memberRequestDto.getName(),memberRequestDto.getPassword(),
-                    MemberStatus.GENERAL,memberRequestDto.getPhoneNumber(),null
+                    MemberStatus.GENERAL,memberRequestDto.getPhoneNumber(),memberRequestDto.getCompanyPosition(),null
                 );
     }
     //관리자
     public static Member createManager(MemberRequestDto memberRequestDto,Company company){
         Member member = new Member(memberRequestDto.getEmail(), memberRequestDto.getName(), memberRequestDto.getPassword(),
-                MemberStatus.MANAGER, memberRequestDto.getPhoneNumber(), company
+                MemberStatus.MANAGER, memberRequestDto.getPhoneNumber(), memberRequestDto.getCompanyPosition(),company
         );
-        company.addMember(member);
+
         return member;
     }
     //직원
     public static Member createEmployee(MemberRequestDto memberRequestDto,Company company) {
         Member member = new Member(memberRequestDto.getEmail(), memberRequestDto.getName(), memberRequestDto.getPassword(),
-                MemberStatus.EMPLOYEE, memberRequestDto.getPhoneNumber(), company
+                MemberStatus.EMPLOYEE, memberRequestDto.getPhoneNumber(),memberRequestDto.getCompanyPosition(), company
         );
-        company.addMember(member);
+
         return member;
     }
     public void setCompany(Company company){

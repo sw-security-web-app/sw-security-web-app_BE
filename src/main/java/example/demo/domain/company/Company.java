@@ -25,8 +25,6 @@ public class Company extends BaseEntity {
     @Column(name = "company_dept")
     private String companyDept;
 
-    @Column(name = "company_position")
-    private String companyPosition;
 
     @Column(name = "invitaion_code")
     private String invitationCode;
@@ -37,15 +35,11 @@ public class Company extends BaseEntity {
 
 
     @Builder
-    public Company(String companyName, String companyDept, String companyPosition, String invitationCode) {
+    public Company(String companyName, String companyDept, String invitationCode) {
         this.companyName = companyName;
         this.companyDept = companyDept;
-        this.companyPosition = companyPosition;
         this.invitationCode = invitationCode;
     }
-    public void addMember(Member member){
-        members.add(member);
-        member.setCompany(this);
-    }
+
 }
 
