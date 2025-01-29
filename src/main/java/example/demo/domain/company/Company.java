@@ -27,6 +27,9 @@ public class Company extends BaseEntity {
     @Column(name = "company_position")
     private String companyPosition;
 
+    @Column(name = "invitaion_code")
+    private String invitationCode;
+
     //Member랑 양방향
     @OneToMany(mappedBy = "company",cascade = CascadeType.ALL)
     private List<Member> members=new ArrayList<>();

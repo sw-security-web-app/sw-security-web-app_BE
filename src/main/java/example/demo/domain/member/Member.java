@@ -1,6 +1,7 @@
 package example.demo.domain.member;
 
 import example.demo.domain.company.Company;
+import example.demo.domain.member.dto.request.MemberRequestDto;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -35,10 +36,31 @@ public class Member {
     @JoinColumn(name = "company_id")
     private Company company;
 
-    public Member(String email, String userName, String password, MemberStatus memberStatus) {
+    public Member(String email, String userName, String password, MemberStatus memberStatus, String phoneNumber, Company company) {
         this.email = email;
         this.userName = userName;
         this.password = password;
         this.memberStatus = memberStatus;
+        this.phoneNumber = phoneNumber;
+        this.company = company;
+    }
+
+    //일반 유저
+    public static Member createGeneral(MemberRequestDto memberRequestDto){
+        return new Member(memberRequestDto.getEmail(),memberRequestDto.getName(),memberRequestDto.getPassword(),
+                    MemberStatus.GENERAL,memberRequestDto.getPhoneNumber(),null
+                );
+    }
+    //관리자
+    public static Member createManager(MemberRequestDto memberRequestDto,Company company){
+        return new Member(memberRequestDto.getEmail(),memberRequestDto.getName(),memberRequestDto.getPassword(),
+                MemberStatus.MANAGER,memberRequestDto.getPhoneNumber(),company
+        );
+    }
+    //직원
+    public static Member createEmployee(MemberRequestDto memberRequestDto,Company company) {
+        return new Member(memberRequestDto.getEmail(), memberRequestDto.getName(), memberRequestDto.getPassword(),
+                MemberStatus.EMPLOYEE, memberRequestDto.getPhoneNumber(), company
+        );
     }
 }
