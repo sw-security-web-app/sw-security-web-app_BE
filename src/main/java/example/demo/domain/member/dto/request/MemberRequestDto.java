@@ -1,30 +1,34 @@
 package example.demo.domain.member.dto.request;
 
 import example.demo.domain.member.MemberStatus;
+import example.demo.util.ValidationGroups;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.*;
 
 @Getter
-@Data
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
 @AllArgsConstructor
 public class  MemberRequestDto{
-    @Pattern(regexp ="^[a-zA-Z0-9+-\\_.]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$")
-    @NotBlank(message = "이메일은 필수 입력 값입니다.")
+    @NotBlank(message = "이메일은 필수 입력 값입니다.",
+                groups = ValidationGroups.NotEmptyGroup.class)
+    @Pattern(regexp ="^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$",
+            message = "잘못된 이메일 입력입니다.",
+            groups = ValidationGroups.PatternCheckGroup.class
+    )
     private String email;
 
     @NotBlank(message = "이름은 필수 입력 값입니다.")
     private String name;
 
-    @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,20}$\n")
+    @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,20}$")
     @NotBlank(message = "비밀번호는 필수 입력 값입니다.")
     private String password;
 
     private MemberStatus memberStatus;
 
-    @Pattern(regexp = "^(010\\d{8}|\\d{3}\\d{7})$\n")
+    @Pattern(regexp = "^(010\\d{8}|\\d{3}\\d{7})$")
     @NotBlank(message = "휴대폰 번호는 필수 입력 값입니다.")
     private String phoneNumber;
 
