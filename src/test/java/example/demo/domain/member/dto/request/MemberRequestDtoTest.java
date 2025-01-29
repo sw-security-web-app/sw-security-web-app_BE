@@ -104,6 +104,37 @@ class MemberRequestDtoTest {
         );
     }
 
+    @Test
+    @DisplayName("회원가입 시 이메일 유효성 검사를 실시합니다.")
+    void validationName(){
+        //given
+        MemberRequestDto general1=MemberRequestDto.ofGeneral(
+                "tkv99@naver.com", null, "rlaehdus00!!", "01050299737"
+        );
+        MemberRequestDto general2=MemberRequestDto.ofGeneral(
+                "tkv99@naver.com", "", "rlaehdus00!!", "01050299737"
+        );
+        MemberRequestDto general3=MemberRequestDto.ofGeneral(
+                "tkv99@naver.com", " ", "rlaehdus00!!", "01050299737"
+        );
+
+        //when
+        Set<ConstraintViolation<MemberRequestDto>> violations1 = getConstraintViolations(general1);
+        Set<ConstraintViolation<MemberRequestDto>> violations2 = getConstraintViolations(general2);
+        Set<ConstraintViolation<MemberRequestDto>> violations3 = getConstraintViolations(general3);
+
+
+        violations1.forEach(error ->
+                assertThat(error.getMessage()).isEqualTo("이름은 필수 입력 값입니다.")
+        );
+        violations2.forEach(error ->
+                assertThat(error.getMessage()).isEqualTo("이름은 필수 입력 값입니다.")
+        );
+        violations3.forEach(error ->
+                assertThat(error.getMessage()).isEqualTo("이름은 필수 입력 값입니다.")
+        );
+    }
+
 
     private static Set<ConstraintViolation<MemberRequestDto>> getConstraintViolations(MemberRequestDto general1) {
         Set<ConstraintViolation<MemberRequestDto>> violations=validator.validate(general1);
