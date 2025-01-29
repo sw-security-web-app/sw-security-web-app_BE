@@ -2,9 +2,10 @@ package example.demo.domain.company.dto;
 
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.Data;
+import org.springframework.http.HttpStatusCode;
 
 @Data
-public class CompanyCodeDto {
+public class CompanyCodeDto  {
     private String companyCode;
 
     @QueryProjection
