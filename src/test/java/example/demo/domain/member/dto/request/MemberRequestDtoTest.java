@@ -1,5 +1,6 @@
 package example.demo.domain.member.dto.request;
 
+import example.demo.domain.member.MemberStatus;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
@@ -36,24 +37,32 @@ class MemberRequestDtoTest {
     @DisplayName("회원가입 시 해당 유저 유형에 맞는 생성자를 통해 빌드합니다.")
     void signupWithMemberStatus(){
         //given  //when
-        MemberRequestDto general= MemberRequestDto.builder()
-                        .email("tkv00@naver.com")
-                        .phoneNumber("01050299737")
-                        .password("rlaehdus00!!")
-                        .name("member1")
-                        .build();
-        MemberRequestDto manager=MemberRequestDto.builder()
-                .email("tkv11@naver.com")
-                .phoneNumber("01050299999")
-                .password("rlaehdus11!!")
-                .name("member2")
-
+        MemberRequestDto general= MemberRequestDto.ofGeneral(
+                "tkv00@naver.com", "member1", "rlaehdus00!!", "01050299737"
+        );
+        MemberRequestDto manager=MemberRequestDto.ofManager(
+                "tkv11@naver.com", "member2", "rlaehdus11!!", "01050299999",
+                "company", "development", "사장"
+        );
+        MemberRequestDto employee=MemberRequestDto.ofEmployee(
+                "tkv11@naver.com", "member2", "rlaehdus11!!", "01050299999",
+                "인턴", "abcdef"
+        );
 
         //then
-        assertThat(general).extracting(
-                tuple("email","tkv00@naver.com"),
-                tuple()
-        )
+        assertThat(general)
+                .extracting("email","name","password","phoneNumber","memberStatus")
+                .containsExactly("tkv00@naver.com", "member1", "rlaehdus00!!", "01050299737", MemberStatus.GENERAL);
+
+        assertThat(manager)
+                .extracting("email","name","password","phoneNumber","companyName","companyDept","companyPosition","memberStatus")
+                .containsExactly("tkv11@naver.com", "member2", "rlaehdus11!!", "01050299999",
+                        "company", "development", "사장",MemberStatus.MANAGER);
+
+        assertThat(employee)
+                .extracting("email","name","password","phoneNumber","companyPosition","invitationCode","memberStatus")
+                .containsExactly("tkv11@naver.com", "member2", "rlaehdus11!!", "01050299999",
+                        "인턴", "abcdef",MemberStatus.EMPLOYEE);
     }
 
     @Test
