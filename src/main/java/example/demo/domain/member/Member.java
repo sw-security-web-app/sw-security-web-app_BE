@@ -53,14 +53,21 @@ public class Member {
     }
     //관리자
     public static Member createManager(MemberRequestDto memberRequestDto,Company company){
-        return new Member(memberRequestDto.getEmail(),memberRequestDto.getName(),memberRequestDto.getPassword(),
-                MemberStatus.MANAGER,memberRequestDto.getPhoneNumber(),company
+        Member member = new Member(memberRequestDto.getEmail(), memberRequestDto.getName(), memberRequestDto.getPassword(),
+                MemberStatus.MANAGER, memberRequestDto.getPhoneNumber(), company
         );
+        company.addMember(member);
+        return member;
     }
     //직원
     public static Member createEmployee(MemberRequestDto memberRequestDto,Company company) {
-        return new Member(memberRequestDto.getEmail(), memberRequestDto.getName(), memberRequestDto.getPassword(),
+        Member member = new Member(memberRequestDto.getEmail(), memberRequestDto.getName(), memberRequestDto.getPassword(),
                 MemberStatus.EMPLOYEE, memberRequestDto.getPhoneNumber(), company
         );
+        company.addMember(member);
+        return member;
+    }
+    public void setCompany(Company company){
+        this.company=company;
     }
 }

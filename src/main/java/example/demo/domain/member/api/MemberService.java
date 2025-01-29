@@ -9,6 +9,7 @@ import example.demo.domain.member.MemberRepository;
 import example.demo.domain.member.dto.request.MemberRequestDto;
 import example.demo.error.RestApiException;
 import example.demo.util.CreateUuid;
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +24,7 @@ public class MemberService {
     //TODO : 비밀번호 암호화 및 휴대폰,이메일 인증 여부 확인 로직 구현
     private final MemberRepository memberRepository;
     private final CompanyRepository companyRepository;
-
+    private final EntityManager em;
     public void signup(MemberRequestDto memberRequestDto){
         Member newMember ;
         Company newCompany;
@@ -42,6 +43,7 @@ public class MemberService {
                         .companyDept(memberRequestDto.getCompanyDept())
                         .invitationCode(companyCode)
                         .build();
+                companyRepository.save(newCompany);
                 newMember=Member.createManager(memberRequestDto,newCompany);
                 break;
             //직원
@@ -55,6 +57,7 @@ public class MemberService {
                         .companyDept(companyDept)
                         .companyPosition(memberRequestDto.getCompanyPosition())
                         .build();
+                companyRepository.save(newCompany);
                 newMember=Member.createEmployee(memberRequestDto,newCompany);
                 break;
             default:

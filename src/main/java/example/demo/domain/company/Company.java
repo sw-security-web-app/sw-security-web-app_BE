@@ -32,7 +32,7 @@ public class Company extends BaseEntity {
     private String invitationCode;
 
     //Member랑 양방향
-    @OneToMany(mappedBy = "company",cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "company",cascade = CascadeType.ALL,orphanRemoval = true)
     private List<Member> members=new ArrayList<>();
 
 
@@ -42,6 +42,10 @@ public class Company extends BaseEntity {
         this.companyDept = companyDept;
         this.companyPosition = companyPosition;
         this.invitationCode = invitationCode;
+    }
+    public void addMember(Member member){
+        members.add(member);
+        member.setCompany(this);
     }
 }
 
