@@ -64,7 +64,7 @@ class CompanyCustomRepositoryImplTest {
     void returnCompanyCode() {
        //given
         String uuid=CreateUuid.createShortUuid();
-        MemberRequestDto memberRequestDto=MemberRequestDto.ofManager("tkv00@naver.com","김도연","rlaehdus00!!!","01012345678","삼성","개발","사장");
+        MemberRequestDto memberRequestDto=MemberRequestDto.ofManager("tkv00@naver.com","김도연","rlaehdus00!!!","01012345678","삼성","개발","사장","MANAGER");
         Company company=Company.builder()
                 .companyDept(memberRequestDto.getCompanyDept())
                 .companyPosition(memberRequestDto.getCompanyPosition())

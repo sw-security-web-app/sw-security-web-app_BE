@@ -39,31 +39,31 @@ class MemberRequestDtoTest {
     void signupWithMemberStatus(){
         //given  //when
         MemberRequestDto general= MemberRequestDto.ofGeneral(
-                "tkv00@naver.com", "member1", "rlaehdus00!!", "01050299737"
+                "tkv00@naver.com", "member1", "rlaehdus00!!", "01050299737","GENERAL"
         );
         MemberRequestDto manager=MemberRequestDto.ofManager(
                 "tkv11@naver.com", "member2", "rlaehdus11!!", "01050299999",
-                "company", "development", "사장"
+                "company", "development", "사장","MANAGER"
         );
         MemberRequestDto employee=MemberRequestDto.ofEmployee(
                 "tkv11@naver.com", "member2", "rlaehdus11!!", "01050299999",
-                "인턴", "abcdef"
+                "인턴", "abcdef","EMPLOYEE"
         );
 
         //then
         assertThat(general)
                 .extracting("email","name","password","phoneNumber","memberStatus")
-                .containsExactly("tkv00@naver.com", "member1", "rlaehdus00!!", "01050299737", MemberStatus.GENERAL);
+                .containsExactly("tkv00@naver.com", "member1", "rlaehdus00!!", "01050299737", "GENERAL");
 
         assertThat(manager)
                 .extracting("email","name","password","phoneNumber","companyName","companyDept","companyPosition","memberStatus")
                 .containsExactly("tkv11@naver.com", "member2", "rlaehdus11!!", "01050299999",
-                        "company", "development", "사장",MemberStatus.MANAGER);
+                        "company", "development", "사장","MANAGER");
 
         assertThat(employee)
                 .extracting("email","name","password","phoneNumber","companyPosition","invitationCode","memberStatus")
                 .containsExactly("tkv11@naver.com", "member2", "rlaehdus11!!", "01050299999",
-                        "인턴", "abcdef",MemberStatus.EMPLOYEE);
+                        "인턴", "abcdef","EMPLOYEE");
     }
 
     @Test
@@ -71,19 +71,19 @@ class MemberRequestDtoTest {
     void validationEmail(){
         //given
         MemberRequestDto general1=MemberRequestDto.ofGeneral(
-                null, "member1", "rlaehdus00!!", "01050299737"
+                null, "member1", "rlaehdus00!!", "01050299737","GENERAL"
         );
         MemberRequestDto general2=MemberRequestDto.ofGeneral(
-                "", "member1", "rlaehdus00!!", "01050299737"
+                "", "member1", "rlaehdus00!!", "01050299737","GENERAL"
         );
         MemberRequestDto general3=MemberRequestDto.ofGeneral(
-                " ", "member1", "rlaehdus00!!", "01050299737"
+                " ", "member1", "rlaehdus00!!", "01050299737","GENERAL"
         );
         MemberRequestDto general4=MemberRequestDto.ofGeneral(
-                "tkv99@naver,com", "member1", "rlaehdus00!!", "01050299737"
+                "tkv99@naver,com", "member1", "rlaehdus00!!", "01050299737","GENERAL"
         );
         MemberRequestDto general5=MemberRequestDto.ofGeneral(
-                "tkv99@naver.com", "member1", "rlaehdus00!!", "01050299737"
+                "tkv99@naver.com", "member1", "rlaehdus00!!", "01050299737","GENERAL"
         );
 
         //when
@@ -116,16 +116,16 @@ class MemberRequestDtoTest {
     void validationName(){
         //given
         MemberRequestDto general1=MemberRequestDto.ofGeneral(
-                "tkv99@naver.com", null, "rlaehdus00!!", "01050299737"
+                "tkv99@naver.com", null, "rlaehdus00!!", "01050299737","GENERAL"
         );
         MemberRequestDto general2=MemberRequestDto.ofGeneral(
-                "tkv99@naver.com", "", "rlaehdus00!!", "01050299737"
+                "tkv99@naver.com", "", "rlaehdus00!!", "01050299737","GENERAL"
         );
         MemberRequestDto general3=MemberRequestDto.ofGeneral(
-                "tkv99@naver.com", " ", "rlaehdus00!!", "01050299737"
+                "tkv99@naver.com", " ", "rlaehdus00!!", "01050299737","GENERAL"
         );
         MemberRequestDto general4=MemberRequestDto.ofGeneral(
-                "tkv99@naver.com", "김도연", "rlaehdus00!!", "01050299737"
+                "tkv99@naver.com", "김도연", "rlaehdus00!!", "01050299737","GENERAL"
         );
 
         //when
@@ -154,33 +154,33 @@ class MemberRequestDtoTest {
     void validationPassword(){
         //given
         MemberRequestDto general1=MemberRequestDto.ofGeneral(
-                "tkv00@naver.com", "member1", null, "01050299737"
+                "tkv00@naver.com", "member1", null, "01050299737","GENERAL"
         );
         MemberRequestDto general2=MemberRequestDto.ofGeneral(
-                "tkv00@naver.com", "member1", "", "01050299737"
+                "tkv00@naver.com", "member1", "", "01050299737","GENERAL"
         );
         MemberRequestDto general3=MemberRequestDto.ofGeneral(
-                "tkv00@naver.com", "member1", " ", "01050299737"
+                "tkv00@naver.com", "member1", " ", "01050299737","GENERAL"
         );
         //특수문자 사용X
         MemberRequestDto general4=MemberRequestDto.ofGeneral(
-                "tkv00@naver.com", "member1", "rlaehdus00", "01050299737"
+                "tkv00@naver.com", "member1", "rlaehdus00", "01050299737","GENERAL"
         );
         //8자미만
         MemberRequestDto general5=MemberRequestDto.ofGeneral(
-                "tkv00@naver.com", "member1", "rlaehd", "01050299737"
+                "tkv00@naver.com", "member1", "rlaehd", "01050299737","GENERAL"
         );
         //20자초과
         MemberRequestDto general6=MemberRequestDto.ofGeneral(
-                "tkv00@naver.com", "member1", "rlaehdus00111111111111111111111111111111", "01050299737"
+                "tkv00@naver.com", "member1", "rlaehdus00111111111111111111111111111111", "01050299737","GENERAL"
         );
         //영어 사용X 혹은 한글 포함
         MemberRequestDto general7=MemberRequestDto.ofGeneral(
-                "tkv00@naver.com", "member1", "rlaehㅁㄴㅇㅁㄴㅇdus00", "01050299737"
+                "tkv00@naver.com", "member1", "rlaehㅁㄴㅇㅁㄴㅇdus00", "01050299737","GENERAL"
         );
         //올바른 값
         MemberRequestDto general8=MemberRequestDto.ofGeneral(
-                "tkv00@naver.com", "member1", "avsdsfsd00!!", "01050299737"
+                "tkv00@naver.com", "member1", "avsdsfsd00!!", "01050299737","GENERAL"
         );
 
 
@@ -226,29 +226,29 @@ class MemberRequestDtoTest {
     void validationPhoneNumber(){
         //given
         MemberRequestDto general1=MemberRequestDto.ofGeneral(
-                "tkv00@naver.com", "member1", "rlaehdus00!!", null
+                "tkv00@naver.com", "member1", "rlaehdus00!!", null,"GENERAL"
         );
         MemberRequestDto general2=MemberRequestDto.ofGeneral(
-                "tkv00@naver.com", "member1", "rlaehdus00!!", ""
+                "tkv00@naver.com", "member1", "rlaehdus00!!", "","GENERAL"
         );
         MemberRequestDto general3=MemberRequestDto.ofGeneral(
-                "tkv00@naver.com", "member1", "rlaehdus00!!",  " "
+                "tkv00@naver.com", "member1", "rlaehdus00!!",  " ","GENERAL"
         );
         //11자미만
         MemberRequestDto general4=MemberRequestDto.ofGeneral(
-                "tkv00@naver.com", "member1", "rlaehdus00!!",  "0100000000"
+                "tkv00@naver.com", "member1", "rlaehdus00!!",  "0100000000","GENERAL"
         );
         //11자초과
         MemberRequestDto general5=MemberRequestDto.ofGeneral(
-                "tkv00@naver.com", "member1", "rlaehdus00!!",  "010502997371"
+                "tkv00@naver.com", "member1", "rlaehdus00!!",  "010502997371","GENERAL"
         );
         //하이픈 첨가
         MemberRequestDto general6=MemberRequestDto.ofGeneral(
-                "tkv00@naver.com", "member1", "rlaehdus00!!", "010-5029-9737"
+                "tkv00@naver.com", "member1", "rlaehdus00!!", "010-5029-9737","GENERAL"
         );
         //올바른 값 입력
         MemberRequestDto general7=MemberRequestDto.ofGeneral(
-                "tkv00@naver.com", "member1", "rlaehdus00!!", "01050299737"
+                "tkv00@naver.com", "member1", "rlaehdus00!!", "01050299737","GENERAL"
         );
 
 

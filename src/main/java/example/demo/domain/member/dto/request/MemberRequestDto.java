@@ -45,18 +45,18 @@ public class  MemberRequestDto{
     private String invitationCode;
 
     //일반인 사용자
-    public static MemberRequestDto ofGeneral(String email, String name, String password, String phoneNumber) {
+    public static MemberRequestDto ofGeneral(String email, String name, String password, String phoneNumber,String memberStatus) {
         return MemberRequestDto.builder()
                 .email(email)
                 .name(name)
                 .password(password)
                 .phoneNumber(phoneNumber)
-                .memberStatus("GENERAL")
+                .memberStatus(memberStatus)
                 .build();
     }
 
     //회사 관리자 사용자
-    public static MemberRequestDto ofManager(String email, String name, String password, String phoneNumber, String companyName, String companyDept, String companyPosition) {
+    public static MemberRequestDto ofManager(String email, String name, String password, String phoneNumber, String companyName, String companyDept, String companyPosition,String memberStatus) {
         return MemberRequestDto.builder()
                 .email(email)
                 .name(name)
@@ -65,12 +65,12 @@ public class  MemberRequestDto{
                 .companyName(companyName)
                 .companyDept(companyDept)
                 .companyPosition(companyPosition)
-                .memberStatus("MANAGER")
+                .memberStatus(memberStatus)
                 .build();
     }
 
     //회사 직원 사용자
-    public static MemberRequestDto ofEmployee(String email, String name, String password, String phoneNumber, String companyPosition, String invitationCode) {
+    public static MemberRequestDto ofEmployee(String email, String name, String password, String phoneNumber, String companyPosition, String invitationCode,String memberStatus) {
         return MemberRequestDto.builder()
                 .email(email)
                 .name(name)
@@ -78,7 +78,7 @@ public class  MemberRequestDto{
                 .phoneNumber(phoneNumber)
                 .companyPosition(companyPosition)
                 .invitationCode(invitationCode)
-                .memberStatus("EMPLOYEE")
+                .memberStatus(memberStatus)
                 .build();
     }
 

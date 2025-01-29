@@ -22,7 +22,7 @@ class MemberRepositoryTest {
     void findByEmailAndPhoneNumber() {
         //given
         Member member1=Member.createGeneral(
-                MemberRequestDto.ofGeneral("tkv00@naver.com","김도연","rlaehdsus!!2","01050299999")
+                MemberRequestDto.ofGeneral("tkv00@naver.com","김도연","rlaehdsus!!2","01050299999","GENERAL")
         );
 
         //when
