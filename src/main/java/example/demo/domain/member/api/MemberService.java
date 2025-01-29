@@ -2,6 +2,7 @@ package example.demo.domain.member.api;
 
 import example.demo.domain.company.Company;
 import example.demo.domain.company.CompanyRepository;
+import example.demo.domain.company.dto.CompanyInfoWithUuidDto;
 import example.demo.domain.member.Member;
 import example.demo.domain.member.MemberErrorCode;
 import example.demo.domain.member.MemberRepository;
@@ -45,12 +46,20 @@ public class MemberService {
                 break;
             //직원
             case "employee":
-
+                //uuid로 회사명, 회사부서명 가져오기
+                CompanyInfoWithUuidDto companyInfoWithUuidDto=companyRepository.findCompanyInfoByInvitationCode(memberRequestDto.getInvitationCode());
+                String companyName=companyInfoWithUuidDto.getCompanyName();
+                String companyDept=companyInfoWithUuidDto.getCompanyDept();
+                newCompany=Company.builder()
+                        .companyName(companyName)
+                        .companyDept(companyDept)
+                        .companyPosition(memberRequestDto.getCompanyPosition())
+                        .build();
+                newMember=Member.createEmployee(memberRequestDto,newCompany);
+                break;
             default:
                 throw new RestApiException(MemberErrorCode.INVALID_MEMBER_STATUS);
         }
-
         memberRepository.save(newMember);
     }
-
 }
