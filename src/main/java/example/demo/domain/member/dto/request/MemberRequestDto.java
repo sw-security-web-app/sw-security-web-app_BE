@@ -22,14 +22,20 @@ public class  MemberRequestDto{
     @NotBlank(message = "이름은 필수 입력 값입니다.")
     private String name;
 
-    @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,20}$")
-    @NotBlank(message = "비밀번호는 필수 입력 값입니다.")
+    @NotBlank(message = "비밀번호는 필수 입력 값입니다.",
+            groups = ValidationGroups.NotEmptyGroup.class)
+    @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,20}$",
+            message = "잘못된 비밀번호 형식입니다.",
+            groups = ValidationGroups.PatternCheckGroup.class)
     private String password;
 
     private MemberStatus memberStatus;
 
-    @Pattern(regexp = "^(010\\d{8}|\\d{3}\\d{7})$")
-    @NotBlank(message = "휴대폰 번호는 필수 입력 값입니다.")
+    @NotBlank(message = "휴대폰 번호는 필수 입력 값입니다.",
+            groups = ValidationGroups.NotEmptyGroup.class)
+    @Pattern(regexp = "^(010\\d{8}|\\d{3}\\d{7})$",
+            message = "잘못된 휴대폰 번호 형식입니다.",
+            groups = ValidationGroups.PatternCheckGroup.class)
     private String phoneNumber;
 
     private String companyName;
