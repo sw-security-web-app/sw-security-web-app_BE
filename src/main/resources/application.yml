@@ -1,4 +1,6 @@
 spring:
+  config:
+    import: application-secret.yml
   profiles:
     default: local
 
@@ -13,18 +15,6 @@ spring:
       ddl-auto: create
     show-sql: true
 
-  mail:
-    host: smtp.gmail.com
-    port: 587
-    username: tkv0098@gmail.com
-    password: avse snuo mogq fnwp
-    properties:
-      mail:
-        smtp:
-          auth: true
-          timeout: 5000
-          starttls:
-            enable: true
 ## Testing 환경
 ---
 
@@ -32,6 +22,7 @@ spring:
   config:
     activate:
       on-profile: test
+    import: application-secret.yml
 
   datasource:
     url: jdbc:log4jdbc:h2:mem:securityInfoWeb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE  # H2 메모리 데이터베이스
@@ -52,3 +43,4 @@ spring:
   h2:
     console:
       enabled: true
+
