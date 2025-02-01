@@ -1,6 +1,7 @@
 package example.demo.domain.member.mail;
 
 import example.demo.domain.member.MemberErrorCode;
+import example.demo.domain.member.MemberRepository;
 import example.demo.error.RestApiException;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -17,13 +18,19 @@ import java.util.concurrent.ConcurrentHashMap;
 @RequiredArgsConstructor
 public class MailService {
     private final JavaMailSender javaMailSender;
+    private final MemberRepository memberRepository;
     static final String senderEmail="tkv0098@gmail.com";
     private final ConcurrentHashMap<String,VerificationData> emailVerificationData=new ConcurrentHashMap<>();
 
 
     public void sendMail(String mail){
         int verificationNumber = createValidationNumber();
+        if (isDuplicatedEmail(mail)){
+            throw new RestApiException(MemberErrorCode.DUPLICATED_EMAIL);
+        }
         MimeMessage message = CreateMail(mail, verificationNumber);
+        //이메일 중복시
+
         javaMailSender.send(message);
 
         // 인증 번호 및 시간 저장
@@ -84,5 +91,10 @@ public class MailService {
         public LocalDateTime getSentTime() {
             return sentTime;
         }
+    }
+    //이메일 중복 검사
+    boolean isDuplicatedEmail(String email){
+        //같은 이메일 1개이상 -> true 반환
+        return memberRepository.getSameEmailCount(email)>0L;
     }
 }
