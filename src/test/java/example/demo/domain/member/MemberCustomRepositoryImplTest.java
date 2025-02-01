@@ -45,5 +45,33 @@ class MemberCustomRepositoryImplTest {
                 .isEqualTo(0L);
     }
 
+    @Test
+    @DisplayName("휴대폰 번호 중복 검사를 실시합니다.")
+    void isDuplicatedPhoneNumber(){
+        //given
+        Member member1=Member.createGeneral(
+                MemberRequestDto.ofGeneral("tkv00@naver.com","김도연","rlaehdsus!!2","01050299999","GENERAL")
+        );
+        Member member2=Member.createGeneral(
+                MemberRequestDto.ofGeneral("tkv11@naver.com","김도연","rlaehdsus!!2","01050299999","GENERAL")
+        );
+        Member member3=Member.createGeneral(
+                MemberRequestDto.ofGeneral("tkv11@naver.com","김도연","rlaehdsus!!2","01050299911","GENERAL")
+        );
+        memberRepository.saveAll(List.of(member1,member2,member3));
+
+        //when
+        Long member1EmailDuplicateState=memberRepository.getPhoneNumberCount(member1.getPhoneNumber());
+        Long member23EmailDuplicateState=memberRepository.getPhoneNumberCount(member3.getPhoneNumber());
+        Long member4EmailDuplicateState=memberRepository.getPhoneNumberCount("01011111111");
+
+        //then
+        assertThat(member1EmailDuplicateState)
+                .isEqualTo(2L);
+        assertThat(member23EmailDuplicateState)
+                .isEqualTo(1L);
+        assertThat(member4EmailDuplicateState)
+                .isEqualTo(0L);
+    }
 
 }

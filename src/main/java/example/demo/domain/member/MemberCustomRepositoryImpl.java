@@ -23,4 +23,15 @@ public class MemberCustomRepositoryImpl implements MemberCustomRepository{
                         .fetchOne()
         ).orElse(0L);
     }
+
+    @Override
+    public Long getPhoneNumberCount(String phoneNumber) {
+        return Optional.ofNullable(
+                queryFactory
+                        .select(member.count())
+                        .from(member)
+                        .where(member.phoneNumber.eq(phoneNumber))
+                        .fetchOne()
+        ).orElse(0L);
+    }
 }
