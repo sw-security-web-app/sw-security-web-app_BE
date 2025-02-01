@@ -1,4 +1,4 @@
-package example.demo.domain.company;
+package example.demo.domain.company.repository;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import example.demo.domain.company.dto.CompanyCodeDto;

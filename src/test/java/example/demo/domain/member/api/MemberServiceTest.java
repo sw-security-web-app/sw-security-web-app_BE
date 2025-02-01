@@ -1,35 +1,25 @@
 package example.demo.domain.member.api;
 
 import example.demo.domain.company.Company;
-import example.demo.domain.company.CompanyRepository;
+import example.demo.domain.company.repository.CompanyRepository;
 import example.demo.domain.company.dto.CompanyCodeDto;
 import example.demo.domain.member.Member;
 import example.demo.domain.member.MemberErrorCode;
-import example.demo.domain.member.MemberRepository;
-import example.demo.domain.member.MemberStatus;
+import example.demo.domain.member.repository.MemberRepository;
 import example.demo.domain.member.dto.request.MemberRequestDto;
 import example.demo.error.RestApiException;
-import example.demo.util.CreateUuid;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.PropertySources;
-import org.springframework.test.annotation.Commit;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 import static example.demo.domain.member.MemberStatus.*;
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
+
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional

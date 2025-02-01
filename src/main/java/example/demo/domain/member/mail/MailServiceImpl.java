@@ -1,7 +1,7 @@
 package example.demo.domain.member.mail;
 
 import example.demo.domain.member.MemberErrorCode;
-import example.demo.domain.member.MemberRepository;
+import example.demo.domain.member.repository.MemberRepository;
 import example.demo.error.RestApiException;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service

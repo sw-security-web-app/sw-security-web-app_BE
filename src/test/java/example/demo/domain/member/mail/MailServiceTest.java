@@ -1,24 +1,17 @@
 package example.demo.domain.member.mail;
 
 import example.demo.domain.member.Member;
-import example.demo.domain.member.MemberRepository;
+import example.demo.domain.member.repository.MemberRepository;
 import example.demo.domain.member.dto.request.MemberRequestDto;
-import jakarta.mail.internet.MimeMessage;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.mail.MailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMailMessage;
-import org.springframework.test.context.ActiveProfiles;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 @SpringBootTest
 class MailServiceTest {

@@ -1,13 +1,14 @@
-package example.demo.domain.member;
+package example.demo.domain.member.repository;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import example.demo.domain.member.repository.MemberCustomRepository;
 import jakarta.persistence.EntityManager;
 
 import java.util.Optional;
 
 import static example.demo.domain.member.QMember.*;
 
-public class MemberCustomRepositoryImpl implements MemberCustomRepository{
+public class MemberCustomRepositoryImpl implements MemberCustomRepository {
     private final JPAQueryFactory queryFactory;
     public MemberCustomRepositoryImpl(EntityManager em){
         this.queryFactory=new JPAQueryFactory(em);

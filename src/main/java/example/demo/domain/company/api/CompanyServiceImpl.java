@@ -1,6 +1,6 @@
 package example.demo.domain.company.api;
 
-import example.demo.domain.company.CompanyRepository;
+import example.demo.domain.company.repository.CompanyRepository;
 import example.demo.domain.company.dto.CompanyCodeDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

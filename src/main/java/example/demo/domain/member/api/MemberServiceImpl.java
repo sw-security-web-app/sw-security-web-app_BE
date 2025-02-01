@@ -1,18 +1,17 @@
 package example.demo.domain.member.api;
 
 import example.demo.domain.company.Company;
-import example.demo.domain.company.CompanyRepository;
+import example.demo.domain.company.repository.CompanyRepository;
 import example.demo.domain.company.dto.CompanyInfoWithUuidDto;
 import example.demo.domain.member.Member;
 import example.demo.domain.member.MemberErrorCode;
-import example.demo.domain.member.MemberRepository;
+import example.demo.domain.member.repository.MemberRepository;
 import example.demo.domain.member.dto.request.MemberRequestDto;
 import example.demo.domain.member.dto.request.SmsCertificationRequestDto;
 import example.demo.domain.member.sms.SmsCertificationDao;
 import example.demo.domain.member.sms.SmsUtil;
 import example.demo.error.RestApiException;
 import example.demo.util.CreateUuid;
-import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

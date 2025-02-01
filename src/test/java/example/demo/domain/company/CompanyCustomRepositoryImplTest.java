@@ -1,26 +1,21 @@
 package example.demo.domain.company;
 
-import example.demo.domain.company.dto.CompanyCodeDto;
 import example.demo.domain.company.dto.CompanyInfoWithUuidDto;
+import example.demo.domain.company.repository.CompanyRepository;
 import example.demo.domain.member.Member;
 import example.demo.domain.member.MemberErrorCode;
-import example.demo.domain.member.MemberRepository;
-import example.demo.domain.member.api.MemberService;
+import example.demo.domain.member.repository.MemberRepository;
 import example.demo.domain.member.dto.request.MemberRequestDto;
 import example.demo.error.RestApiException;
 import example.demo.util.CreateUuid;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.List;
-
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
+
 @SpringBootTest
 class CompanyCustomRepositoryImplTest {
     @Autowired

@@ -1,10 +1,12 @@
-package example.demo.domain.company;
+package example.demo.domain.company.repository;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import example.demo.domain.company.CompanyErrorCode;
 import example.demo.domain.company.dto.CompanyCodeDto;
 import example.demo.domain.company.dto.CompanyInfoWithUuidDto;
 import example.demo.domain.company.dto.QCompanyCodeDto;
 import example.demo.domain.company.dto.QCompanyInfoWithUuidDto;
+import example.demo.domain.company.repository.CompanyCustomRepository;
 import example.demo.error.RestApiException;
 import jakarta.persistence.EntityManager;
 

@@ -1,4 +1,4 @@
-package example.demo.domain.member;
+package example.demo.domain.member.repository;
 
 import org.springframework.stereotype.Repository;
 
