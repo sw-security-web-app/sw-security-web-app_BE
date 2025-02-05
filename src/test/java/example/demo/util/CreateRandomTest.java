@@ -1,13 +1,11 @@
 package example.demo.util;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 
-class CreateUuidTest {
+class CreateRandomTest {
     @Test
     @DisplayName("UUID 암호가 생성되는지 확인하고 8자리와 중복되지 않는지 확인합니다.")
     void createUuid(){
