@@ -27,7 +27,7 @@ public class MailServiceImpl implements MailService {
         if (isDuplicatedEmail(mail)){
             throw new RestApiException(MemberErrorCode.DUPLICATED_EMAIL);
         }
-        MimeMessage message = CreateMail(mail, verificationNumber);
+         MimeMessage message = CreateMail(mail, verificationNumber);
         //이메일 중복시
 
         javaMailSender.send(message);
@@ -92,7 +92,7 @@ public class MailServiceImpl implements MailService {
         }
     }
     //이메일 중복 검사
-    boolean isDuplicatedEmail(String email){
+    public boolean isDuplicatedEmail(String email){
         //같은 이메일 1개이상 -> true 반환
         return memberRepository.getSameEmailCount(email)>0L;
     }

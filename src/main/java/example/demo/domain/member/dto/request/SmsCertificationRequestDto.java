@@ -13,5 +13,6 @@ public class SmsCertificationRequestDto {
             message = "잘못된 휴대폰 번호 형식입니다.",
             groups = ValidationGroups.PatternCheckGroup.class)
     private String phoneNumber;
+
     private String certificationCode;
 }

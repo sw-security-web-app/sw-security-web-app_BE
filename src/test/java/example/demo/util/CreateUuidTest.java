@@ -12,8 +12,8 @@ class CreateUuidTest {
     @DisplayName("UUID 암호가 생성되는지 확인하고 8자리와 중복되지 않는지 확인합니다.")
     void createUuid(){
         //given//when
-        String uuid1=CreateUuid.createShortUuid();
-        String uuid2=CreateUuid.createShortUuid();
+        String uuid1=CreateRandom.createShortUuid();
+        String uuid2=CreateRandom.createShortUuid();
 
         //then
 

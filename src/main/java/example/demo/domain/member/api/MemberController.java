@@ -23,15 +23,4 @@ public class MemberController {
         return ResponseEntity.ok("회원가입 성공");
     }
 
-    @PostMapping("/api/sms-certification/send")
-    public ResponseEntity<?> sendSms(@Validated(ValidationSequence.class) @RequestBody SmsCertificationRequestDto requestDto){
-        memberService.sendSms(requestDto);
-        return ResponseEntity.ok("인증번호 전송");
-    }
-
-    @PostMapping("/api/sms-certification/confirm")
-    public ResponseEntity<?> confirmSms(@Validated(ValidationSequence.class) @RequestBody SmsCertificationRequestDto requestDto){
-        memberService.verifySms(requestDto);
-        return ResponseEntity.ok("인증 성공");
-    }
 }

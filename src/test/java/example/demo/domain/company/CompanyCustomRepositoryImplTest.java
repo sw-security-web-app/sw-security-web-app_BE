@@ -7,7 +7,8 @@ import example.demo.domain.member.MemberErrorCode;
 import example.demo.domain.member.repository.MemberRepository;
 import example.demo.domain.member.dto.request.MemberRequestDto;
 import example.demo.error.RestApiException;
-import example.demo.util.CreateUuid;
+
+import example.demo.util.CreateRandom;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -33,7 +34,7 @@ class CompanyCustomRepositoryImplTest {
     @DisplayName("초대코드로 회사이름과 회사부서명을 조회합니다.")
     void findCompanyInfoByInvitationCode() {
         //given
-        String uuid= CreateUuid.createShortUuid();
+        String uuid= CreateRandom.createShortUuid();
         Company company=new Company("company1","개발",uuid);
 
         //when
@@ -49,7 +50,7 @@ class CompanyCustomRepositoryImplTest {
     @DisplayName("초대코드로 회사를 찾을 수 없을 때 에러를 반환합니다.")
     void findNotCompanyInfoByInvitationCode(){
         //given
-        String uuid= CreateUuid.createShortUuid();
+        String uuid= CreateRandom.createShortUuid();
         Company company=new Company("company1","개발",uuid);
         String incorrectUuid="00000000";
         //when
@@ -65,7 +66,7 @@ class CompanyCustomRepositoryImplTest {
     @DisplayName("해당 유저가 관리자인지 확인하고 회사 초대코드를 반환합니다.")
     void returnCompanyCode() {
        //given
-        String uuid=CreateUuid.createShortUuid();
+        String uuid=CreateRandom.createShortUuid();
         MemberRequestDto memberRequestDto=MemberRequestDto.ofManager("tkv00@naver.com","김도연","rlaehdus00!!!","01012345678","삼성","개발","사장","MANAGER");
         Company company=Company.builder()
                 .companyDept(memberRequestDto.getCompanyDept())

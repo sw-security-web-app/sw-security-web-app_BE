@@ -3,11 +3,12 @@ package example.demo.domain.member.repository;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import example.demo.domain.member.repository.MemberCustomRepository;
 import jakarta.persistence.EntityManager;
+import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
 import static example.demo.domain.member.QMember.*;
-
+@Repository("memberCustomRepositoryImpl")
 public class MemberCustomRepositoryImpl implements MemberCustomRepository {
     private final JPAQueryFactory queryFactory;
     public MemberCustomRepositoryImpl(EntityManager em){

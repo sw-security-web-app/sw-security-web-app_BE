@@ -1,5 +1,6 @@
 package example.demo.domain.member.api;
 
+import example.demo.data.RedisCustomServiceImpl;
 import example.demo.domain.company.Company;
 import example.demo.domain.company.repository.CompanyRepository;
 import example.demo.domain.company.dto.CompanyInfoWithUuidDto;
@@ -8,12 +9,10 @@ import example.demo.domain.member.MemberErrorCode;
 import example.demo.domain.member.repository.MemberRepository;
 import example.demo.domain.member.dto.request.MemberRequestDto;
 import example.demo.domain.member.dto.request.SmsCertificationRequestDto;
-import example.demo.domain.member.sms.SmsCertificationDao;
 import example.demo.domain.member.sms.SmsUtil;
 import example.demo.error.RestApiException;
-import example.demo.util.CreateUuid;
+import example.demo.util.CreateRandom;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -29,12 +28,20 @@ public class MemberServiceImpl implements MemberService {
     private final MemberRepository memberRepository;
     private final CompanyRepository companyRepository;
 
-    private final SmsCertificationDao smsCertificationDao;
-    @Autowired
+   // private final SmsCertificationDao smsCertificationDao;
+    private final RedisCustomServiceImpl redisCustomService;
     private final SmsUtil smsUtil;
+    private final String SMS_PREFIX="sms: ";
+    private final String VALIDATION_PREFIX="cer: ";
+    //회원가입 이전 : 이메일 인증, 휴대폰 인증 여부 확인.
     public void signup(MemberRequestDto memberRequestDto){
         Member newMember ;
         Company newCompany;
+        //회원가입 전 이메일 인증 및 휴대폰 번호 인증 여부
+        if(smsAndMailValidation(memberRequestDto.getEmail(),memberRequestDto.getPhoneNumber())){
+            throw new RestApiException(MemberErrorCode.INVALID_CERTIFICATION_EMAIL_OR_PHONE);
+        }
+
         switch (memberRequestDto.getMemberStatus().toLowerCase()){
             //일반
             case "general":
@@ -43,7 +50,7 @@ public class MemberServiceImpl implements MemberService {
             //관리자
             case "manager":
                 //uuid생성
-                String companyCode= CreateUuid.createShortUuid();
+                String companyCode= CreateRandom.createShortUuid();
                 newCompany=Company.builder()
                         .companyName(memberRequestDto.getCompanyName())
                         .companyDept(memberRequestDto.getCompanyDept())
@@ -71,29 +78,14 @@ public class MemberServiceImpl implements MemberService {
         memberRepository.save(newMember);
     }
 
-    @Override
-    public void sendSms(SmsCertificationRequestDto smsCertificationRequestDto) {
-        String to=smsCertificationRequestDto.getPhoneNumber();
-        //랜덤 숫자 생성
-        String random= smsUtil.createRandomNumber();
-        smsUtil.sendOne(to,random);
-        smsCertificationDao.createSmsCertification(to,random);
+
+
+    private boolean smsAndMailValidation(String email,String phoneNumber){
+        return !((redisCustomService.hasKey(VALIDATION_PREFIX+email)&&
+                    redisCustomService.hasKey(VALIDATION_PREFIX+phoneNumber)&&
+                        redisCustomService.getRedisData(VALIDATION_PREFIX+email).equals("TRUE")&&
+                            redisCustomService.getRedisData(VALIDATION_PREFIX+phoneNumber).equals("TRUE")
+        ));
     }
 
-
-    @Override
-    public void verifySms(SmsCertificationRequestDto smsCertificationRequestDto) {
-        if(isVerify(smsCertificationRequestDto)){
-            throw new RestApiException(MemberErrorCode.INVALID_CERTIFICATION_CODE);
-        }
-        smsCertificationDao.removeSmsCertification(smsCertificationRequestDto.getPhoneNumber());
-    }
-
-
-    private boolean isVerify(SmsCertificationRequestDto smsCertificationRequestDto) {
-        return !(smsCertificationDao.hasKey(smsCertificationRequestDto.getPhoneNumber())&&
-                    smsCertificationDao.getSmsCertification(smsCertificationRequestDto.getPhoneNumber())
-                            .equals(smsCertificationRequestDto.getCertificationCode())
-                );
-    }
 }
