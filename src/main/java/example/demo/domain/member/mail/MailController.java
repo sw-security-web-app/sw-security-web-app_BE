@@ -1,5 +1,6 @@
 package example.demo.domain.member.mail;
 
+import example.demo.data.RedisCustomServiceImpl;
 import example.demo.domain.member.MemberErrorCode;
 import example.demo.error.RestApiException;
 import lombok.Getter;
@@ -18,6 +19,8 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class MailController {
     private final MailService mailService;
+    private final RedisCustomServiceImpl redisCustomService;
+
     //인증 메일 전송
     @PostMapping("/api/mailsend")
     public ResponseEntity<?> mailSend(@RequestParam String email){
@@ -33,6 +36,9 @@ public class MailController {
         if (!isMatch){
             return ResponseEntity.status(400).body("인증 실패");
         }else{
+            //유효시간 10분 설정.
+            String PREFIX = "cer: ";
+            redisCustomService.saveRedisData(PREFIX +email,"TRUE", (long) (10*60));
             return  ResponseEntity.ok("인증 성공");
         }
     }

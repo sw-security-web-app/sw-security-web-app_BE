@@ -1,10 +1,12 @@
 spring:
+  config:
+    import: application-secret.yml
   profiles:
     default: local
 
   datasource:
-    url: jdbc:mysql://localhost:3306/securityInfoWeb
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:log4jdbc:mysql://localhost:3306/securityInfoWeb
+    driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
     username: root
     password: rlaehdus00
 
@@ -13,18 +15,6 @@ spring:
       ddl-auto: create
     show-sql: true
 
-  mail:
-    host: smtp.gmail.com
-    port: 587
-    username: tkv0098@gmail.com
-    password: avse snuo mogq fnwp
-    properties:
-      mail:
-        smtp:
-          auth: true
-          timeout: 5000
-          starttls:
-            enable: true
 ## Testing 환경
 ---
 
@@ -32,16 +22,17 @@ spring:
   config:
     activate:
       on-profile: test
+    import: application-secret.yml
 
   datasource:
-    url: jdbc:h2:mem:securityInfoWeb  # H2 메모리 데이터베이스
-    driver-class-name: org.h2.Driver                         # H2 드라이버
+    url: jdbc:log4jdbc:h2:mem:securityInfoWeb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE  # H2 메모리 데이터베이스
+    driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy                      # H2 드라이버
     username: sa                                             # H2 기본 사용자명
     password: 1234                                              # 비밀번호 공백
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     show-sql: true
     properties:
       hibernate:
@@ -52,3 +43,4 @@ spring:
   h2:
     console:
       enabled: true
+

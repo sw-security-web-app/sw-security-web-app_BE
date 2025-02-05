@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+    <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%highlight([%-5level]) [%d{yy-MM-dd HH:mm:ss}] %cyan(%logger{36})\n - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="jdbc" level="OFF"/>
+    <logger name="jdbc.connection" level="OFF"/>
+    <logger name="jdbc.sqlonly" level="OFF"/>  <!-- 파라미터를 셋팅해서 출력-->
+    <logger name="jdbc.sqltiming" level="DEBUG"/>  <!--쿼리 실행 속도 표시-->
+    <logger name="jdbc.resultsettable" level="OFF"/>  <!-- 결과값을 보여줌-->
+    <logger name="log4jdbc.debug" level="OFF"/>
+    <logger name="jdbc.audit" level="OFF"/>
+    <logger name="jdbc.resultset" level="OFF"/>
+
+    <root level="INFO">
+        <appender-ref ref="STDOUT"/>
+    </root>
+
+</configuration>

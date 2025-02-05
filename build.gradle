@@ -42,8 +42,13 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	//testImplementation 'org.springframework.security:spring-security-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	testImplementation 'org.mockito:mockito-core:5.7.0'
+	testCompileOnly 'org.projectlombok:lombok'
+	testAnnotationProcessor 'org.projectlombok:lombok'
+	testImplementation group: 'org.testcontainers', name: 'testcontainers', version: '1.17.2'
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
 	implementation("org.springframework.boot:spring-boot-starter-validation")
+	implementation('org.bgee.log4jdbc-log4j2:log4jdbc-log4j2-jdbc4.1:1.16')
 
 	//querydsl
 	//QueryDsl
@@ -51,6 +56,12 @@ dependencies {
 	annotationProcessor "com.querydsl:querydsl-apt:5.0.0:jakarta"
 	annotationProcessor "jakarta.annotation:jakarta.annotation-api"
 	annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+
+	//coolsms
+	implementation 'net.nurigo:sdk:4.3.0'
+	//redis
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+	implementation 'org.springframework.session:spring-session-data-redis'
 }
 
 tasks.named('test') {
@@ -61,4 +72,8 @@ tasks.named('test') {
 tasks.named('asciidoctor') {
 	inputs.dir snippetsDir
 	dependsOn test
+}
+test {
+	// 테스트 실행 시 'test' 프로파일을 활성화
+	systemProperty 'spring.profiles.active', 'test'
 }
