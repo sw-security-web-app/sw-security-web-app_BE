@@ -28,4 +28,17 @@ class CreateRandomTest {
 
     }
 
+    @Test
+    @DisplayName("6자리의 랜덤한 숫자가 생성됩니다.")
+    void createRandomNumber(){
+        //given //when
+        String random1=CreateRandom.createRandomNumber();
+        String random2=CreateRandom.createRandomNumber();
+
+        //then
+        assertThat(random1.length()).isEqualTo(6);
+        assertThat(random2.length()).isEqualTo(6);
+
+    }
+
 }
