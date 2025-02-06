@@ -3,6 +3,7 @@ package example.demo.domain.member.sms;
 import example.demo.data.RedisCustomServiceImpl;
 import example.demo.domain.member.MemberErrorCode;
 import example.demo.domain.member.dto.request.SmsCertificationRequestDto;
+import example.demo.domain.member.repository.MemberRepository;
 import example.demo.error.RestApiException;
 import example.demo.util.CreateRandom;
 import jakarta.annotation.PostConstruct;
@@ -30,6 +31,7 @@ public class SmsServiceImpl implements SmsService{
     private DefaultMessageService messageService;
     private final SmsUtil smsUtil;
     private final RedisCustomServiceImpl redisCustomService;
+    private final MemberRepository memberRepository;
 
 
     @PostConstruct
@@ -46,6 +48,12 @@ public class SmsServiceImpl implements SmsService{
         smsUtil.sendOne(to,random);
         redisCustomService.saveRedisData(SMS_PREFIX+to,random, 5L*60);
     }
+
+    @Override
+    public void sendMemberEmail(String phoneNumber) {
+        
+    }
     //휴대폰 번호로 가입한 이메일 정보 전송
+
 
 }
