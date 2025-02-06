@@ -1,5 +1,6 @@
 package example.demo.domain.member.api;
 
+import example.demo.data.RedisCustomService;
 import example.demo.data.RedisCustomServiceImpl;
 import example.demo.domain.company.Company;
 import example.demo.domain.company.repository.CompanyRepository;
@@ -16,6 +17,7 @@ import example.demo.util.CreateRandom;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -33,7 +35,8 @@ public class MemberServiceImpl implements MemberService {
     private final CompanyRepository companyRepository;
 
    // private final SmsCertificationDao smsCertificationDao;
-    private final RedisCustomServiceImpl redisCustomService;
+    private final RedisCustomService redisCustomService;
+    private final PasswordEncoder passwordEncoder;
 
 
     //회원가입 이전 : 이메일 인증, 휴대폰 인증 여부 확인.
@@ -78,6 +81,8 @@ public class MemberServiceImpl implements MemberService {
             default:
                 throw new RestApiException(MemberErrorCode.INVALID_MEMBER_STATUS);
         }
+        //비밀번호 암호화
+        newMember.setPassword(passwordEncoder.encode(newMember.getPassword()));
         memberRepository.save(newMember);
     }
 
@@ -88,12 +93,20 @@ public class MemberServiceImpl implements MemberService {
 
 
     private boolean smsAndMailValidation(String email,String phoneNumber){
+        if (isTestMode()) {
+            return false; // 테스트 모드일 때 항상 false
+        }
         String VALIDATION_PREFIX = "cer: ";
         return !((redisCustomService.hasKey(VALIDATION_PREFIX +email)&&
                     redisCustomService.hasKey(VALIDATION_PREFIX +phoneNumber)&&
                         redisCustomService.getRedisData(VALIDATION_PREFIX +email).equals("TRUE")&&
                             redisCustomService.getRedisData(VALIDATION_PREFIX +phoneNumber).equals("TRUE")
         ));
+    }
+
+    //test를 위한 메서드
+    private boolean isTestMode() {
+        return Boolean.parseBoolean(System.getProperty("test.mode", "false"));
     }
 
 }

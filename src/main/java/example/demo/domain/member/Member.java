@@ -40,12 +40,10 @@ public class Member extends BaseEntity {
     @JoinColumn(name = "company_id")
     private Company company;
 
-    private static final BCryptPasswordEncoder passwordEncoder=new BCryptPasswordEncoder();
-
     public Member(String email, String userName, String password, MemberStatus memberStatus, String phoneNumber, String companyPosition,Company company) {
         this.email = email;
         this.userName = userName;
-        this.password = passwordEncoder.encode(password);
+        this.password = password;
         this.memberStatus = memberStatus;
         this.phoneNumber = phoneNumber;
         this.company = company;
@@ -54,25 +52,29 @@ public class Member extends BaseEntity {
 
     //일반 유저
     public static Member createGeneral(MemberRequestDto memberRequestDto){
-        return new Member(memberRequestDto.getEmail(),memberRequestDto.getName(),passwordEncoder.encode(memberRequestDto.getPassword()),
+        return new Member(memberRequestDto.getEmail(),memberRequestDto.getName(),memberRequestDto.getPassword(),
                     MemberStatus.GENERAL,memberRequestDto.getPhoneNumber(),memberRequestDto.getCompanyPosition(),null
                 );
     }
     //관리자
     public static Member createManager(MemberRequestDto memberRequestDto,Company company){
 
-        return new Member(memberRequestDto.getEmail(), memberRequestDto.getName(), passwordEncoder.encode(memberRequestDto.getPassword()),
+        return new Member(memberRequestDto.getEmail(), memberRequestDto.getName(),memberRequestDto.getPassword(),
                 MemberStatus.MANAGER, memberRequestDto.getPhoneNumber(), memberRequestDto.getCompanyPosition(),company
         );
     }
     //직원
     public static Member createEmployee(MemberRequestDto memberRequestDto,Company company) {
 
-        return new Member(memberRequestDto.getEmail(), memberRequestDto.getName(), passwordEncoder.encode(memberRequestDto.getPassword()),
+        return new Member(memberRequestDto.getEmail(), memberRequestDto.getName(), memberRequestDto.getPassword(),
                 MemberStatus.EMPLOYEE, memberRequestDto.getPhoneNumber(),memberRequestDto.getCompanyPosition(), company
         );
     }
     public void setCompany(Company company){
         this.company=company;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

@@ -10,10 +10,13 @@ import example.demo.domain.member.dto.request.MemberRequestDto;
 import example.demo.error.RestApiException;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +35,13 @@ class MemberServiceTest {
     private MemberService memberService;
     @Autowired
     private EntityManager em;
+    @Autowired
+    private PasswordEncoder encoder;
+
+    @BeforeAll
+    static void setup() {
+        System.setProperty("test.mode", "true");
+    }
     @AfterEach
     void tearDown(){
         memberRepository.deleteAllInBatch();
@@ -56,10 +66,13 @@ class MemberServiceTest {
                 .orElseThrow(()->new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
 
         //then
-        assertThat(findMember1).extracting("email","userName","password","phoneNumber","memberStatus")
-                .containsExactly("tkv00@naver.com","member1","rlaehdus00!!","01012345678", GENERAL);
-        assertThat(findMember2).extracting("email","userName","password","phoneNumber","memberStatus")
-                .containsExactly("tkv11@naver.com","member2","rlaehdus00!!","01012345611",GENERAL);
+        assertThat(findMember1).extracting("email","userName","phoneNumber","memberStatus")
+                .containsExactly("tkv00@naver.com","member1","01012345678", GENERAL);
+        assertThat(encoder.matches("rlaehdus00!!",findMember1.getPassword())).isTrue();
+
+        assertThat(findMember2).extracting("email","userName","phoneNumber","memberStatus")
+                .containsExactly("tkv11@naver.com","member2","01012345611",GENERAL);
+        assertThat(encoder.matches("rlaehdus00!!",findMember2.getPassword())).isTrue();
 
     }
 
@@ -86,13 +99,17 @@ class MemberServiceTest {
         Company findCompany2=findMember2.getCompany();
 
         //then
-        assertThat(findMember1).extracting("email","userName","password","phoneNumber","memberStatus","companyPosition")
-                .containsExactly("tkv00@naver.com","member1","rlaehdus00!!","01012345678",MANAGER,"사장");
+        assertThat(findMember1).extracting("email","userName","phoneNumber","memberStatus","companyPosition")
+                .containsExactly("tkv00@naver.com","member1","01012345678",MANAGER,"사장");
+        assertThat(encoder.matches("rlaehdus00!!",findMember1.getPassword())).isTrue();
+
         assertThat(findCompany1).extracting("companyName","companyDept")
                         .containsExactly("삼성","개발");
 
-        assertThat(findMember2).extracting("email","userName","password","phoneNumber","memberStatus","companyPosition")
-                .containsExactly("tkv11@naver.com","member2","rlaehdus00!!","01012345611",MANAGER,"부사장");
+        assertThat(findMember2).extracting("email","userName","phoneNumber","memberStatus","companyPosition")
+                .containsExactly("tkv11@naver.com","member2","01012345611",MANAGER,"부사장");
+        assertThat(encoder.matches("rlaehdus00!!",findMember2.getPassword())).isTrue();
+
         assertThat(findCompany2).extracting("companyName","companyDept")
                 .containsExactly("LG","디스플레이");
     }
@@ -136,13 +153,15 @@ class MemberServiceTest {
         Company findCompany2=findMember2.getCompany();
 
         //then
-        assertThat(findMember1).extracting("email","userName","password","phoneNumber","companyPosition","memberStatus")
-                .containsExactly("tkv00222@naver.com","employee1","rlaehdus00!!","01012345622","인턴1",EMPLOYEE);
+        assertThat(findMember1).extracting("email","userName","phoneNumber","companyPosition","memberStatus")
+                .containsExactly("tkv00222@naver.com","employee1","01012345622","인턴1",EMPLOYEE);
+        assertThat(encoder.matches("rlaehdus00!!",findMember1.getPassword())).isTrue();
         assertThat(findCompany1).extracting("companyName","companyDept")
                 .containsExactly("삼성","개발");
 
-        assertThat(findMember2).extracting("email","userName","password","phoneNumber","companyPosition","memberStatus")
-                .containsExactly("tkv1131@naver.com","employee2","rlaehdus00!!","01012345633","인턴2",EMPLOYEE);
+        assertThat(findMember2).extracting("email","userName","phoneNumber","companyPosition","memberStatus")
+                .containsExactly("tkv1131@naver.com","employee2","01012345633","인턴2",EMPLOYEE);
+        assertThat(encoder.matches("rlaehdus00!!",findMember2.getPassword())).isTrue();
         assertThat(findCompany2).extracting("companyName","companyDept")
                 .containsExactly("LG","디스플레이");
     }
