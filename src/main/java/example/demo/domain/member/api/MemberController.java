@@ -8,10 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -21,6 +18,12 @@ public class MemberController {
     public ResponseEntity<?>signup(@Validated(ValidationSequence.class) @RequestBody MemberRequestDto memberRequestDto){
         memberService.signup(memberRequestDto);
         return ResponseEntity.ok("회원가입 성공");
+    }
+
+    @GetMapping("/api/find-email")
+    public ResponseEntity<?>findEmail(@RequestParam String phoneNumber){
+        memberService.findMemberEmail(phoneNumber);
+        return ResponseEntity.ok("휴대폰 번호로 가입한 이메일 정보 전송");
     }
 
 }

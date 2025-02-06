@@ -36,17 +36,7 @@ public class SmsServiceImpl implements SmsService{
     private void init(){
         this.messageService= NurigoApp.INSTANCE.initialize(apiKey,apiSecretKey,"https://api.coolsms.co.kr");
     }
-    @Override
-    public SingleMessageSentResponse sendOne(String to, String verificationCode) {
-        Message message=new Message();
-        message.setFrom(sendNumber);
-        message.setTo(to);
 
-        message.setText("[Vero AI]\n아래의 휴대폰 인증번호를 입력해주세요\n✅ "
-                + verificationCode + " ✅\n(5분 내 입력해 주세요)");
-        SingleMessageSentResponse response=this.messageService.sendOne(new SingleMessageSendingRequest(message));
-        return response;
-    }
 
     @Override
     public void sendSms(SmsCertificationRequestDto smsCertificationRequestDto) {
@@ -56,6 +46,6 @@ public class SmsServiceImpl implements SmsService{
         smsUtil.sendOne(to,random);
         redisCustomService.saveRedisData(SMS_PREFIX+to,random, 5L*60);
     }
-
+    //휴대폰 번호로 가입한 이메일 정보 전송
 
 }

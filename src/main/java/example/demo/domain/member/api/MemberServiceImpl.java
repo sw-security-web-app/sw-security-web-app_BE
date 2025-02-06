@@ -83,7 +83,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public void login(MemberLoginDto memberLoginDto) {
+    public void findMemberEmail(String phoneNumber) {
 
     }
 

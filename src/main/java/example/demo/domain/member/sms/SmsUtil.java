@@ -36,5 +36,14 @@ public class SmsUtil {
         SingleMessageSentResponse response=this.messageService.sendOne(new SingleMessageSendingRequest(message));
         return response;
     }
+    //휴대폰 번호로 가입한 이메일 정보 전송
+    public SingleMessageSentResponse sendMemberEmail(String to,String email){
+        Message message=new Message();
+        message.setFrom(sendNumber);
+        message.setTo(to);
+
+        message.setText("[Vero AI]\n회원님이 가입하신 이메일은 다음과 같습니다.\n"+email);
+        SingleMessageSentResponse response=this.messageService.sendOne(new SingleMessageSendingRequest(message));
+    }
 
 }
