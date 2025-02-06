@@ -6,6 +6,7 @@ import example.demo.domain.company.repository.CompanyRepository;
 import example.demo.domain.company.dto.CompanyInfoWithUuidDto;
 import example.demo.domain.member.Member;
 import example.demo.domain.member.MemberErrorCode;
+import example.demo.domain.member.dto.request.MemberLoginDto;
 import example.demo.domain.member.repository.MemberRepository;
 import example.demo.domain.member.dto.request.MemberRequestDto;
 import example.demo.domain.member.dto.request.SmsCertificationRequestDto;
@@ -13,11 +14,14 @@ import example.demo.domain.member.sms.SmsUtil;
 import example.demo.error.RestApiException;
 import example.demo.util.CreateRandom;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class MemberServiceImpl implements MemberService {
+    private final BCryptPasswordEncoder encoder;
     //TODO
     //일반 -> 회사이름,직책,부서명 / 초대코드 없음.
     //관리자 -> 회사이름, 직책, 부서명 있어야함 / 초대코드는 없음.
@@ -30,9 +34,8 @@ public class MemberServiceImpl implements MemberService {
 
    // private final SmsCertificationDao smsCertificationDao;
     private final RedisCustomServiceImpl redisCustomService;
-    private final SmsUtil smsUtil;
-    private final String SMS_PREFIX="sms: ";
-    private final String VALIDATION_PREFIX="cer: ";
+
+
     //회원가입 이전 : 이메일 인증, 휴대폰 인증 여부 확인.
     public void signup(MemberRequestDto memberRequestDto){
         Member newMember ;
@@ -78,13 +81,18 @@ public class MemberServiceImpl implements MemberService {
         memberRepository.save(newMember);
     }
 
+    @Override
+    public void login(MemberLoginDto memberLoginDto) {
+
+    }
 
 
     private boolean smsAndMailValidation(String email,String phoneNumber){
-        return !((redisCustomService.hasKey(VALIDATION_PREFIX+email)&&
-                    redisCustomService.hasKey(VALIDATION_PREFIX+phoneNumber)&&
-                        redisCustomService.getRedisData(VALIDATION_PREFIX+email).equals("TRUE")&&
-                            redisCustomService.getRedisData(VALIDATION_PREFIX+phoneNumber).equals("TRUE")
+        String VALIDATION_PREFIX = "cer: ";
+        return !((redisCustomService.hasKey(VALIDATION_PREFIX +email)&&
+                    redisCustomService.hasKey(VALIDATION_PREFIX +phoneNumber)&&
+                        redisCustomService.getRedisData(VALIDATION_PREFIX +email).equals("TRUE")&&
+                            redisCustomService.getRedisData(VALIDATION_PREFIX +phoneNumber).equals("TRUE")
         ));
     }
 

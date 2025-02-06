@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -39,10 +40,12 @@ public class Member extends BaseEntity {
     @JoinColumn(name = "company_id")
     private Company company;
 
+    private static final BCryptPasswordEncoder passwordEncoder=new BCryptPasswordEncoder();
+
     public Member(String email, String userName, String password, MemberStatus memberStatus, String phoneNumber, String companyPosition,Company company) {
         this.email = email;
         this.userName = userName;
-        this.password = password;
+        this.password = passwordEncoder.encode(password);
         this.memberStatus = memberStatus;
         this.phoneNumber = phoneNumber;
         this.company = company;
@@ -51,25 +54,23 @@ public class Member extends BaseEntity {
 
     //일반 유저
     public static Member createGeneral(MemberRequestDto memberRequestDto){
-        return new Member(memberRequestDto.getEmail(),memberRequestDto.getName(),memberRequestDto.getPassword(),
+        return new Member(memberRequestDto.getEmail(),memberRequestDto.getName(),passwordEncoder.encode(memberRequestDto.getPassword()),
                     MemberStatus.GENERAL,memberRequestDto.getPhoneNumber(),memberRequestDto.getCompanyPosition(),null
                 );
     }
     //관리자
     public static Member createManager(MemberRequestDto memberRequestDto,Company company){
-        Member member = new Member(memberRequestDto.getEmail(), memberRequestDto.getName(), memberRequestDto.getPassword(),
+
+        return new Member(memberRequestDto.getEmail(), memberRequestDto.getName(), passwordEncoder.encode(memberRequestDto.getPassword()),
                 MemberStatus.MANAGER, memberRequestDto.getPhoneNumber(), memberRequestDto.getCompanyPosition(),company
         );
-
-        return member;
     }
     //직원
     public static Member createEmployee(MemberRequestDto memberRequestDto,Company company) {
-        Member member = new Member(memberRequestDto.getEmail(), memberRequestDto.getName(), memberRequestDto.getPassword(),
+
+        return new Member(memberRequestDto.getEmail(), memberRequestDto.getName(), passwordEncoder.encode(memberRequestDto.getPassword()),
                 MemberStatus.EMPLOYEE, memberRequestDto.getPhoneNumber(),memberRequestDto.getCompanyPosition(), company
         );
-
-        return member;
     }
     public void setCompany(Company company){
         this.company=company;

@@ -5,6 +5,7 @@ import example.demo.util.ValidationGroups;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.*;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
