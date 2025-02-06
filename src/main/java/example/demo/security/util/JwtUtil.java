@@ -1,6 +1,6 @@
 package example.demo.security.util;
 
-import example.demo.security.auth.CustomMemberInfoDto;
+import example.demo.security.auth.dto.CustomMemberInfoDto;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;

@@ -35,6 +35,10 @@ public class Member extends BaseEntity {
 
     @Column(name = "company_position")
     private String companyPosition;
+
+    //계정 잠금 여부
+    @Column(name = "account_locked")
+    private boolean accountLocked;
     //Company랑 양방향
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company_id")

@@ -1,4 +1,4 @@
-package example.demo.security.auth;
+package example.demo.security.auth.dto;
 
 import example.demo.util.ValidationGroups;
 import jakarta.validation.constraints.NotBlank;
@@ -7,8 +7,7 @@ import lombok.*;
 
 @Getter
 @AllArgsConstructor
-@NoArgsConstructor
-@Builder
+
 public class MemberLoginDto {
     @NotBlank(message = "이메일은 필수 입력 값입니다.",
             groups = ValidationGroups.NotEmptyGroup.class)

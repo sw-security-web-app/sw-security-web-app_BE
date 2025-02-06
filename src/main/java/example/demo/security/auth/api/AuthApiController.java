@@ -1,9 +1,6 @@
-package example.demo.security.auth;
+package example.demo.security.auth.api;
 
-import example.demo.util.ValidationSequence;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController

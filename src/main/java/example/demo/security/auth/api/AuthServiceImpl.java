@@ -1,8 +1,11 @@
-package example.demo.security.auth;
+package example.demo.security.auth.api;
 
 import example.demo.domain.member.Member;
 import example.demo.domain.member.repository.MemberRepository;
 import example.demo.error.RestApiException;
+import example.demo.security.auth.AuthErrorCode;
+import example.demo.security.auth.dto.CustomMemberInfoDto;
+import example.demo.security.auth.dto.MemberLoginDto;
 import example.demo.security.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -10,7 +13,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class AuthServiceImpl implements AuthService{
+public class AuthServiceImpl implements AuthService {
     private final JwtUtil jwtUtil;
     private final MemberRepository memberRepository;
     private final PasswordEncoder encoder;
@@ -27,12 +30,9 @@ public class AuthServiceImpl implements AuthService{
             throw new RestApiException(AuthErrorCode.INVALID_EMAIL_OR_PASSWORD);
         }
 
-        CustomMemberInfoDto infoDto=CustomMemberInfoDto.builder()
-                .email(findMember.getEmail())
-                .password(findMember.getPassword())
-                .memberStatus(findMember.getMemberStatus())
-                .memberId(findMember.getMemberId())
-                .build();
+        CustomMemberInfoDto infoDto=new CustomMemberInfoDto(
+                findMember.getMemberId(),email,password,findMember.getMemberStatus()
+        );
         return jwtUtil.createAccessToken(infoDto);
     }
 }

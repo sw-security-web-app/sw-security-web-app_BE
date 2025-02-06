@@ -6,7 +6,7 @@ import example.demo.domain.company.repository.CompanyRepository;
 import example.demo.domain.company.dto.CompanyInfoWithUuidDto;
 import example.demo.domain.member.Member;
 import example.demo.domain.member.MemberErrorCode;
-import example.demo.security.auth.MemberLoginDto;
+import example.demo.security.auth.dto.MemberLoginDto;
 import example.demo.domain.member.repository.MemberRepository;
 import example.demo.domain.member.dto.request.MemberRequestDto;
 import example.demo.error.RestApiException;
@@ -28,10 +28,10 @@ public class MemberServiceImpl implements MemberService {
     //TODO:JWT Filter로 관리자 확인 로직 구현
     private final MemberRepository memberRepository;
     private final CompanyRepository companyRepository;
+    private final PasswordEncoder passwordEncoder;
 
    // private final SmsCertificationDao smsCertificationDao;
     private final RedisCustomService redisCustomService;
-    private final PasswordEncoder passwordEncoder;
 
 
     //회원가입 이전 : 이메일 인증, 휴대폰 인증 여부 확인.
