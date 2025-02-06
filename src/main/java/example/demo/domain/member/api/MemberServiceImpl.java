@@ -1,22 +1,17 @@
 package example.demo.domain.member.api;
 
 import example.demo.data.RedisCustomService;
-import example.demo.data.RedisCustomServiceImpl;
 import example.demo.domain.company.Company;
 import example.demo.domain.company.repository.CompanyRepository;
 import example.demo.domain.company.dto.CompanyInfoWithUuidDto;
 import example.demo.domain.member.Member;
 import example.demo.domain.member.MemberErrorCode;
-import example.demo.domain.member.dto.request.MemberLoginDto;
+import example.demo.security.auth.MemberLoginDto;
 import example.demo.domain.member.repository.MemberRepository;
 import example.demo.domain.member.dto.request.MemberRequestDto;
-import example.demo.domain.member.dto.request.SmsCertificationRequestDto;
-import example.demo.domain.member.sms.SmsUtil;
 import example.demo.error.RestApiException;
 import example.demo.util.CreateRandom;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -43,6 +38,7 @@ public class MemberServiceImpl implements MemberService {
     public void signup(MemberRequestDto memberRequestDto){
         Member newMember ;
         Company newCompany;
+        //이메일 중복, 휴대폰번호 중복 예외처리는 해당 서비스 계층에서 실시합니다.
         //회원가입 전 이메일 인증 및 휴대폰 번호 인증 여부
         if(smsAndMailValidation(memberRequestDto.getEmail(),memberRequestDto.getPhoneNumber())){
             throw new RestApiException(MemberErrorCode.INVALID_CERTIFICATION_EMAIL_OR_PHONE);
