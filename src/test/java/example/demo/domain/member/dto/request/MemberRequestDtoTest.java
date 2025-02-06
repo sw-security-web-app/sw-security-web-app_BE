@@ -12,6 +12,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.Set;
 
@@ -22,6 +23,9 @@ class MemberRequestDtoTest {
 
     private static ValidatorFactory factory;
     private static Validator validator;
+
+    @Autowired
+    private BCryptPasswordEncoder encoder;
     @BeforeAll
     static void init() {
         factory = Validation.buildDefaultValidatorFactory();
@@ -53,16 +57,16 @@ class MemberRequestDtoTest {
         //then
         assertThat(general)
                 .extracting("email","name","password","phoneNumber","memberStatus")
-                .containsExactly("tkv00@naver.com", "member1", "rlaehdus00!!", "01050299737", "GENERAL");
+                .containsExactly("tkv00@naver.com", "member1", encoder.encode("rlaehdus00!!"), "01050299737", "GENERAL");
 
         assertThat(manager)
                 .extracting("email","name","password","phoneNumber","companyName","companyDept","companyPosition","memberStatus")
-                .containsExactly("tkv11@naver.com", "member2", "rlaehdus11!!", "01050299999",
+                .containsExactly("tkv11@naver.com", "member2", encoder.encode("rlaehdus11!!"), "01050299999",
                         "company", "development", "사장","MANAGER");
 
         assertThat(employee)
                 .extracting("email","name","password","phoneNumber","companyPosition","invitationCode","memberStatus")
-                .containsExactly("tkv11@naver.com", "member2", "rlaehdus11!!", "01050299999",
+                .containsExactly("tkv11@naver.com", "member2", encoder.encode("rlaehdus11!!"), "01050299999",
                         "인턴", "abcdef","EMPLOYEE");
     }
 
@@ -80,10 +84,10 @@ class MemberRequestDtoTest {
                 " ", "member1", "rlaehdus00!!", "01050299737","GENERAL"
         );
         MemberRequestDto general4=MemberRequestDto.ofGeneral(
-                "tkv99@naver,com", "member1", "rlaehdus00!!", "01050299737","GENERAL"
+                "tkv99@naver,com", "member1", encoder.encode("rlaehdus00!!"), "01050299737","GENERAL"
         );
         MemberRequestDto general5=MemberRequestDto.ofGeneral(
-                "tkv99@naver.com", "member1", "rlaehdus00!!", "01050299737","GENERAL"
+                "tkv99@naver.com", "member1", encoder.encode("rlaehdus00!!"), "01050299737","GENERAL"
         );
 
         //when

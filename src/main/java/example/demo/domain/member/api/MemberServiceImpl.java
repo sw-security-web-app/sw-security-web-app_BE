@@ -1,23 +1,24 @@
 package example.demo.domain.member.api;
 
-import example.demo.data.RedisCustomServiceImpl;
+import example.demo.data.RedisCustomService;
 import example.demo.domain.company.Company;
 import example.demo.domain.company.repository.CompanyRepository;
 import example.demo.domain.company.dto.CompanyInfoWithUuidDto;
 import example.demo.domain.member.Member;
 import example.demo.domain.member.MemberErrorCode;
+import example.demo.security.auth.dto.MemberLoginDto;
 import example.demo.domain.member.repository.MemberRepository;
 import example.demo.domain.member.dto.request.MemberRequestDto;
-import example.demo.domain.member.dto.request.SmsCertificationRequestDto;
-import example.demo.domain.member.sms.SmsUtil;
 import example.demo.error.RestApiException;
 import example.demo.util.CreateRandom;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class MemberServiceImpl implements MemberService {
+
     //TODO
     //일반 -> 회사이름,직책,부서명 / 초대코드 없음.
     //관리자 -> 회사이름, 직책, 부서명 있어야함 / 초대코드는 없음.
@@ -27,16 +28,17 @@ public class MemberServiceImpl implements MemberService {
     //TODO:JWT Filter로 관리자 확인 로직 구현
     private final MemberRepository memberRepository;
     private final CompanyRepository companyRepository;
+    private final PasswordEncoder passwordEncoder;
 
    // private final SmsCertificationDao smsCertificationDao;
-    private final RedisCustomServiceImpl redisCustomService;
-    private final SmsUtil smsUtil;
-    private final String SMS_PREFIX="sms: ";
-    private final String VALIDATION_PREFIX="cer: ";
+    private final RedisCustomService redisCustomService;
+
+
     //회원가입 이전 : 이메일 인증, 휴대폰 인증 여부 확인.
     public void signup(MemberRequestDto memberRequestDto){
         Member newMember ;
         Company newCompany;
+        //이메일 중복, 휴대폰번호 중복 예외처리는 해당 서비스 계층에서 실시합니다.
         //회원가입 전 이메일 인증 및 휴대폰 번호 인증 여부
         if(smsAndMailValidation(memberRequestDto.getEmail(),memberRequestDto.getPhoneNumber())){
             throw new RestApiException(MemberErrorCode.INVALID_CERTIFICATION_EMAIL_OR_PHONE);
@@ -75,17 +77,32 @@ public class MemberServiceImpl implements MemberService {
             default:
                 throw new RestApiException(MemberErrorCode.INVALID_MEMBER_STATUS);
         }
+        //비밀번호 암호화
+        newMember.setPassword(passwordEncoder.encode(newMember.getPassword()));
         memberRepository.save(newMember);
     }
 
+    @Override
+    public void login(MemberLoginDto memberLoginDto) {
+
+    }
 
 
     private boolean smsAndMailValidation(String email,String phoneNumber){
-        return !((redisCustomService.hasKey(VALIDATION_PREFIX+email)&&
-                    redisCustomService.hasKey(VALIDATION_PREFIX+phoneNumber)&&
-                        redisCustomService.getRedisData(VALIDATION_PREFIX+email).equals("TRUE")&&
-                            redisCustomService.getRedisData(VALIDATION_PREFIX+phoneNumber).equals("TRUE")
+        if (isTestMode()) {
+            return false; // 테스트 모드일 때 항상 false
+        }
+        String VALIDATION_PREFIX = "cer: ";
+        return !((redisCustomService.hasKey(VALIDATION_PREFIX +email)&&
+                    redisCustomService.hasKey(VALIDATION_PREFIX +phoneNumber)&&
+                        redisCustomService.getRedisData(VALIDATION_PREFIX +email).equals("TRUE")&&
+                            redisCustomService.getRedisData(VALIDATION_PREFIX +phoneNumber).equals("TRUE")
         ));
+    }
+
+    //test를 위한 메서드
+    private boolean isTestMode() {
+        return Boolean.parseBoolean(System.getProperty("test.mode", "false"));
     }
 
 }

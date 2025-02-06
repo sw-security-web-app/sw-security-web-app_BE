@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -34,6 +35,10 @@ public class Member extends BaseEntity {
 
     @Column(name = "company_position")
     private String companyPosition;
+
+    //계정 잠금 여부
+    @Column(name = "account_locked")
+    private boolean accountLocked;
     //Company랑 양방향
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company_id")
@@ -47,6 +52,7 @@ public class Member extends BaseEntity {
         this.phoneNumber = phoneNumber;
         this.company = company;
         this.companyPosition=companyPosition;
+        this.accountLocked=isAccountLocked();
     }
 
     //일반 유저
@@ -57,21 +63,23 @@ public class Member extends BaseEntity {
     }
     //관리자
     public static Member createManager(MemberRequestDto memberRequestDto,Company company){
-        Member member = new Member(memberRequestDto.getEmail(), memberRequestDto.getName(), memberRequestDto.getPassword(),
+
+        return new Member(memberRequestDto.getEmail(), memberRequestDto.getName(),memberRequestDto.getPassword(),
                 MemberStatus.MANAGER, memberRequestDto.getPhoneNumber(), memberRequestDto.getCompanyPosition(),company
         );
-
-        return member;
     }
     //직원
     public static Member createEmployee(MemberRequestDto memberRequestDto,Company company) {
-        Member member = new Member(memberRequestDto.getEmail(), memberRequestDto.getName(), memberRequestDto.getPassword(),
+
+        return new Member(memberRequestDto.getEmail(), memberRequestDto.getName(), memberRequestDto.getPassword(),
                 MemberStatus.EMPLOYEE, memberRequestDto.getPhoneNumber(),memberRequestDto.getCompanyPosition(), company
         );
-
-        return member;
     }
     public void setCompany(Company company){
         this.company=company;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

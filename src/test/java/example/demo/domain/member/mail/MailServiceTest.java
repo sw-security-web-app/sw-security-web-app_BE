@@ -15,11 +15,8 @@ import static org.assertj.core.api.Assertions.*;
 
 @SpringBootTest
 class MailServiceTest {
-    @Mock
-    private JavaMailSender javaMailSender; // Mock the mail sender
 
     @Autowired
-    @InjectMocks
     private MailService mailService; // Inject the mocked mail sender into MailService
 
     @Autowired
