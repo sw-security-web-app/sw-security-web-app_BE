@@ -21,7 +21,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class MemberServiceImpl implements MemberService {
-    private final BCryptPasswordEncoder encoder;
+
     //TODO
     //일반 -> 회사이름,직책,부서명 / 초대코드 없음.
     //관리자 -> 회사이름, 직책, 부서명 있어야함 / 초대코드는 없음.
