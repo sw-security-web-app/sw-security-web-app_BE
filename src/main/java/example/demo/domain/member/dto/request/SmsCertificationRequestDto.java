@@ -1,6 +1,7 @@
 package example.demo.domain.member.dto.request;
 
 import example.demo.util.ValidationGroups;
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
@@ -13,6 +14,6 @@ public class SmsCertificationRequestDto {
             message = "잘못된 휴대폰 번호 형식입니다.",
             groups = ValidationGroups.PatternCheckGroup.class)
     private String phoneNumber;
-
+    @Nullable
     private String certificationCode;
 }

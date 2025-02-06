@@ -36,6 +36,7 @@ public class JwtUtil {
         claims.put("memberId",memberInfoDto.getMemberId());
         claims.put("email",memberInfoDto.getEmail());
         claims.put("memberStatus",memberInfoDto.getMemberStatus());
+        claims.put("accountLocked",memberInfoDto.isAccountLocked());
 
         ZonedDateTime now=ZonedDateTime.now();
         ZonedDateTime tokenValidity=now.plusSeconds(accessTokenExpTime);

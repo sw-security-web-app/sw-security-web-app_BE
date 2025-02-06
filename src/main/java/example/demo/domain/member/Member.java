@@ -52,6 +52,7 @@ public class Member extends BaseEntity {
         this.phoneNumber = phoneNumber;
         this.company = company;
         this.companyPosition=companyPosition;
+        this.accountLocked=isAccountLocked();
     }
 
     //일반 유저

@@ -54,7 +54,7 @@ public class SmsServiceImpl implements SmsService{
         String random= CreateRandom.createRandomNumber();
         String SMS_PREFIX="sms: ";
         smsUtil.sendOne(to,random);
-        redisCustomService.saveRedisData(SMS_PREFIX+to,smsCertificationRequestDto.getCertificationCode(), 5L*60);
+        redisCustomService.saveRedisData(SMS_PREFIX+to,random, 5L*60);
     }
 
 

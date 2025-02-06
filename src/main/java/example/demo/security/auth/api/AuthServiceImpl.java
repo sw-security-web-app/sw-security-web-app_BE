@@ -23,7 +23,7 @@ public class AuthServiceImpl implements AuthService {
         String email=loginDto.getEmail();
         String password=loginDto.getPassword();
         Member findMember=memberRepository.findByEmail(email).orElseThrow(
-                ()-> new RestApiException(AuthErrorCode.NOT_EXIST_EMAIL)
+                ()-> new RestApiException(AuthErrorCode.INVALID_EMAIL_OR_PASSWORD)
         );
 
         if (!encoder.matches(password,findMember.getPassword())){
@@ -31,7 +31,7 @@ public class AuthServiceImpl implements AuthService {
         }
 
         CustomMemberInfoDto infoDto=new CustomMemberInfoDto(
-                findMember.getMemberId(),email,password,findMember.getMemberStatus()
+                findMember.getMemberId(),email,password,findMember.getMemberStatus(),findMember.isAccountLocked()
         );
         return jwtUtil.createAccessToken(infoDto);
     }
