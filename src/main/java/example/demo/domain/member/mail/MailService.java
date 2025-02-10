@@ -1,9 +1,10 @@
 package example.demo.domain.member.mail;
 
+import example.demo.domain.member.dto.request.MemberPhoneAndEmailRequestDto;
+
 public interface MailService {
     void sendMail(String mail);
-    int createValidationNumber();
     boolean verifyVerificationCode(String mail,String number);
-    boolean isDuplicatedEmail(String email);
+    void sendTemporaryPassword(MemberPhoneAndEmailRequestDto requestDto);
 
 }
