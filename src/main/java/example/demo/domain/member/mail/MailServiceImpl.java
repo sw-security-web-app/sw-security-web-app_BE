@@ -72,46 +72,26 @@ public class MailServiceImpl implements MailService {
 
 
     private MimeMessage CreateMail(String mail, String verificationNumber){
-        MimeMessage message=javaMailSender.createMimeMessage();
+       String subject="[Vero AI]이메일 인증";
+       String body="<h3>"+"요청하신 이메일 인증 번호입니다."+"</h3>"+
+                    "<h1>"+verificationNumber+"</h1>"+
+                    "<h3>"+"감사합니다."+"</h3>";
 
-        try {
-            message.setFrom(senderEmail);
-            message.setRecipients(MimeMessage.RecipientType.TO,mail);
-            message.setSubject("[Vero AI]이메일 인증");
-            String body="";
-
-            body+="<h3>"+"요청하신 이메일 인증 번호입니다."+"</h3>";
-            body+="<h1>"+verificationNumber+"</h1>";
-            body+="<h3>"+"감사합니다."+"</h3>";
-            message.setText(body,"UTF-8","html");
-        }catch (MessagingException e){
-            e.printStackTrace();
-        }
-        return message;
+        return createMailMessage(mail,subject,body);
     }
     private MimeMessage createTemporaryPassword(String mail){
-        MimeMessage message=javaMailSender.createMimeMessage();
         Member findMember=memberRepository.findByEmail(mail).orElseThrow(
                 ()->new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND)
         );
 
-        try {
-            message.setFrom(senderEmail);
-            message.setRecipients(MimeMessage.RecipientType.TO,mail);
-            message.setSubject("[Vero AI]임시비밀번호");
-            String body="";
-            String uuid=CreateRandom.createShortUuid();
-            findMember.setPassword(passwordEncoder.encode(uuid));
-            memberRepository.save(findMember);
-
-            body+="<h3>"+"임시 비밀번호입니다."+"</h3>";
-            body+="<h1>"+uuid+"</h1>";
-            body+="<h3>"+"감사합니다."+"</h3>";
-            message.setText(body,"UTF-8","html");
-        }catch (MessagingException e){
-            e.printStackTrace();
-        }
-        return message;
+        String subject="[Vero AI]임시비밀번호";
+        String uuid=CreateRandom.createShortUuid();
+        findMember.setPassword(passwordEncoder.encode(uuid));
+        memberRepository.save(findMember);
+        String body="<h3>"+"임시 비밀번호입니다."+"</h3>"+
+                "<h1>"+uuid+"</h1>"+
+                "<h3>"+"감사합니다."+"</h3>";
+        return createMailMessage(mail,subject,body);
     }
 
     // 인증 번호 및 발송 시간 정보
@@ -152,4 +132,16 @@ public class MailServiceImpl implements MailService {
         return Boolean.parseBoolean(System.getProperty("test.mode", "false"));
     }
 
+    private MimeMessage createMailMessage(String mail,String subject,String body){
+        MimeMessage message=javaMailSender.createMimeMessage();
+        try {
+            message.setFrom(senderEmail);
+            message.setRecipients(MimeMessage.RecipientType.TO,mail);
+            message.setSubject(subject);
+            message.setText(body,"UTF-8","html");
+        }catch (MessagingException e){
+            e.printStackTrace();
+        }
+        return message;
+    }
 }
