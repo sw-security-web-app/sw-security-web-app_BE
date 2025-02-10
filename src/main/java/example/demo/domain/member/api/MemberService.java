@@ -6,6 +6,6 @@ import example.demo.domain.member.dto.request.MemberRequestDto;
 
 public interface MemberService {
     void signup(MemberRequestDto memberRequestDto);
-    void findMemberEmail(String phoneNumber);
+
 
 }

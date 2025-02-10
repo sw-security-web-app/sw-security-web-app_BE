@@ -25,4 +25,9 @@ public class SmsController {
         return ResponseEntity.ok("인증 성공");
     }
 
+    @PostMapping ("/api/find-email")
+    public ResponseEntity<?> findEmail(@RequestParam String phoneNumber){
+        smsService.sendMemberEmail(phoneNumber);
+        return ResponseEntity.ok("전송 성공");
+    }
 }

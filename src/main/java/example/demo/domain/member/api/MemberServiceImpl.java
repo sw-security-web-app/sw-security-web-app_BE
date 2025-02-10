@@ -40,9 +40,9 @@ public class MemberServiceImpl implements MemberService {
         Company newCompany;
         //이메일 중복, 휴대폰번호 중복 예외처리는 해당 서비스 계층에서 실시합니다.
         //회원가입 전 이메일 인증 및 휴대폰 번호 인증 여부
-        if(smsAndMailValidation(memberRequestDto.getEmail(),memberRequestDto.getPhoneNumber())){
-            throw new RestApiException(MemberErrorCode.INVALID_CERTIFICATION_EMAIL_OR_PHONE);
-        }
+//        if(smsAndMailValidation(memberRequestDto.getEmail(),memberRequestDto.getPhoneNumber())){
+//            throw new RestApiException(MemberErrorCode.INVALID_CERTIFICATION_EMAIL_OR_PHONE);
+//        }
 
         switch (memberRequestDto.getMemberStatus().toLowerCase()){
             //일반
@@ -80,11 +80,6 @@ public class MemberServiceImpl implements MemberService {
         //비밀번호 암호화
         newMember.setPassword(passwordEncoder.encode(newMember.getPassword()));
         memberRepository.save(newMember);
-    }
-
-    @Override
-    public void findMemberEmail(String phoneNumber) {
-
     }
 
 

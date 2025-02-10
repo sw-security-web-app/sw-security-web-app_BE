@@ -20,10 +20,5 @@ public class MemberController {
         return ResponseEntity.ok("회원가입 성공");
     }
 
-    @GetMapping("/api/find-email")
-    public ResponseEntity<?>findEmail(@RequestParam String phoneNumber){
-        memberService.findMemberEmail(phoneNumber);
-        return ResponseEntity.ok("휴대폰 번호로 가입한 이메일 정보 전송");
-    }
 
 }
