@@ -48,11 +48,11 @@ public class MailServiceImpl implements MailService {
     //임시 비밀번호 전송
     @Override
     public void sendTemporaryPassword(MemberPhoneAndEmailRequestDto requestDto) {
-        //휴대폰 인증을 한 경우
-        if(smsValidation(requestDto.getPhoneNumber())){
-            throw new RestApiException(MemberErrorCode.INVALID_CERTIFICATION_CODE);
-        }
-
+        //휴대폰 인증을 안한 경우
+//        if(smsValidation(requestDto.getPhoneNumber())){
+//            throw new RestApiException(MemberErrorCode.INVALID_PHONE_CERTIFICATION_NUMBER);
+//        }
+        javaMailSender.send(createTemporaryPassword(requestDto.getEmail()));
     }
     @Override
     //인증 번호 확인
@@ -128,10 +128,6 @@ public class MailServiceImpl implements MailService {
     }
 
     //test를 위한 메서드
-    private boolean isTestMode() {
-        return Boolean.parseBoolean(System.getProperty("test.mode", "false"));
-    }
-
     private MimeMessage createMailMessage(String mail,String subject,String body){
         MimeMessage message=javaMailSender.createMimeMessage();
         try {
@@ -143,5 +139,9 @@ public class MailServiceImpl implements MailService {
             e.printStackTrace();
         }
         return message;
+    }
+
+    private boolean isTestMode() {
+        return Boolean.parseBoolean(System.getProperty("test.mode", "false"));
     }
 }
