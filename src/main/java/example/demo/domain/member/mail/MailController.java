@@ -22,7 +22,7 @@ public class MailController {
     private final RedisCustomServiceImpl redisCustomService;
 
     //인증 메일 전송
-    @PostMapping("/api/mail-send")
+    @GetMapping("/api/mail-send")
     public ResponseEntity<?> mailSend(@RequestParam String email){
          mailService.sendMail(email);
          return ResponseEntity.ok("인증 번호 전송");
@@ -30,9 +30,9 @@ public class MailController {
 
     //인증번호 일치 확인
     @GetMapping("/api/mail-check")
-    public ResponseEntity<?>mailCheck(@RequestParam String email,@RequestParam String userNumber){
+    public ResponseEntity<?>mailCheck(@RequestParam String email,@RequestParam String certificationNumber){
         //인증 번호 일치 여부
-        boolean isMatch=mailService.verifyVerificationCode(email, userNumber);
+        boolean isMatch=mailService.verifyVerificationCode(email, certificationNumber);
         if (!isMatch){
             return ResponseEntity.status(400).body("인증 실패");
         }else{

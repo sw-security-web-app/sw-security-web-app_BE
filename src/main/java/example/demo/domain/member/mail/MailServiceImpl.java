@@ -26,8 +26,8 @@ public class MailServiceImpl implements MailService {
     private final MemberRepository memberRepository;
     private final RedisCustomService redisCustomService;
     private final PasswordEncoder passwordEncoder;
-    static final String senderEmail="tkv0098@gmail.com";
-    private final ConcurrentHashMap<String,VerificationData> emailVerificationData=new ConcurrentHashMap<>();
+    private static final String senderEmail="tkv0098@gmail.com";
+    private static final String MAIL_PREFIX="mail: ";
 
     @Override
     public void sendMail(String mail){
@@ -41,7 +41,7 @@ public class MailServiceImpl implements MailService {
         javaMailSender.send(message);
 
         // 인증 번호 및 시간 저장
-        emailVerificationData.put(mail, new VerificationData(verificationNumber, LocalDateTime.now()));
+        redisCustomService.saveRedisData(MAIL_PREFIX+mail,verificationNumber,5L*60);
     }
 
 
@@ -49,25 +49,22 @@ public class MailServiceImpl implements MailService {
     @Override
     public void sendTemporaryPassword(MemberPhoneAndEmailRequestDto requestDto) {
         //휴대폰 인증을 안한 경우
-//        if(smsValidation(requestDto.getPhoneNumber())){
-//            throw new RestApiException(MemberErrorCode.INVALID_PHONE_CERTIFICATION_NUMBER);
-//        }
+        if(smsValidation(requestDto.getPhoneNumber())){
+            throw new RestApiException(MemberErrorCode.INVALID_PHONE_CERTIFICATION_NUMBER);
+        }
         javaMailSender.send(createTemporaryPassword(requestDto.getEmail()));
     }
     @Override
     //인증 번호 확인
     public boolean verifyVerificationCode(String mail,String number){
-        VerificationData data = emailVerificationData.get(mail);
-        if (data == null) {
+
+        String verificationNumber = redisCustomService.getRedisData(MAIL_PREFIX+mail);
+        if (verificationNumber == null) {
             throw new RestApiException(MemberErrorCode.INVALID_MAIL_NUMBER);
         }
 
-        // 인증 시간 초과(3분)
-        if (Duration.between(data.getSentTime(), LocalDateTime.now()).toMinutes() > 3) {
-            throw new RestApiException(MemberErrorCode.TIMEOUT_MAIL_NUMBER);
-        }
 
-        return data.getVerificationNumber().equals(number);
+        return verificationNumber.equals(number);
     }
 
 
@@ -95,22 +92,7 @@ public class MailServiceImpl implements MailService {
     }
 
     // 인증 번호 및 발송 시간 정보
-    private static class VerificationData {
-        private final String verificationNumber;
-        private final LocalDateTime sentTime;
 
-        public VerificationData(String verificationNumber, LocalDateTime sentTime) {
-            this.verificationNumber = verificationNumber;
-            this.sentTime = sentTime;
-        }
-
-        public String getVerificationNumber() {
-            return verificationNumber;
-        }
-        public LocalDateTime getSentTime() {
-            return sentTime;
-        }
-    }
     //이메일 중복 검사
     private boolean isDuplicatedEmail(String email){
         //같은 이메일 1개이상 -> true 반환

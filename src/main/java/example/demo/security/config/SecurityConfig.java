@@ -16,6 +16,12 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -29,15 +35,14 @@ public class SecurityConfig {
 
     private static final String[] AUTH_WHITELIST={
             "/api/login","/swagger-ui/**","/api-docs", "/swagger-ui-custom.html",
-            "/v3/api-docs/**", "/api-docs/**", "/swagger-ui.html","/api/signup"
+            "/v3/api-docs/**", "/api-docs/**", "/swagger-ui.html","/api/signup","/api/**"
     };
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
         //CSRF,CORS
-        http.csrf((csrf)->csrf.disable());
-        http.cors((Customizer.withDefaults()));
-
+        http.csrf(AbstractHttpConfigurer::disable);
+        http.cors(cors -> cors.configurationSource(corsConfigurationSource()));
         //세션 관리 상태 없음 구성,
         http.sessionManagement(sessionManagement->sessionManagement.sessionCreationPolicy(
                 SessionCreationPolicy.STATELESS
@@ -56,11 +61,26 @@ public class SecurityConfig {
 
         //권한 규칙 생성
         http.authorizeHttpRequests(authorize->authorize
-                .requestMatchers(AUTH_WHITELIST).permitAll()
+                .requestMatchers(AUTH_WHITELIST)
+                .permitAll()
                 //@PreAuthorization을 사용
-                .anyRequest().permitAll());
+                .anyRequest().authenticated());
 
         return http.build();
+    }
+
+    //CORS
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource(){
+        CorsConfiguration corsConfiguration=new CorsConfiguration();
+        corsConfiguration.setAllowedOriginPatterns(Arrays.asList("http://localhost:*","http://172.20.10.2:5173"));
+        corsConfiguration.setAllowedMethods(Arrays.asList("GET","POST","DELETE","OPTIONS"));
+        corsConfiguration.setAllowedHeaders(List.of("*"));
+        corsConfiguration.setAllowCredentials(false);
+
+        UrlBasedCorsConfigurationSource source=new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**",corsConfiguration);
+        return source;
     }
 
 
