@@ -14,8 +14,7 @@ public interface CompanyCustomRepository {
     //uuid로 직원 유저의 회사명, 부서명 가져오기
     CompanyInfoWithUuidDto findCompanyInfoByInvitationCode(String inviteCode);
     //유저가 관리자인지 확인하고 해당 유저의 회사 초대코드를 불러옵니다.
-  CompanyCodeDto findCompanyCode(Long memberId);
-  //같은 회사 , 같은 부서의 직원 목록 조회
-    CompanyResponseDto getListOfCompanyEmployees(Long memberId,int offset);
+    CompanyCodeDto findCompanyCode(Long memberId);
+    //같은 회사 , 같은 부서의 직원 목록 조회
 
 }

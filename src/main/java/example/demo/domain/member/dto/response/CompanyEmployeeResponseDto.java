@@ -1,4 +1,4 @@
-package example.demo.domain.company.dto.response;
+package example.demo.domain.member.dto.response;
 
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.*;

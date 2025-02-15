@@ -1,6 +1,7 @@
 package example.demo.domain.company.dto.response;
 
 import com.querydsl.core.annotations.QueryProjection;
+import example.demo.domain.member.dto.response.CompanyEmployeeResponseDto;
 import lombok.*;
 
 import java.util.List;
