@@ -40,6 +40,12 @@ public class Company extends BaseEntity {
         this.companyDept = companyDept;
         this.invitationCode = invitationCode;
     }
+    public void addMember(Member member){
+        members.add(member);
+    }
+    public void setCompanyId(Long companyId){
+        this.companyId=companyId;
+    }
 
 }
 
