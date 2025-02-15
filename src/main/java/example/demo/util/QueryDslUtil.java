@@ -20,7 +20,7 @@ public class QueryDslUtil {
     }
 
     //멤버의 이름으로 가나다순 정렬
-    public static List<OrderSpecifier> getAllOrderByMemberNameSpecifies(Pageable pageable,String entityType){
+    public static List<OrderSpecifier> getAllOrderByMemberNameSpecifies(Pageable pageable){
         List<OrderSpecifier> orders=new ArrayList<>();
 
         if(!pageable.getSort().isEmpty()){
