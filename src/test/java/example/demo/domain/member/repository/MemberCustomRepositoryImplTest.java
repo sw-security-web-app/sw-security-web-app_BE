@@ -1,7 +1,10 @@
 package example.demo.domain.member.repository;
 
+import example.demo.domain.company.Company;
+import example.demo.domain.company.repository.CompanyRepository;
 import example.demo.domain.member.Member;
 import example.demo.domain.member.dto.request.MemberRequestDto;
+import example.demo.domain.member.dto.response.MemberInfoResponseDto;
 import jakarta.transaction.Transactional;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
@@ -23,6 +26,9 @@ class MemberCustomRepositoryImplTest {
 
     @Autowired
     private MemberRepository memberRepository;
+
+    @Autowired
+    private CompanyRepository companyRepository;
     @AfterEach
     void teardown(){
         memberRepository.deleteAllInBatch();
@@ -83,5 +89,48 @@ class MemberCustomRepositoryImplTest {
         //then
         assertThat(count).isEqualTo(3L);
         assertThat(NaNCount).isEqualTo(0L);
+    }
+
+    @Test
+    @DisplayName("관리자 회원의 정보와 회원의 회사 정보를 가지고 옵니다.")
+    void getMemberInfo(){
+        //given
+        MemberRequestDto managerRequest1=MemberRequestDto.ofManager(
+                "tkv99@naver.com", "김김김", "rlaehdus00!!","0105555555",
+                "삼성","SDI","사장","MANAGER"
+        );
+        MemberRequestDto managerRequest2=MemberRequestDto.ofManager(
+                "tkv9911@naver.com", "김도김도김도", "rlaehdus00!!","0105552555",
+                "삼성","SDI","부장","MANAGER"
+        );
+        Company company=Company.builder()
+                .invitationCode(null)
+                .companyDept(managerRequest1.getCompanyDept())
+                .companyName(managerRequest1.getCompanyName())
+                .build();
+        companyRepository.save(company);
+
+        Member member1=Member.createManager(managerRequest1,company);
+        Member member2=Member.createManager(managerRequest2,company);
+        memberRepository.saveAll(List.of(member1,member2));
+
+        Long member1_Id=memberRepository.findByEmail(member1.getEmail()).get().getMemberId();
+        Long member2_Id=memberRepository.findByEmail(member2.getEmail()).get().getMemberId();
+
+        //when
+        MemberInfoResponseDto memberInfoResponseDto1=memberRepository.getMemberInfo(member1_Id);
+        MemberInfoResponseDto memberInfoResponseDto2=memberRepository.getMemberInfo(member2_Id);
+
+        //then
+        assertThat(memberInfoResponseDto1).extracting(
+                "name","email","companyName","companyDept","companyPosition"
+        ).containsExactly(
+                member1.getUserName(),member1.getEmail(),company.getCompanyName(),company.getCompanyDept(),member1.getCompanyPosition()
+        );
+        assertThat(memberInfoResponseDto2).extracting(
+                "name","email","companyName","companyDept","companyPosition"
+        ).containsExactly(
+                member2.getUserName(),member2.getEmail(),company.getCompanyName(),company.getCompanyDept(),member2.getCompanyPosition()
+        );
     }
 }

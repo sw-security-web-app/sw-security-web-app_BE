@@ -54,7 +54,6 @@ public class MemberCustomRepositoryImpl implements MemberCustomRepository {
                 ))
                 .from(member)
                 .leftJoin(member.company,company)
-                .fetchJoin()
                 .where(member.memberId.eq(memberId))
                 .fetchOne();
     }
