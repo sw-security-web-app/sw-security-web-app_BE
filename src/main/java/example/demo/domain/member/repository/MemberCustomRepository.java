@@ -1,6 +1,8 @@
 package example.demo.domain.member.repository;
 
 import example.demo.domain.member.dto.response.CompanyEmployeeResponseDto;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -13,5 +15,5 @@ public interface MemberCustomRepository {
     //휴대폰 번호 중복검사를 위한 쿼리
     Long getPhoneNumberCount(String phoneNumber);
     //회사Id로 소속 직원 정보 가져오기
-    List<CompanyEmployeeResponseDto> getCompanyEmployeeInfo(Long companyId);
+    Page<CompanyEmployeeResponseDto> getCompanyEmployeeInfo(Long companyId, Pageable pageable);
 }

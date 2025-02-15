@@ -6,10 +6,12 @@ import example.demo.domain.company.dto.CompanyCodeDto;
 import example.demo.domain.company.dto.CompanyInfoWithUuidDto;
 import example.demo.domain.company.dto.QCompanyCodeDto;
 import example.demo.domain.company.dto.QCompanyInfoWithUuidDto;
+import example.demo.domain.company.dto.response.CompanyResponseDto;
 import example.demo.domain.company.repository.CompanyCustomRepository;
 import example.demo.error.RestApiException;
 import jakarta.persistence.EntityManager;
 
+import java.util.List;
 import java.util.Optional;
 
 import static example.demo.domain.company.QCompany.*;
