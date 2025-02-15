@@ -5,13 +5,18 @@ import example.demo.domain.company.repository.CompanyRepository;
 import example.demo.domain.member.Member;
 import example.demo.domain.member.dto.request.MemberRequestDto;
 import example.demo.domain.member.dto.response.CompanyEmployeeResponseDto;
+import jakarta.persistence.EntityManager;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -30,14 +35,10 @@ class MemberCustomRepositoryImplTest {
 
     @Autowired
     private MemberRepository memberRepository;
-    @AfterEach
-    void teardown(){
-        memberRepository.deleteAllInBatch();
-    }
-    @Test
-    @DisplayName("같은 이메일의 개수를 반환하며 존재하지 않는다면 0L을 반환합니다.")
-    void getSameEmailCount() {
-        //given
+    @Autowired
+    private EntityManager em;
+
+    public void initMemberOfGeneral(){
         MemberRequestDto general1=MemberRequestDto.ofGeneral(
                 "tkv99@naver.com", "김김김", "rlaehdus00!!", "01050299737","GENERAL"
         );
@@ -53,6 +54,17 @@ class MemberCustomRepositoryImplTest {
         );
         Member member3=Member.createGeneral(general3);
         memberRepository.saveAll(List.of(member1,member2,member3));
+    }
+
+    @AfterEach
+    void teardown(){
+        memberRepository.deleteAllInBatch();
+    }
+    @Test
+    @DisplayName("같은 이메일의 개수를 반환하며 존재하지 않는다면 0L을 반환합니다.")
+    void getSameEmailCount() {
+        //given
+        initMemberOfGeneral();
 
         //when
         Long count=memberCustomRepository.getSameEmailCount("tkv99@naver.com");
@@ -67,22 +79,7 @@ class MemberCustomRepositoryImplTest {
     @DisplayName("같은 휴대폰 번호의 개수를 반횐하며 존재하지 않는다면 0L을 반환합니다.")
     void getPhoneNumberCount() {
         //given
-        MemberRequestDto general1=MemberRequestDto.ofGeneral(
-                "tkv99@naver.com", "김김김", "rlaehdus00!!", "01050299737","GENERAL"
-        );
-        Member member1=Member.createGeneral(general1);
-
-        MemberRequestDto general2=MemberRequestDto.ofGeneral(
-                "tkv99@naver.com", "김김김", "rlaehdus00!!", "01050299737","GENERAL"
-        );
-        Member member2=Member.createGeneral(general2);
-
-        MemberRequestDto general3=MemberRequestDto.ofGeneral(
-                "tkv99@naver.com", "김김김", "rlaehdus00!!", "01050299737","GENERAL"
-        );
-        Member member3=Member.createGeneral(general3);
-        memberRepository.saveAll(List.of(member1,member2,member3));
-
+        initMemberOfGeneral();
         //when
         Long count=memberCustomRepository.getPhoneNumberCount("01050299737");
         Long NaNCount=memberCustomRepository.getPhoneNumberCount("01012345678");
@@ -96,6 +93,7 @@ class MemberCustomRepositoryImplTest {
     @DisplayName("회사id로 해당 회사소속의 직원목록을 불러옵니다.")
     void getCompanyEmployeeInfo(){
         //given
+        initMemberOfGeneral();
         String COMPANY_CODE="TEST_CODE";
         MemberRequestDto managerDto=MemberRequestDto.ofManager(
                 "tkv00@naver.com", "김김0", "rlaehdus00!!", "01050299737","SK","AI","사장","MANAGER"
@@ -121,24 +119,26 @@ class MemberCustomRepositoryImplTest {
         Member employee2=Member.createEmployee(employee2Dto,company);
         memberRepository.saveAll(List.of(manager,employee1,employee2));
 
+        Pageable pageable= PageRequest.of(0,2);
         //when
-        List<CompanyEmployeeResponseDto> employeeList=memberCustomRepository.getCompanyEmployeeInfo(company.getCompanyId());
+        Page<CompanyEmployeeResponseDto> employeeList=memberCustomRepository.getCompanyEmployeeInfo(company.getCompanyId(),pageable);
 
         //then
         assertThat(employeeList).isNotNull();
-        assertThat(employeeList).hasSize(3);
+        assertThat(employeeList.getTotalElements()).isEqualTo(3);
+        assertThat(employeeList.getTotalPages()).isEqualTo(2);
 
         //직원 검증
         assertThat(employeeList)
                 .extracting(CompanyEmployeeResponseDto::getName)
-                .containsExactlyInAnyOrder("김김0","김김1","김김2");
+                .containsExactlyInAnyOrder("김김0","김김1");
 
         assertThat(employeeList)
                 .extracting(CompanyEmployeeResponseDto::getEmail)
-                .containsExactlyInAnyOrder("tkv00@naver.com","tkv11@naver.com","tkv22@naver.com");
+                .containsExactlyInAnyOrder("tkv00@naver.com","tkv11@naver.com");
 
         assertThat(employeeList)
                 .extracting(CompanyEmployeeResponseDto::getCompanyPosition)
-                .containsExactlyInAnyOrder("사장","인턴1","인턴2");
+                .containsExactlyInAnyOrder("사장","인턴1");
     }
 }
