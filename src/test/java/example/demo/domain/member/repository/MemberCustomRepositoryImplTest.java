@@ -133,4 +133,39 @@ class MemberCustomRepositoryImplTest {
                 member2.getUserName(),member2.getEmail(),company.getCompanyName(),company.getCompanyDept(),member2.getCompanyPosition()
         );
     }
+
+    @Test
+    @DisplayName("일반 회원의 정보와 회원의 회사 정보를 가지고 옵니다.")
+    void getMemberInfoOfGeneral(){
+        //given
+        MemberRequestDto managerRequest1=MemberRequestDto.ofGeneral(
+                "tkv99@naver.com", "김김김", "rlaehdus00!!","0105555555", "GENERAL"
+        );
+        MemberRequestDto managerRequest2=MemberRequestDto.ofGeneral(
+                "tkv9911@naver.com", "김도김도김도", "rlaehdus00!!","0105552555", "GENERAL"
+        );
+
+        Member member1=Member.createGeneral(managerRequest1);
+        Member member2=Member.createGeneral(managerRequest2);
+        memberRepository.saveAll(List.of(member1,member2));
+
+        Long member1_Id=memberRepository.findByEmail(member1.getEmail()).get().getMemberId();
+        Long member2_Id=memberRepository.findByEmail(member2.getEmail()).get().getMemberId();
+
+        //when
+        MemberInfoResponseDto memberInfoResponseDto1=memberRepository.getMemberInfo(member1_Id);
+        MemberInfoResponseDto memberInfoResponseDto2=memberRepository.getMemberInfo(member2_Id);
+
+        //then
+        assertThat(memberInfoResponseDto1).extracting(
+                "name","email","companyName","companyDept","companyPosition"
+        ).containsExactly(
+                member1.getUserName(),member1.getEmail(),null,null,member1.getCompanyPosition()
+        );
+        assertThat(memberInfoResponseDto2).extracting(
+                "name","email","companyName","companyDept","companyPosition"
+        ).containsExactly(
+                member2.getUserName(),member2.getEmail(),null,null,member2.getCompanyPosition()
+        );
+    }
 }
