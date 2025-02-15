@@ -5,29 +5,36 @@ import example.demo.domain.company.repository.CompanyRepository;
 import example.demo.domain.company.dto.CompanyCodeDto;
 import example.demo.domain.member.Member;
 import example.demo.domain.member.MemberErrorCode;
+import example.demo.domain.member.dto.response.MemberInfoResponseDto;
 import example.demo.domain.member.repository.MemberRepository;
 import example.demo.domain.member.dto.request.MemberRequestDto;
 import example.demo.error.RestApiException;
+import example.demo.security.util.JwtUtil;
 import jakarta.persistence.EntityManager;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
 
 import static example.demo.domain.member.MemberStatus.*;
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
+
 class MemberServiceTest {
     @Autowired
+    @MockitoBean
     private MemberRepository memberRepository;
     @Autowired
     private CompanyRepository companyRepository;
@@ -37,6 +44,9 @@ class MemberServiceTest {
     private EntityManager em;
     @Autowired
     private PasswordEncoder encoder;
+    @MockitoBean
+    private JwtUtil jwtUtil;
+
 
     @BeforeAll
     static void setup() {
@@ -165,5 +175,94 @@ class MemberServiceTest {
         assertThat(findCompany2).extracting("companyName","companyDept")
                 .containsExactly("LG","디스플레이");
     }
+    @Test
+    @DisplayName("성공케이스-매니저 회원 정보와 회원의 회사 정보를 반환합니다.")
+    void getMemberInfoOfManager(){
+        //given
+        String token="valid_token";
+        Long memberId=1L;
+
+        MemberInfoResponseDto expectedResponse=MemberInfoResponseDto
+                .builder()
+                .name("김도연")
+                .email("tkv00@naver.com")
+                .companyName("삼성")
+                .companyDept("개발부")
+                .companyPosition("사장")
+                .build();
+        //Jwt Mock 설정
+        when(jwtUtil.getMemberId(token)).thenReturn(memberId);
+        //memberRepo에서 호출 시 예상 응답
+        when(memberRepository.getMemberInfo(memberId)).thenReturn(expectedResponse);
+
+        //when
+       MemberInfoResponseDto actualResponseDto=memberService.getMemberInfo(token);
+
+        //then
+        assertNotNull(actualResponseDto);
+        assertEquals(actualResponseDto.getName(),expectedResponse.getName());
+        assertEquals(actualResponseDto.getEmail(),expectedResponse.getEmail());
+        assertEquals(actualResponseDto.getCompanyDept(),expectedResponse.getCompanyDept());
+        assertEquals(actualResponseDto.getCompanyName(),expectedResponse.getCompanyName());
+        assertEquals(actualResponseDto.getCompanyPosition(),expectedResponse.getCompanyPosition());
+
+        verify(jwtUtil,times(1)).getMemberId(token);
+        verify(memberRepository,times(1)).getMemberInfo(memberId);
+    }
+
+    @Test
+    @DisplayName("성공케이스-일반 회원 정보와 회원의 회사 정보를 반환합니다.")
+    void getMemberInfoOfGeneral(){
+        //given
+        String token="valid_token";
+        Long memberId=1L;
+
+        MemberInfoResponseDto expectedResponse=MemberInfoResponseDto
+                .builder()
+                .name("김도연")
+                .email("tkv00@naver.com")
+                .companyName(null)
+                .companyDept(null)
+                .companyPosition(null)
+                .build();
+        //Jwt Mock 설정
+        when(jwtUtil.getMemberId(token)).thenReturn(memberId);
+        //memberRepo에서 호출 시 예상 응답
+        when(memberRepository.getMemberInfo(memberId)).thenReturn(expectedResponse);
+
+        //when
+        MemberInfoResponseDto actualResponseDto=memberService.getMemberInfo(token);
+
+        //then
+        assertNotNull(actualResponseDto);
+        assertEquals(actualResponseDto.getName(),expectedResponse.getName());
+        assertEquals(actualResponseDto.getEmail(),expectedResponse.getEmail());
+        assertEquals(actualResponseDto.getCompanyDept(),expectedResponse.getCompanyDept());
+        assertEquals(actualResponseDto.getCompanyName(),expectedResponse.getCompanyName());
+        assertEquals(actualResponseDto.getCompanyPosition(),expectedResponse.getCompanyPosition());
+
+        verify(jwtUtil,times(1)).getMemberId(token);
+        verify(memberRepository,times(1)).getMemberInfo(memberId);
+    }
+
+    @Test
+    @DisplayName("실패케이스-회원 정보가 없는 경우 예외를 반환합니다.")
+    void getMemberInfo_Invalid_Member(){
+        //given
+        String token="valid_token";
+        Long memberId=1L;
+
+        //Jwt Mock 설정
+        when(jwtUtil.getMemberId(token)).thenReturn(memberId);
+        //memberRepo에서 호출 시 예상 응답
+        when(memberRepository.getMemberInfo(memberId)).thenReturn(null);
+
+        //when
+        //then
+        assertThrows(RestApiException.class,()->{
+            memberService.getMemberInfo(token);
+        });
+    }
+
 
 }

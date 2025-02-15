@@ -2,6 +2,7 @@ package example.demo.domain.member.dto.response;
 
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 
 @Getter
@@ -18,6 +19,7 @@ public class MemberInfoResponseDto {
     private String companyPosition;
 
     @QueryProjection
+    @Builder
     public MemberInfoResponseDto(String name, String email, String companyName, String companyDept, String companyPosition) {
         this.name = name;
         this.email = email;

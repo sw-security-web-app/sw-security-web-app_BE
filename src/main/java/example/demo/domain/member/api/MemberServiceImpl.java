@@ -89,7 +89,11 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public MemberInfoResponseDto getMemberInfo(String token) {
         Long findMemberId=jwtUtil.getMemberId(token);
-        return memberRepository.getMemberInfo(findMemberId);
+        MemberInfoResponseDto memberInfo = memberRepository.getMemberInfo(findMemberId);
+        if(memberInfo==null){
+            throw new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND);
+        }
+        return memberInfo;
     }
 
 
