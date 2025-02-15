@@ -1,6 +1,7 @@
 package example.demo.domain.member.api;
 
 import example.demo.domain.company.Company;
+import example.demo.domain.company.dto.CompanyInfoWithUuidDto;
 import example.demo.domain.company.repository.CompanyRepository;
 import example.demo.domain.company.dto.CompanyCodeDto;
 import example.demo.domain.member.Member;
@@ -13,23 +14,38 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvcBuilder;
 import org.springframework.transaction.annotation.Transactional;
 
 import static example.demo.domain.member.MemberStatus.*;
 import static org.assertj.core.api.Assertions.*;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.Optional;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.when;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
 class MemberServiceTest {
     @Autowired
+    @MockitoBean
     private MemberRepository memberRepository;
     @Autowired
+    @MockitoBean
     private CompanyRepository companyRepository;
     @Autowired
     private MemberService memberService;
@@ -166,4 +182,45 @@ class MemberServiceTest {
                 .containsExactly("LG","디스플레이");
     }
 
+    @Test
+    @DisplayName("회원가입 시 기존 회사가 존재하면 회사에 인원이 추가됩니다.")
+    void sigUpWhenExistCompany(){
+        //given
+        String INVITE_CODE="TEST_CODE";
+        MemberRequestDto requestDto=MemberRequestDto.ofEmployee(
+                "tkv00222@naver.com","employee1","rlaehdus00!!","01012345622","인턴1",INVITE_CODE,"EMPLOYEE"
+        );
+        CompanyInfoWithUuidDto companyInfoWithUuidDto=new CompanyInfoWithUuidDto("삼성","개발");
+
+        when(companyRepository.findCompanyInfoByInvitationCode(INVITE_CODE))
+                .thenReturn(companyInfoWithUuidDto);
+
+        //Mock Company저장
+        Company existedCompany=Company.builder()
+                .companyName(companyInfoWithUuidDto.getCompanyName())
+                        .companyDept(companyInfoWithUuidDto.getCompanyDept())
+                                .invitationCode(INVITE_CODE).build();
+        existedCompany.setCompanyId(123L);
+
+        when(companyRepository.save(any(Company.class))).thenReturn(existedCompany);
+        when(companyRepository.findByCompanyNameAndCompanyDept(any(),any()))
+                .thenReturn(Optional.of(existedCompany));
+        Member member=Member.createEmployee(requestDto,existedCompany);
+
+        when(memberRepository.save(any(Member.class))).thenReturn(member);
+        when(memberRepository.findByEmailAndPhoneNumber(requestDto.getEmail(),requestDto.getPhoneNumber()))
+                .thenReturn(Optional.of(member));
+
+        //when
+        memberService.signup(requestDto);
+
+        //then
+        Member findMember=memberRepository.findByEmailAndPhoneNumber(requestDto.getEmail(),requestDto.getPhoneNumber())
+                        .get();
+        verify(companyRepository,times(1)).findCompanyInfoByInvitationCode(INVITE_CODE);
+        verify(companyRepository,times(1)).findByCompanyNameAndCompanyDept(any(),any());
+        verify(memberRepository,times(1)).save(any(Member.class));
+
+        assertThat(findMember.getCompany().getCompanyId()).isEqualTo(123L);
+    }
 }
