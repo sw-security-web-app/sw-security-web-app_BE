@@ -6,6 +6,9 @@ import example.demo.domain.company.dto.CompanyCodeDto;
 import example.demo.domain.company.dto.CompanyInfoWithUuidDto;
 import example.demo.domain.company.dto.QCompanyCodeDto;
 import example.demo.domain.company.dto.QCompanyInfoWithUuidDto;
+import example.demo.domain.company.dto.response.CompanyResponseDto;
+import example.demo.domain.company.dto.response.QCompanyEmployeeResponseDto;
+import example.demo.domain.company.dto.response.QCompanyResponseDto;
 import example.demo.domain.company.repository.CompanyCustomRepository;
 import example.demo.error.RestApiException;
 import jakarta.persistence.EntityManager;
@@ -44,5 +47,10 @@ public class CompanyCustomRepositoryImpl implements CompanyCustomRepository {
                         .where(member.memberId.eq(memberId))
                         .fetchOne()
         ).orElseThrow(()->new RestApiException(CompanyErrorCode.NOT_EXIST_COMPANY));
+    }
+
+    @Override
+    public CompanyResponseDto getListOfCompanyEmployees(Long memberId,int offset) {
+        return null;
     }
 }
