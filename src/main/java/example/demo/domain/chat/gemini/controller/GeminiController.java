@@ -1,7 +1,7 @@
 package example.demo.domain.chat.gemini.controller;
 
 import example.demo.domain.chat.gemini.service.QnAService;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,16 +18,16 @@ import java.util.Map;
  */
 
 @RestController
-@AllArgsConstructor
+@RequiredArgsConstructor
 @RequestMapping("/api/qna")
 public class GeminiController {
 
-    private final QnAService qnaService;
+    private final QnAService qnAService;
 
     @PostMapping("/ask")
     public ResponseEntity<String> askQuestion(@RequestBody Map<String, String> payload) {
         String question = payload.get("question");
-        String answer = qnaService.getAnswer(question);
+        String answer = qnAService.getAnswer(question);
         return ResponseEntity.ok(answer);
     }
 }

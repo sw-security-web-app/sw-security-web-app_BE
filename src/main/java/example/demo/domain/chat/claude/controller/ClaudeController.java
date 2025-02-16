@@ -1,7 +1,7 @@
 package example.demo.domain.chat.claude.controller;
 
 import example.demo.domain.chat.claude.service.ClaudeService;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,7 +19,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/claude")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ClaudeController {
 
     private final ClaudeService claudeService;
