@@ -9,6 +9,7 @@ import example.demo.error.RestApiException;
 import example.demo.security.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +23,7 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public CompanyResponseDto getCompanyInfo(String token) {
         CompanyResponseDto companyResponseDto=
                 companyRepository.getCompanyInfo(jwtUtil.getMemberId(token));
