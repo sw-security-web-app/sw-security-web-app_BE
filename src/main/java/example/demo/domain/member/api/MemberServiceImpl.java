@@ -21,6 +21,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -92,7 +93,8 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public CompanyResponseDto getAllEmployees(String token, Pageable page) {
+    @Transactional(readOnly = true)
+    public Page<CompanyEmployeeResponseDto>  getAllEmployees(String token, Pageable page) {
         Member member=memberRepository.findById(jwtUtil.getMemberId(token))
                 .orElseThrow(()->new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
         //MANAGER인지 판단

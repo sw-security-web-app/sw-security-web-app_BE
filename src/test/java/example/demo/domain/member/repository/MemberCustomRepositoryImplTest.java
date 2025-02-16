@@ -8,6 +8,7 @@ import example.demo.domain.member.dto.request.MemberRequestDto;
 import example.demo.domain.member.dto.response.CompanyEmployeeResponseDto;
 import jakarta.persistence.EntityManager;
 import org.assertj.core.api.Assertions;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -18,6 +19,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -39,7 +41,7 @@ class MemberCustomRepositoryImplTest {
     @Autowired
     private EntityManager em;
 
-    public void initMemberOfGeneral(){
+    private void initMemberOfGeneral(){
         MemberRequestDto general1=MemberRequestDto.ofGeneral(
                 "tkv99@naver.com", "김김김", "rlaehdus00!!", "01050299737","GENERAL"
         );
@@ -95,6 +97,49 @@ class MemberCustomRepositoryImplTest {
     void getCompanyInfo(){
         //given
         String COMPANY_CODE="TEST_CODE";
+        Result result = getResult(COMPANY_CODE);
+
+        //when
+        CompanyResponseDto companyResponseDto1=companyRepository.getCompanyInfo(result.member1().getMemberId());
+        CompanyResponseDto companyResponseDto2=companyRepository.getCompanyInfo(result.member2().getMemberId());
+        CompanyResponseDto companyResponseDto3=companyRepository.getCompanyInfo(result.member3().getMemberId());
+
+        //then
+        //직원 검증
+        assertThat(companyResponseDto1.getCompanyName()).isEqualTo(result.company1().getCompanyName());
+        assertThat(companyResponseDto1.getCompanyDept()).isEqualTo(result.company1().getCompanyDept());
+
+        assertThat(companyResponseDto2.getCompanyName()).isEqualTo(result.company1().getCompanyName());
+        assertThat(companyResponseDto2.getCompanyDept()).isEqualTo(result.company1().getCompanyDept());
+
+        assertThat(companyResponseDto3.getCompanyName()).isEqualTo(result.company2().getCompanyName());
+        assertThat(companyResponseDto3.getCompanyDept()).isEqualTo(result.company2().getCompanyDept());
+    }
+
+    @Test
+    @DisplayName("회사직원 목록을 페이징하여 조회합니다.")
+    void getCompanyEmployeeInfo(){
+        //given
+        String COMPANY_CODE="TEST_CODE";
+        Result result=getResult(COMPANY_CODE);
+
+        //페이징 케이스
+        Pageable page1=PageRequest.of(0,3, Sort.by(Sort.Direction.DESC,"userName"));
+        Pageable page2=PageRequest.of(1,3, Sort.by(Sort.Direction.DESC,"userName"));
+
+        //when
+        Page<CompanyEmployeeResponseDto> result1=memberRepository.getCompanyEmployeeInfo(result.company1.getCompanyId(),page1);
+        Page<CompanyEmployeeResponseDto> result2=memberRepository.getCompanyEmployeeInfo(result.company1.getCompanyId(),page2);
+
+        //then
+        assertThat(result1.getTotalPages()).isEqualTo(2);
+        assertThat(result1.getTotalElements()).isEqualTo(4);
+        assertThat(result1.getContent().size()).isEqualTo(3);
+        assertThat(result2.getContent().size()).isEqualTo(1);
+    }
+
+    @NotNull
+    private Result getResult(String COMPANY_CODE) {
         Company company1=Company
                 .builder()
                 .companyDept("AI1")
@@ -113,36 +158,35 @@ class MemberCustomRepositoryImplTest {
                 "tkv123@naver.com","김도연1","abcd123!","01012345678","SK1","AI1","사장1","MANAGER"
         );
         MemberRequestDto memberRequestDto2=MemberRequestDto.ofManager(
-                "tkv124@naver.com","김도연2","abcd123!1","01012345679","SK1","AI1","사장2","MANAGER"
+                "tkv124@naver.com","김도연2","abcd123!12","01012345679","SK1","AI1","사장2","MANAGER"
+        );
+        MemberRequestDto memberRequestDto3=MemberRequestDto.ofManager(
+                "tkv124@naver.com","김도연3","abcd123!13","01012345679","SK1","AI1","사장3","MANAGER"
+        );
+        MemberRequestDto memberRequestDto4=MemberRequestDto.ofManager(
+                "tkv124@naver.com","김도연4","abcd123!14","01012345679","SK1","AI1","사장4","MANAGER"
         );
 
-        MemberRequestDto memberRequestDto3=MemberRequestDto.ofManager(
-                "tkv125@naver.com","김도연3","abcd123!2","01012345670","SK2","AI2","사장3","MANAGER"
+        MemberRequestDto memberRequestDto5=MemberRequestDto.ofManager(
+                "tkv125@naver.com","김도연5","abcd123!2","01012345670","SK2","AI2","사장3","MANAGER"
         );
 
         Member member1=Member.createManager(memberRequestDto1,company1);
         Member member2=Member.createManager(memberRequestDto2,company1);
+        Member member4=Member.createManager(memberRequestDto4,company1);
+        Member member5=Member.createManager(memberRequestDto5,company1);
         Member member3=Member.createManager(memberRequestDto3,company2);
         member1=memberRepository.save(member1);
         member2=memberRepository.save(member2);
         member3=memberRepository.save(member3);
+        member4=memberRepository.save(member4);
+        member5=memberRepository.save(member5);
         em.flush();
         em.clear();
+        Result result = new Result(company1, company2, member1, member2, member3,member4,member5);
+        return result;
+    }
+    private record Result(Company company1, Company company2, Member member1, Member member2, Member member3,Member member4,Member member5) {
 
-        //when
-        CompanyResponseDto companyResponseDto1=companyRepository.getCompanyInfo(member1.getMemberId());
-        CompanyResponseDto companyResponseDto2=companyRepository.getCompanyInfo(member2.getMemberId());
-        CompanyResponseDto companyResponseDto3=companyRepository.getCompanyInfo(member3.getMemberId());
-
-        //then
-        //직원 검증
-        assertThat(companyResponseDto1.getCompanyName()).isEqualTo(company1.getCompanyName());
-        assertThat(companyResponseDto1.getCompanyDept()).isEqualTo(company1.getCompanyDept());
-
-        assertThat(companyResponseDto2.getCompanyName()).isEqualTo(company1.getCompanyName());
-        assertThat(companyResponseDto2.getCompanyDept()).isEqualTo(company1.getCompanyDept());
-
-        assertThat(companyResponseDto3.getCompanyName()).isEqualTo(company2.getCompanyName());
-        assertThat(companyResponseDto3.getCompanyDept()).isEqualTo(company2.getCompanyDept());
     }
 }
