@@ -17,7 +17,7 @@ import java.util.List;
 
 public class QueryDslUtil {
     private static String[] companyDept={
-            "기타","인턴","사원","주임","대리","과장","차장","부장","이사","상무","전무","부사장","사장"
+            "사장", "부사장", "전무", "상무", "이사", "부장", "차장", "과장", "대리", "주임", "사원", "인턴", "기타"
     };
     public static OrderSpecifier<?> getSortedColumn(Order order, Path<?> parent, String fieldName){
         Path<Object> fieldPath= Expressions.path(Object.class,parent,fieldName);
@@ -33,7 +33,7 @@ public class QueryDslUtil {
                 String property=order.getProperty();
                 Order direction=order.getDirection().isAscending() ? Order.ASC : Order.DESC;
 
-                if(property.equals("companyDept")){
+                if(property.equals("position")){
                     orders.add(getSortedByCompanyDept(direction));
                 }else if(property.equals("name")){
                     orders.add(new OrderSpecifier<>(direction,QMember.member.userName));

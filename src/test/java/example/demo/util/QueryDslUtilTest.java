@@ -1,5 +1,6 @@
 package example.demo.util;
 
+import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import example.demo.domain.member.QMember;
 import org.junit.jupiter.api.Assertions;
@@ -24,7 +25,7 @@ class QueryDslUtilTest {
         Pageable pageable= PageRequest.of(0,10, Sort.by(Sort.Direction.ASC,"name"));
 
         //when
-        List<OrderSpecifier> orderSpecifiers=QueryDslUtil.getAllOrderByMemberNameSpecifies(pageable);
+        List<OrderSpecifier<?>> orderSpecifiers=QueryDslUtil.getOrderSpecifiers(pageable);
 
         //then
         assertThat(orderSpecifiers).isNotEmpty();
@@ -37,7 +38,7 @@ class QueryDslUtilTest {
         Pageable pageable= PageRequest.of(0,10, Sort.by(Sort.Direction.DESC,"name"));
 
         //when
-        List<OrderSpecifier> orderSpecifiers=QueryDslUtil.getAllOrderByMemberNameSpecifies(pageable);
+        List<OrderSpecifier<?>> orderSpecifiers=QueryDslUtil.getOrderSpecifiers(pageable);
 
         //then
         assertThat(orderSpecifiers).isNotEmpty();
@@ -51,10 +52,36 @@ class QueryDslUtilTest {
         Pageable pageable= PageRequest.of(0,10);
 
         //when
-        List<OrderSpecifier> orderSpecifiers=QueryDslUtil.getAllOrderByMemberNameSpecifies(pageable);
+        List<OrderSpecifier<?>> orderSpecifiers=QueryDslUtil.getOrderSpecifiers(pageable);
 
         //then
         assertThat(orderSpecifiers).isNotEmpty();
         assertThat(orderSpecifiers.get(0)).isEqualTo(QMember.member.userName.asc());
+    }
+
+    @Test
+    @DisplayName("직무별 오름차순으로 정렬합니다.")
+    void getAllOrderByMemberDeptPosition(){
+        //given
+        Pageable pageable=PageRequest.of(0,10,Sort.by("position"));
+        String[] companyDept={
+                "사장", "부사장", "전무", "상무", "이사", "부장", "차장", "과장", "대리", "주임", "사원", "인턴", "기타"
+        };
+        //when
+        List<OrderSpecifier<?>> orderSpecifiers=QueryDslUtil.getOrderSpecifiers(pageable);
+
+        //then
+        assertThat(orderSpecifiers).isNotEmpty();
+        OrderSpecifier<?> orderSpecifier = orderSpecifiers.get(0);
+        String orderSpecifierString = orderSpecifier.toString();
+
+        assertThat(orderSpecifierString).contains("case when");
+
+        for (String dept : companyDept) {
+            assertThat(orderSpecifierString).contains(dept);
+        }
+
+        // 정렬 방향이 오름차순인지 확인
+        assertThat(orderSpecifier.getOrder()).isEqualTo(Order.ASC);
     }
 }

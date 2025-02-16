@@ -124,8 +124,8 @@ class MemberCustomRepositoryImplTest {
         Result result=getResult(COMPANY_CODE);
 
         //페이징 케이스
-        Pageable page1=PageRequest.of(0,3, Sort.by(Sort.Direction.DESC,"userName"));
-        Pageable page2=PageRequest.of(1,3, Sort.by(Sort.Direction.DESC,"userName"));
+        Pageable page1=PageRequest.of(0,3, Sort.by(Sort.Direction.DESC,"name"));
+        Pageable page2=PageRequest.of(1,3, Sort.by(Sort.Direction.DESC,"name"));
 
         //when
         Page<CompanyEmployeeResponseDto> result1=memberRepository.getCompanyEmployeeInfo(result.company1.getCompanyId(),page1);
