@@ -1,7 +1,9 @@
 package example.demo.domain.company.repository;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import example.demo.domain.company.Company;
 import example.demo.domain.company.CompanyErrorCode;
+import example.demo.domain.company.QCompany;
 import example.demo.domain.company.dto.CompanyCodeDto;
 import example.demo.domain.company.dto.CompanyInfoWithUuidDto;
 import example.demo.domain.company.dto.QCompanyCodeDto;
@@ -49,14 +51,15 @@ public class CompanyCustomRepositoryImpl implements CompanyCustomRepository {
     }
 
     @Override
-    public CompanyResponseDto getCompanyInfo(Long companyId) {
+    public CompanyResponseDto getCompanyInfo(Long memberId) {
         return queryFactory
                 .select(new QCompanyResponseDto(
                         company.companyName,
                         company.companyDept
                 ))
-                .from(company)
-                .where(company.companyId.eq(companyId))
+                .from(member)
+                .join(member.company,company)
+                .where(member.memberId.eq(memberId))
                 .fetchOne();
     }
 }

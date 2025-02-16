@@ -95,7 +95,6 @@ class MemberCustomRepositoryImplTest {
     void getCompanyInfo(){
         //given
         String COMPANY_CODE="TEST_CODE";
-
         Company company1=Company
                 .builder()
                 .companyDept("AI1")
@@ -108,30 +107,42 @@ class MemberCustomRepositoryImplTest {
                 .companyName("SK2")
                 .invitationCode(COMPANY_CODE)
                 .build();
-        Company company3=Company
-                .builder()
-                .companyDept("AI3")
-                .companyName("SK3")
-                .invitationCode(COMPANY_CODE)
-                .build();
-        company1=companyRepository.save(company1);
-        company2=companyRepository.save(company2);
-        company3=companyRepository.save(company3);
+        companyRepository.saveAll(List.of(company1,company2));
+
+        MemberRequestDto memberRequestDto1=MemberRequestDto.ofManager(
+                "tkv123@naver.com","김도연1","abcd123!","01012345678","SK1","AI1","사장1","MANAGER"
+        );
+        MemberRequestDto memberRequestDto2=MemberRequestDto.ofManager(
+                "tkv124@naver.com","김도연2","abcd123!1","01012345679","SK1","AI1","사장2","MANAGER"
+        );
+
+        MemberRequestDto memberRequestDto3=MemberRequestDto.ofManager(
+                "tkv125@naver.com","김도연3","abcd123!2","01012345670","SK2","AI2","사장3","MANAGER"
+        );
+
+        Member member1=Member.createManager(memberRequestDto1,company1);
+        Member member2=Member.createManager(memberRequestDto2,company1);
+        Member member3=Member.createManager(memberRequestDto3,company2);
+        member1=memberRepository.save(member1);
+        member2=memberRepository.save(member2);
+        member3=memberRepository.save(member3);
+        em.flush();
+        em.clear();
 
         //when
-        CompanyResponseDto companyResponseDto1=companyRepository.getCompanyInfo(company1.getCompanyId());
-        CompanyResponseDto companyResponseDto2=companyRepository.getCompanyInfo(company2.getCompanyId());
-        CompanyResponseDto companyResponseDto3=companyRepository.getCompanyInfo(company3.getCompanyId());
+        CompanyResponseDto companyResponseDto1=companyRepository.getCompanyInfo(member1.getMemberId());
+        CompanyResponseDto companyResponseDto2=companyRepository.getCompanyInfo(member2.getMemberId());
+        CompanyResponseDto companyResponseDto3=companyRepository.getCompanyInfo(member3.getMemberId());
 
         //then
         //직원 검증
         assertThat(companyResponseDto1.getCompanyName()).isEqualTo(company1.getCompanyName());
         assertThat(companyResponseDto1.getCompanyDept()).isEqualTo(company1.getCompanyDept());
 
-        assertThat(companyResponseDto2.getCompanyName()).isEqualTo(company2.getCompanyName());
-        assertThat(companyResponseDto2.getCompanyDept()).isEqualTo(company2.getCompanyDept());
+        assertThat(companyResponseDto2.getCompanyName()).isEqualTo(company1.getCompanyName());
+        assertThat(companyResponseDto2.getCompanyDept()).isEqualTo(company1.getCompanyDept());
 
-        assertThat(companyResponseDto3.getCompanyName()).isEqualTo(company3.getCompanyName());
-        assertThat(companyResponseDto3.getCompanyDept()).isEqualTo(company3.getCompanyDept());
+        assertThat(companyResponseDto3.getCompanyName()).isEqualTo(company2.getCompanyName());
+        assertThat(companyResponseDto3.getCompanyDept()).isEqualTo(company2.getCompanyDept());
     }
 }
