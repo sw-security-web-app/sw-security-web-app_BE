@@ -13,9 +13,9 @@ import org.springframework.web.bind.annotation.*;
 public class CompanyController {
     private final CompanyService companyService;
     @GetMapping("/company-code")
-    public ResponseEntity<?> getCompanyCode(@RequestParam Long memberId){
+    public ResponseEntity<?> getCompanyCode(@RequestHeader("Authorization")String token){
         //TODO:나중에 JWT토큰으로 변경
-        CompanyCodeDto codeDto=companyService.returnCompanyCode(memberId);
+        CompanyCodeDto codeDto=companyService.returnCompanyCode(token);
         return  ResponseEntity.status(HttpStatus.OK).body(new CompanyCodeDto(codeDto.getCompanyCode()));
     }
 

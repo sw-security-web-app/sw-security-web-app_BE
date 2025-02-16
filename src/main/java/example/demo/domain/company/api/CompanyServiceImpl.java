@@ -18,8 +18,9 @@ public class CompanyServiceImpl implements CompanyService {
     private final JwtUtil jwtUtil;
     //발급받은 코드 리턴
     //TODO:나중에 JWT TOKEN으로 대체합니다.
-    public CompanyCodeDto returnCompanyCode(Long memberId){
-        return companyRepository.findCompanyCode(memberId);
+    public CompanyCodeDto returnCompanyCode(String token){
+
+        return companyRepository.findCompanyCode(jwtUtil.getMemberId(token));
     }
 
     @Override

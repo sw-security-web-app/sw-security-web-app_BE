@@ -4,6 +4,6 @@ import example.demo.domain.company.dto.CompanyCodeDto;
 import example.demo.domain.company.dto.response.CompanyResponseDto;
 
 public interface CompanyService {
-    CompanyCodeDto returnCompanyCode(Long companyId);
+    CompanyCodeDto returnCompanyCode(String token);
     CompanyResponseDto getCompanyInfo(String token);
 }

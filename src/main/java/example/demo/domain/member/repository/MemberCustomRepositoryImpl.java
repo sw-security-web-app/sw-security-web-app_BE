@@ -15,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -52,7 +53,10 @@ public class MemberCustomRepositoryImpl implements MemberCustomRepository {
     @Override
     public Page<CompanyEmployeeResponseDto> getCompanyEmployeeInfo(Long companyId, Pageable pageable) {
         //정렬 추가
-        List<OrderSpecifier> orderSpecifiers= QueryDslUtil.getAllOrderByMemberNameSpecifies(pageable);
+        List<OrderSpecifier<?>> orderSpecifiers=new ArrayList<>();
+
+        //정렬 조건
+
         List<CompanyEmployeeResponseDto> content=queryFactory
                 .select(new QCompanyEmployeeResponseDto(
                         member.companyPosition,
