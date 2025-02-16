@@ -20,7 +20,7 @@ import java.util.Map;
 
 @Slf4j
 @RestController
-@RequestMapping(value = "/api/v1/chatGpt")
+@RequestMapping(value = "/api/v1/chat-gpt")
 public class ChatGPTController {
 
     private final ChatGPTService chatGPTService;
@@ -32,7 +32,7 @@ public class ChatGPTController {
     /**
      * @GET [API] ChatGPT 모델 리스트 조회
      */
-    @GetMapping("/modelList")
+    @GetMapping("/model-list")
     public ResponseEntity<List<Map<String, Object>>> selectModelList() {
         List<Map<String, Object>> result = chatGPTService.modelList();
         return new ResponseEntity<>(result, HttpStatus.OK);
@@ -50,7 +50,7 @@ public class ChatGPTController {
     /**
      * @POST [API] Legacy ChatGPT 프롬프트 명령어 수행
      */
-    @PostMapping("/legacyPrompt")
+    @PostMapping("/legacy-prompt")
     public ResponseEntity<Map<String, Object>> selectLegacyPrompt(@RequestBody CompletionDto completionDto) {
         log.debug("param :: " + completionDto.toString());
         Map<String, Object> result = chatGPTService.legacyPrompt(completionDto);

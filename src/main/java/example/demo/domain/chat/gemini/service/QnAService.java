@@ -6,6 +6,13 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.Map;
 
+/**
+ * Gemini API Service
+ *
+ * @Author : 박재성
+ * @Since : 02/15/2025
+ */
+
 @Service
 public class QnAService {
     // Access to APIKey and URL [Gemini]

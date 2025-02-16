@@ -10,6 +10,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
 
+/**
+ * Gemini API
+ *
+ * @Author : 박재성
+ * @Since : 02/15/2025
+ */
+
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/qna")
