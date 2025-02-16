@@ -1,12 +1,14 @@
 package example.demo.domain.member.api;
 
 import example.demo.domain.company.Company;
+import example.demo.domain.company.api.CompanyService;
 import example.demo.domain.company.dto.CompanyInfoWithUuidDto;
 import example.demo.domain.company.dto.response.CompanyResponseDto;
 import example.demo.domain.company.repository.CompanyRepository;
 import example.demo.domain.company.dto.CompanyCodeDto;
 import example.demo.domain.member.Member;
 import example.demo.domain.member.MemberErrorCode;
+import example.demo.domain.member.dto.response.CompanyEmployeeResponseDto;
 import example.demo.domain.member.repository.MemberRepository;
 import example.demo.domain.member.dto.request.MemberRequestDto;
 import example.demo.error.RestApiException;
@@ -18,16 +20,16 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
 import static example.demo.domain.member.MemberStatus.*;
 import static org.assertj.core.api.Assertions.*;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.when;
@@ -231,11 +233,12 @@ class MemberServiceTest {
         String COMPANY_CODE="TEST_CODE";
         String TOKEN="TOKEN";
         Long fakeCompanyId=10L;
+        Long MEMBER_ID=20L;
+
         MemberRequestDto requestDto=MemberRequestDto.ofManager(
                 "tkv00@naver.com","김김김","aaaa123!!","01012345678","SK","AI","사장","GENERAL"
         );
 
-        CompanyInfoWithUuidDto companyInfoWithUuidDto=new CompanyInfoWithUuidDto("SK","AI");
         Company company=Company
                 .builder()
                 .companyName(requestDto.getCompanyName())
@@ -243,29 +246,34 @@ class MemberServiceTest {
                 .invitationCode(COMPANY_CODE)
                 .build();
         company.setCompanyId(fakeCompanyId);
+        Member manageer=Member.createManager(requestDto,company);
+        manageer.setMemberId(MEMBER_ID);
 
-        when(companyRepository.findCompanyInfoByInvitationCode(COMPANY_CODE))
-                .thenReturn(companyInfoWithUuidDto);
-        when(companyRepository.findByCompanyNameAndCompanyDept(companyInfoWithUuidDto.getCompanyName(), companyInfoWithUuidDto.getCompanyDept()))
-                .thenReturn(Optional.of(company));
-        //메니저 Mock
-        Member manager=Member.createManager(requestDto,company);
-        when(memberRepository.save(any(Member.class))).thenReturn(manager);
+        when(jwtUtil.getMemberId(TOKEN)).thenReturn(MEMBER_ID);
+        when(memberRepository.findById(MEMBER_ID)).thenReturn(Optional.of(manageer));
+
+        List<CompanyEmployeeResponseDto> employeeList=new ArrayList<>();
 
         //회사 직원 생성
         for (int i=0;i<10;i++){
-            MemberRequestDto requestDtoOfEmployee=MemberRequestDto.ofEmployee(
-                    "tkv"+i+"@naver.com","김도연"+i,"abcd!!12"+i,"0101234567"+i,"인턴"+i,COMPANY_CODE,"EMPLOYEE"
-            );
-            Member employee=Member.createEmployee(requestDtoOfEmployee,company);
-            when(memberRepository.save(any(Member.class))).thenReturn(employee);
-            when(jwtUtil.getMemberId(TOKEN)).thenReturn(employee.getMemberId());
+            CompanyEmployeeResponseDto requestDtoOfEmployee=CompanyEmployeeResponseDto
+                            .builder()
+                            .email("tkv00"+i+"@naver.com")
+                            .name("김도연"+i)
+                            .companyPosition("인턴"+i)
+                            .build();
+
+            employeeList.add(requestDtoOfEmployee);
         }
 
-        Pageable pageable1= PageRequest.of(0,3, Sort.by(Sort.Direction.DESC));
-        Pageable pageable2= PageRequest.of(1,3, Sort.by(Sort.Direction.DESC));
-        Pageable pageable3= PageRequest.of(2,3, Sort.by(Sort.Direction.DESC));
-        Pageable pageable4= PageRequest.of(3,3, Sort.by(Sort.Direction.DESC));
+        Pageable pageable=PageRequest.of(0,3,Sort.by(Sort.Direction.DESC,"name"));
+        Page<CompanyEmployeeResponseDto> expectedPage=new PageImpl<>(
+                employeeList.subList(0,3), //첫 페이지 데이터
+                pageable,
+                employeeList.size()
+        );
+        when(memberRepository.getCompanyEmployeeInfo(fakeCompanyId,pageable))
+                .thenReturn(expectedPage);
         //when
         /*매니저 1명+직원 10명
           페이지당 3명씩 조회 테스트 and 이름 가나다순 정렬
@@ -274,7 +282,15 @@ class MemberServiceTest {
           2 : 3명
           3 : 2명
          */
-        //CompanyResponseDto companyResponseDto1=memberRepository.getCompanyEmployeeInfo();
+        Page<CompanyEmployeeResponseDto> result=memberService.getAllEmployees(TOKEN,pageable);
+
         //then
+        assertThat(result).isNotNull();
+        assertThat(result.getContent().size()).isEqualTo(3);
+        assertThat(result.getTotalElements()).isEqualTo(10);
+        assertThat(result.getTotalPages()).isEqualTo(4);
+
+        verify(jwtUtil).getMemberId(TOKEN);
+        verify(memberRepository).getCompanyEmployeeInfo(fakeCompanyId,pageable);
     }
 }

@@ -101,14 +101,8 @@ public class MemberServiceImpl implements MemberService {
         if(!member.getMemberStatus().equals(MemberStatus.MANAGER)){
             throw new RestApiException(MemberErrorCode.INVALID_PERMISSION);
         }
-
         //DTO조립
-        Page<CompanyEmployeeResponseDto> employeeList=memberRepository.getCompanyEmployeeInfo(member.getCompany().getCompanyId(),page);
-        return null;  /*CompanyResponseDto.builder()
-                .companyName(member.getCompany().getCompanyName())
-                .companyDept(member.getCompany().getCompanyDept())
-                .companyEmployees(employeeList)
-                .build();*/
+        return memberRepository.getCompanyEmployeeInfo(member.getCompany().getCompanyId(),page);
     }
 
 
