@@ -1,5 +1,6 @@
 package example.demo.domain.member.repository;
 
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -7,6 +8,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import example.demo.domain.member.Member;
 import example.demo.domain.member.dto.response.CompanyEmployeeResponseDto;
 import example.demo.domain.member.dto.response.QCompanyEmployeeResponseDto;
+import example.demo.util.QueryDslUtil;
 import jakarta.persistence.EntityManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -49,6 +51,8 @@ public class MemberCustomRepositoryImpl implements MemberCustomRepository {
 
     @Override
     public Page<CompanyEmployeeResponseDto> getCompanyEmployeeInfo(Long companyId, Pageable pageable) {
+        //정렬 추가
+        List<OrderSpecifier> orderSpecifiers= QueryDslUtil.getAllOrderByMemberNameSpecifies(pageable);
         List<CompanyEmployeeResponseDto> content=queryFactory
                 .select(new QCompanyEmployeeResponseDto(
                         member.companyPosition,
@@ -58,6 +62,7 @@ public class MemberCustomRepositoryImpl implements MemberCustomRepository {
                 .from(member)
                 .leftJoin(member.company, company)
                 .where(allCompanyIdEq(company.companyId,companyId))
+                .orderBy(orderSpecifiers.toArray(new OrderSpecifier[0]))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();

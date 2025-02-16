@@ -2,6 +2,7 @@ package example.demo.domain.member.api;
 
 import example.demo.domain.company.Company;
 import example.demo.domain.company.dto.CompanyInfoWithUuidDto;
+import example.demo.domain.company.dto.response.CompanyResponseDto;
 import example.demo.domain.company.repository.CompanyRepository;
 import example.demo.domain.company.dto.CompanyCodeDto;
 import example.demo.domain.member.Member;
@@ -9,31 +10,27 @@ import example.demo.domain.member.MemberErrorCode;
 import example.demo.domain.member.repository.MemberRepository;
 import example.demo.domain.member.dto.request.MemberRequestDto;
 import example.demo.error.RestApiException;
+import example.demo.security.util.JwtUtil;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.web.servlet.MockMvcBuilder;
 import org.springframework.transaction.annotation.Transactional;
-
 import static example.demo.domain.member.MemberStatus.*;
 import static org.assertj.core.api.Assertions.*;
-import org.mockito.junit.jupiter.MockitoExtension;
-
 import java.util.Optional;
-
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.when;
-import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -53,6 +50,8 @@ class MemberServiceTest {
     private EntityManager em;
     @Autowired
     private PasswordEncoder encoder;
+    @MockitoBean
+    private JwtUtil jwtUtil;
 
     @BeforeAll
     static void setup() {
@@ -222,5 +221,60 @@ class MemberServiceTest {
         verify(memberRepository,times(1)).save(any(Member.class));
 
         assertThat(findMember.getCompany().getCompanyId()).isEqualTo(123L);
+    }
+
+    @Test
+    @DisplayName("성공케이스-회사의 모든 직원 정보를 조회합니다.")
+    void getAllEmployees_SUCCESS(){
+        //given
+        //회사코드 생성
+        String COMPANY_CODE="TEST_CODE";
+        String TOKEN="TOKEN";
+        Long fakeCompanyId=10L;
+        MemberRequestDto requestDto=MemberRequestDto.ofManager(
+                "tkv00@naver.com","김김김","aaaa123!!","01012345678","SK","AI","사장","GENERAL"
+        );
+
+        CompanyInfoWithUuidDto companyInfoWithUuidDto=new CompanyInfoWithUuidDto("SK","AI");
+        Company company=Company
+                .builder()
+                .companyName(requestDto.getCompanyName())
+                .companyDept(requestDto.getCompanyDept())
+                .invitationCode(COMPANY_CODE)
+                .build();
+        company.setCompanyId(fakeCompanyId);
+
+        when(companyRepository.findCompanyInfoByInvitationCode(COMPANY_CODE))
+                .thenReturn(companyInfoWithUuidDto);
+        when(companyRepository.findByCompanyNameAndCompanyDept(companyInfoWithUuidDto.getCompanyName(), companyInfoWithUuidDto.getCompanyDept()))
+                .thenReturn(Optional.of(company));
+        //메니저 Mock
+        Member manager=Member.createManager(requestDto,company);
+        when(memberRepository.save(any(Member.class))).thenReturn(manager);
+
+        //회사 직원 생성
+        for (int i=0;i<10;i++){
+            MemberRequestDto requestDtoOfEmployee=MemberRequestDto.ofEmployee(
+                    "tkv"+i+"@naver.com","김도연"+i,"abcd!!12"+i,"0101234567"+i,"인턴"+i,COMPANY_CODE,"EMPLOYEE"
+            );
+            Member employee=Member.createEmployee(requestDtoOfEmployee,company);
+            when(memberRepository.save(any(Member.class))).thenReturn(employee);
+            when(jwtUtil.getMemberId(TOKEN)).thenReturn(employee.getMemberId());
+        }
+
+        Pageable pageable1= PageRequest.of(0,3, Sort.by(Sort.Direction.DESC));
+        Pageable pageable2= PageRequest.of(1,3, Sort.by(Sort.Direction.DESC));
+        Pageable pageable3= PageRequest.of(2,3, Sort.by(Sort.Direction.DESC));
+        Pageable pageable4= PageRequest.of(3,3, Sort.by(Sort.Direction.DESC));
+        //when
+        /*매니저 1명+직원 10명
+          페이지당 3명씩 조회 테스트 and 이름 가나다순 정렬
+          0 : 3명
+          1 : 3명
+          2 : 3명
+          3 : 2명
+         */
+        //CompanyResponseDto companyResponseDto1=memberRepository.getCompanyEmployeeInfo();
+        //then
     }
 }

@@ -1,6 +1,7 @@
 package example.demo.domain.member.repository;
 
 import example.demo.domain.company.Company;
+import example.demo.domain.company.dto.response.CompanyResponseDto;
 import example.demo.domain.company.repository.CompanyRepository;
 import example.demo.domain.member.Member;
 import example.demo.domain.member.dto.request.MemberRequestDto;
@@ -90,55 +91,47 @@ class MemberCustomRepositoryImplTest {
     }
 
     @Test
-    @DisplayName("회사id로 해당 회사소속의 직원목록을 불러옵니다.")
-    void getCompanyEmployeeInfo(){
+    @DisplayName("회사id로 해당 회사 정보를 불러옵니다.")
+    void getCompanyInfo(){
         //given
-        initMemberOfGeneral();
         String COMPANY_CODE="TEST_CODE";
-        MemberRequestDto managerDto=MemberRequestDto.ofManager(
-                "tkv00@naver.com", "김김0", "rlaehdus00!!", "01050299737","SK","AI","사장","MANAGER"
-        );
-        MemberRequestDto employee1Dto=MemberRequestDto.ofEmployee(
-                "tkv11@naver.com", "김김1", "rlaehdus00!!", "01050299737","인턴1",COMPANY_CODE,"EMPLOYEE"
-        );
-        MemberRequestDto employee2Dto=MemberRequestDto.ofEmployee(
-                "tkv22@naver.com", "김김2", "rlaehdus00!!", "01050299737","인턴2",COMPANY_CODE,"EMPLOYEE"
-        );
 
-        Company company=Company
+        Company company1=Company
                 .builder()
-                .companyDept("AI")
-                .companyName("SK")
+                .companyDept("AI1")
+                .companyName("SK1")
                 .invitationCode(COMPANY_CODE)
                 .build();
+        Company company2=Company
+                .builder()
+                .companyDept("AI2")
+                .companyName("SK2")
+                .invitationCode(COMPANY_CODE)
+                .build();
+        Company company3=Company
+                .builder()
+                .companyDept("AI3")
+                .companyName("SK3")
+                .invitationCode(COMPANY_CODE)
+                .build();
+        company1=companyRepository.save(company1);
+        company2=companyRepository.save(company2);
+        company3=companyRepository.save(company3);
 
-        company=companyRepository.save(company);
-
-        Member manager=Member.createManager(managerDto,company);
-        Member employee1=Member.createEmployee(employee1Dto,company);
-        Member employee2=Member.createEmployee(employee2Dto,company);
-        memberRepository.saveAll(List.of(manager,employee1,employee2));
-
-        Pageable pageable= PageRequest.of(0,2);
         //when
-        Page<CompanyEmployeeResponseDto> employeeList=memberCustomRepository.getCompanyEmployeeInfo(company.getCompanyId(),pageable);
+        CompanyResponseDto companyResponseDto1=companyRepository.getCompanyInfo(company1.getCompanyId());
+        CompanyResponseDto companyResponseDto2=companyRepository.getCompanyInfo(company2.getCompanyId());
+        CompanyResponseDto companyResponseDto3=companyRepository.getCompanyInfo(company3.getCompanyId());
 
         //then
-        assertThat(employeeList).isNotNull();
-        assertThat(employeeList.getTotalElements()).isEqualTo(3);
-        assertThat(employeeList.getTotalPages()).isEqualTo(2);
-
         //직원 검증
-        assertThat(employeeList)
-                .extracting(CompanyEmployeeResponseDto::getName)
-                .containsExactlyInAnyOrder("김김0","김김1");
+        assertThat(companyResponseDto1.getCompanyName()).isEqualTo(company1.getCompanyName());
+        assertThat(companyResponseDto1.getCompanyDept()).isEqualTo(company1.getCompanyDept());
 
-        assertThat(employeeList)
-                .extracting(CompanyEmployeeResponseDto::getEmail)
-                .containsExactlyInAnyOrder("tkv00@naver.com","tkv11@naver.com");
+        assertThat(companyResponseDto2.getCompanyName()).isEqualTo(company2.getCompanyName());
+        assertThat(companyResponseDto2.getCompanyDept()).isEqualTo(company2.getCompanyDept());
 
-        assertThat(employeeList)
-                .extracting(CompanyEmployeeResponseDto::getCompanyPosition)
-                .containsExactlyInAnyOrder("사장","인턴1");
+        assertThat(companyResponseDto3.getCompanyName()).isEqualTo(company3.getCompanyName());
+        assertThat(companyResponseDto3.getCompanyDept()).isEqualTo(company3.getCompanyDept());
     }
 }
