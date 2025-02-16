@@ -1,5 +1,6 @@
 package example.demo.security.auth;
 
+import example.demo.domain.member.MemberStatus;
 import example.demo.security.auth.dto.CustomMemberInfoDto;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
