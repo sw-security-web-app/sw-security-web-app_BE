@@ -2,6 +2,7 @@ package example.demo.domain.member.api;
 
 import example.demo.data.RedisCustomService;
 import example.demo.domain.company.Company;
+import example.demo.domain.company.CompanyErrorCode;
 import example.demo.domain.company.repository.CompanyRepository;
 import example.demo.domain.company.dto.CompanyInfoWithUuidDto;
 import example.demo.domain.member.Member;
@@ -41,7 +42,7 @@ public class MemberServiceImpl implements MemberService {
     //회원가입 이전 : 이메일 인증, 휴대폰 인증 여부 확인.
     public void signup(MemberRequestDto memberRequestDto){
         Member newMember ;
-        Company newCompany;
+        Company company;
         //이메일 중복, 휴대폰번호 중복 예외처리는 해당 서비스 계층에서 실시합니다.
         //회원가입 전 이메일 인증 및 휴대폰 번호 인증 여부
         if(smsAndMailValidation(memberRequestDto.getEmail(),memberRequestDto.getPhoneNumber())){
@@ -57,13 +58,16 @@ public class MemberServiceImpl implements MemberService {
             case "manager":
                 //uuid생성
                 String companyCode= CreateRandom.createShortUuid();
-                newCompany=Company.builder()
-                        .companyName(memberRequestDto.getCompanyName())
-                        .companyDept(memberRequestDto.getCompanyDept())
-                        .invitationCode(companyCode)
-                        .build();
-                companyRepository.save(newCompany);
-                newMember=Member.createManager(memberRequestDto,newCompany);
+                company=companyRepository.findByCompanyNameAndCompanyDept(memberRequestDto.getCompanyName(),memberRequestDto.getCompanyDept())
+                                .orElse(
+                                        Company.builder()
+                                                .companyName(memberRequestDto.getCompanyName())
+                                                .companyDept(memberRequestDto.getCompanyDept())
+                                                .invitationCode(companyCode)
+                                                .build()
+                                );
+                companyRepository.save(company);
+                newMember=Member.createManager(memberRequestDto,company);
                 break;
             //직원
             case "employee":
@@ -71,12 +75,10 @@ public class MemberServiceImpl implements MemberService {
                 CompanyInfoWithUuidDto companyInfoWithUuidDto=companyRepository.findCompanyInfoByInvitationCode(memberRequestDto.getInvitationCode());
                 String companyName=companyInfoWithUuidDto.getCompanyName();
                 String companyDept=companyInfoWithUuidDto.getCompanyDept();
-                newCompany=Company.builder()
-                        .companyName(companyName)
-                        .companyDept(companyDept)
-                        .build();
-                companyRepository.save(newCompany);
-                newMember=Member.createEmployee(memberRequestDto,newCompany);
+                company=companyRepository.findByCompanyNameAndCompanyDept(companyName,companyDept)
+                                .orElseThrow(()->new RestApiException(CompanyErrorCode.NOT_EXIST_COMPANY));
+
+                newMember=Member.createEmployee(memberRequestDto,company);
                 break;
             default:
                 throw new RestApiException(MemberErrorCode.INVALID_MEMBER_STATUS);

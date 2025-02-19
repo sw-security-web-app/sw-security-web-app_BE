@@ -86,4 +86,21 @@ class CompanyCustomRepositoryImplTest {
         //assertThat(codeDto.getCompanyCode()).isEqualTo(uuid);
 
     }
+    @Test
+    @DisplayName("회사명과 회사부서명으로 회사를 찾습니다.")
+    void findByCompanyNameAndCompanyDept(){
+        //given
+        Company company=Company.builder()
+                .companyName("삼성")
+                .companyDept("개발")
+                .invitationCode(null)
+                .build();
+        companyRepository.save(company);
+        //when
+        Company findCompany=companyRepository.findByCompanyNameAndCompanyDept("삼성","개발").orElseThrow();
+
+        //then
+        assertThat(findCompany).extracting("companyName","companyDept","invitationCode")
+                .containsExactly(company.getCompanyName(),company.getCompanyDept(),company.getInvitationCode());
+    }
 }
