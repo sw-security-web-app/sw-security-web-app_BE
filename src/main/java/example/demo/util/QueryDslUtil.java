@@ -16,9 +16,7 @@ import java.util.List;
 
 
 public class QueryDslUtil {
-    private static String[] companyDept={
-            "사장", "부사장", "전무", "상무", "이사", "부장", "차장", "과장", "대리", "주임", "사원", "인턴", "기타"
-    };
+
     public static OrderSpecifier<?> getSortedColumn(Order order, Path<?> parent, String fieldName){
         Path<Object> fieldPath= Expressions.path(Object.class,parent,fieldName);
         return new OrderSpecifier(order,fieldPath);
@@ -51,19 +49,19 @@ public class QueryDslUtil {
     //직급 순서대로 정렬
     private static OrderSpecifier<Integer>getSortedByCompanyDept(Order order){
         NumberExpression<Integer> rank=new CaseBuilder()
-                .when(QMember.member.companyPosition.eq(companyDept[0])).then(0)
-                .when(QMember.member.companyPosition.eq(companyDept[1])).then(1)
-                .when(QMember.member.companyPosition.eq(companyDept[2])).then(2)
-                .when(QMember.member.companyPosition.eq(companyDept[3])).then(3)
-                .when(QMember.member.companyPosition.eq(companyDept[4])).then(4)
-                .when(QMember.member.companyPosition.eq(companyDept[5])).then(5)
-                .when(QMember.member.companyPosition.eq(companyDept[6])).then(6)
-                .when(QMember.member.companyPosition.eq(companyDept[7])).then(7)
-                .when(QMember.member.companyPosition.eq(companyDept[8])).then(8)
-                .when(QMember.member.companyPosition.eq(companyDept[9])).then(9)
-                .when(QMember.member.companyPosition.eq(companyDept[10])).then(10)
-                .when(QMember.member.companyPosition.eq(companyDept[11])).then(11)
-                .when(QMember.member.companyPosition.eq(companyDept[12])).then(12)
+                .when(QMember.member.companyPosition.eq(CompanyPosition.CEO.getPosition())).then(0)
+                .when(QMember.member.companyPosition.eq(CompanyPosition.VICE_PRESIDENT.getPosition())).then(1)
+                .when(QMember.member.companyPosition.eq(CompanyPosition.EXECUTIVE_DIRECTOR.getPosition())).then(2)
+                .when(QMember.member.companyPosition.eq(CompanyPosition.MANAGING_DIRECTOR.getPosition())).then(3)
+                .when(QMember.member.companyPosition.eq(CompanyPosition.DIRECTOR.getPosition())).then(4)
+                .when(QMember.member.companyPosition.eq(CompanyPosition.GENERAL_MANAGER.getPosition())).then(5)
+                .when(QMember.member.companyPosition.eq(CompanyPosition.DEPUTY_GENERAL_MANAGER.getPosition())).then(6)
+                .when(QMember.member.companyPosition.eq(CompanyPosition.MANAGER.getPosition())).then(7)
+                .when(QMember.member.companyPosition.eq(CompanyPosition.ASSISTANT_MANAGER.getPosition())).then(8)
+                .when(QMember.member.companyPosition.eq(CompanyPosition.SENIOR_STAFF.getPosition())).then(9)
+                .when(QMember.member.companyPosition.eq(CompanyPosition.STAFF.getPosition())).then(10)
+                .when(QMember.member.companyPosition.eq(CompanyPosition.INTERN.getPosition())).then(11)
+                .when(QMember.member.companyPosition.eq(CompanyPosition.OTHER.getPosition())).then(12)
                 //나머지 후순위 배치
                 .otherwise(99);
         return new OrderSpecifier<>(order,rank);
