@@ -10,6 +10,8 @@ import example.demo.domain.member.Member;
 import example.demo.domain.member.MemberErrorCode;
 import example.demo.domain.member.MemberStatus;
 import example.demo.domain.member.dto.response.CompanyEmployeeResponseDto;
+
+import example.demo.domain.member.dto.response.MemberInfoResponseDto;
 import example.demo.security.auth.dto.MemberLoginDto;
 import example.demo.domain.member.repository.MemberRepository;
 import example.demo.domain.member.dto.request.MemberRequestDto;
@@ -41,6 +43,7 @@ public class MemberServiceImpl implements MemberService {
 
    // private final SmsCertificationDao smsCertificationDao;
     private final RedisCustomService redisCustomService;
+    private final JwtUtil jwtUtil;
 
 
     //회원가입 이전 : 이메일 인증, 휴대폰 인증 여부 확인.
@@ -91,7 +94,7 @@ public class MemberServiceImpl implements MemberService {
         newMember.setPassword(passwordEncoder.encode(newMember.getPassword()));
         memberRepository.save(newMember);
     }
-
+  
     @Override
     @Transactional(readOnly = true)
     public Page<CompanyEmployeeResponseDto>  getAllEmployees(String token, Pageable page) {

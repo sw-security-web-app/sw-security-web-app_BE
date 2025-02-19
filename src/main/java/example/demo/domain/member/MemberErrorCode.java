@@ -16,6 +16,11 @@ public enum MemberErrorCode implements ErrorCode {
     INVALID_CERTIFICATION_CODE(HttpStatus.BAD_REQUEST,"인증번호가 일치하지 않습니다."),
     INVALID_CERTIFICATION_EMAIL_OR_PHONE(HttpStatus.UNAUTHORIZED,"이메일 인증 또는 휴대폰 인증이 유효하지 않습니다."),
     INVALID_PERMISSION(HttpStatus.BAD_GATEWAY,"접근권한이 없습니다.");
+
+    EMPTY_PHONENUMBER(HttpStatus.BAD_REQUEST,"휴대폰 번호를 입력해주세요."),
+    INVALID_PHONENUMBER(HttpStatus.BAD_REQUEST,"올바르지 않은 휴대폰 형식입니다."),
+    INVALID_PHONE_CERTIFICATION_NUMBER(HttpStatus.UNAUTHORIZED,"휴대폰 인증번호가 유효하지 않습니다.");
+
   
 
     private final HttpStatus httpStatus;

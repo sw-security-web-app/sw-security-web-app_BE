@@ -9,6 +9,11 @@ import example.demo.domain.member.Member;
 import example.demo.domain.member.dto.response.CompanyEmployeeResponseDto;
 import example.demo.domain.member.dto.response.QCompanyEmployeeResponseDto;
 import example.demo.util.QueryDslUtil;
+import example.demo.domain.company.QCompany;
+import example.demo.domain.company.dto.QCompanyInfoWithUuidDto;
+import example.demo.domain.member.dto.response.MemberInfoResponseDto;
+import example.demo.domain.member.dto.response.QMemberInfoResponseDto;
+import example.demo.domain.member.repository.MemberCustomRepository;
 import jakarta.persistence.EntityManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -85,6 +90,7 @@ public class MemberCustomRepositoryImpl implements MemberCustomRepository {
     private BooleanExpression companyIdOfMemberEq(NumberPath<Long> companyId){
         return companyId==null ? null : member.company.companyId.eq(companyId);
     }
+  
     private BooleanExpression allCompanyIdEq(NumberPath<Long> companyOfCompanyId, Long inputCompanyId){
         BooleanExpression companyCondition=companyIdEq(inputCompanyId);
         BooleanExpression memberCondition=companyIdOfMemberEq(companyOfCompanyId);
@@ -92,5 +98,20 @@ public class MemberCustomRepositoryImpl implements MemberCustomRepository {
         if(companyCondition==null)return memberCondition;
         if(memberCondition==null) return companyCondition;
         return companyCondition.and(memberCondition);
+
+    public MemberInfoResponseDto getMemberInfo(Long memberId) {
+        return queryFactory
+                .select(new QMemberInfoResponseDto(
+                        member.userName,
+                        member.email,
+                        member.company.companyName,
+                        member.company.companyDept,
+                        member.companyPosition
+                ))
+                .from(member)
+                .leftJoin(member.company,company)
+                .where(member.memberId.eq(memberId))
+                .fetchOne();
+
     }
 }

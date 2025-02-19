@@ -5,9 +5,7 @@ import example.demo.util.ValidationSequence;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -27,4 +25,9 @@ public class SmsController {
         return ResponseEntity.ok("인증 성공");
     }
 
+    @PostMapping ("/api/find-email")
+    public ResponseEntity<?> findEmail(@RequestParam String phoneNumber){
+        smsService.sendMemberEmail(phoneNumber);
+        return ResponseEntity.ok("전송 성공");
+    }
 }
