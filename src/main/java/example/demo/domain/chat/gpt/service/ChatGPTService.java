@@ -1,10 +1,8 @@
 package example.demo.domain.chat.gpt.service;
 
 import example.demo.domain.chat.gpt.dto.ChatCompletionDto;
-import example.demo.domain.chat.gpt.dto.CompletionDto;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -17,12 +15,5 @@ import java.util.Map;
 
 @Service
 public interface ChatGPTService {
-
-    List<Map<String, Object>> modelList();
-
-    Map<String, Object> isValidModel(String modelName);
-
-    Map<String, Object> legacyPrompt(CompletionDto completionDto);
-
     Map<String, Object> prompt(ChatCompletionDto chatCompletionDto);
 }

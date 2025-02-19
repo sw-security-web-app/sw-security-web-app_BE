@@ -93,16 +93,23 @@ public class ClaudeServiceImpl implements ClaudeService {
             throw new RestApiException(ClaudeErrorCode.NO_EXIST_CONTENT);
         }
 
-        List<Map<String, Object>> contentList = (List<Map<String, Object>>) content;
+        List<?> contentList = (List<?>) content;
         if (contentList.isEmpty()) {
             throw new RestApiException(ClaudeErrorCode.NO_EXIST_CONTENT);
         }
 
-        Object firstMessage = contentList.get(0).get("text");
-        if (firstMessage == null || firstMessage.toString().isBlank()) {
+        if (!(contentList.get(0) instanceof HashMap)) {
             throw new RestApiException(ClaudeErrorCode.NO_EXIST_CONTENT);
         }
 
-        return firstMessage.toString();
+        HashMap<String, Object> firstMessage = (HashMap<String, Object>) contentList.get(0);
+
+        // "text" 키가 존재하는지 확인하고 가져오기
+        Object text = firstMessage.get("text");
+        if (text == null || text.toString().isBlank()) {
+            throw new RestApiException(ClaudeErrorCode.NO_EXIST_CONTENT);
+        }
+
+        return text.toString();
     }
 }
