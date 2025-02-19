@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 public class AuthApiController {
     private final AuthService authService;
 
-    @GetMapping("login")
+    @PostMapping("login")
     public ResponseEntity<?> login(@Validated(ValidationSequence.class) @RequestBody MemberLoginDto loginDto){
         String token=authService.loginMember(loginDto);
         return ResponseEntity.ok().body(token);

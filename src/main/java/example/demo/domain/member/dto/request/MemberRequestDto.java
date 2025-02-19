@@ -29,7 +29,8 @@ public class  MemberRequestDto{
             message = "잘못된 비밀번호 형식입니다.",
             groups = ValidationGroups.PatternCheckGroup.class)
     private String password;
-
+    @NotBlank(message = "회원 유형은 필수 값입니다.",
+                groups = ValidationGroups.NotEmptyGroup.class)
     private String memberStatus;
 
     @NotBlank(message = "휴대폰 번호는 필수 입력 값입니다.",
