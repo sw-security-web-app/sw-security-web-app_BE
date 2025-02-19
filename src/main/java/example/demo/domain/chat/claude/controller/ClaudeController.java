@@ -25,7 +25,7 @@ public class ClaudeController {
 
     private final ClaudeService claudeService;
 
-    @PostMapping("/chat")
+    @PostMapping("/ask")
     public ResponseEntity<ClaudeResponseDto> chat(@Valid @RequestBody ClaudeRequestDto requestDTO) {
         ClaudeResponseDto responseDto = claudeService.getCompletion(requestDTO);
         return ResponseEntity.ok(responseDto);

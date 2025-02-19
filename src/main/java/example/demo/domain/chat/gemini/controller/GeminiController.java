@@ -1,14 +1,14 @@
 package example.demo.domain.chat.gemini.controller;
 
-import example.demo.domain.chat.gemini.service.QnAService;
+import example.demo.domain.chat.gemini.dto.GeminiRequestDto;
+import example.demo.domain.chat.gemini.dto.GeminiResponseDto;
+import example.demo.domain.chat.gemini.service.GeminiService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Map;
 
 /**
  * Gemini API
@@ -19,15 +19,14 @@ import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/qna")
+@RequestMapping("/api/gemini")
 public class GeminiController {
 
-    private final QnAService qnAService;
+    private final GeminiService geminiService;
 
     @PostMapping("/ask")
-    public ResponseEntity<Map<String, Object>> askQuestion(@RequestBody Map<String, String> payload) {
-        String prompt = payload.get("prompt");
-        Map<String, Object> answer = qnAService.getAnswer(prompt);
-        return ResponseEntity.ok(answer);
+    public ResponseEntity<GeminiResponseDto> askQuestion(@RequestBody GeminiRequestDto requestDto) {
+        GeminiResponseDto responseDto = geminiService.getAnswer(requestDto);
+        return ResponseEntity.ok(responseDto);
     }
 }

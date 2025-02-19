@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import example.demo.domain.chat.gemini.GeminiErrorCode;
+import example.demo.domain.chat.gemini.dto.GeminiRequestDto;
+import example.demo.domain.chat.gemini.dto.GeminiResponseDto;
 import example.demo.error.RestApiException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -11,6 +13,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.List;
 import java.util.Map;
+
+import static org.springframework.web.reactive.function.client.WebClient.*;
 
 /**
  * Gemini API Service Impl
@@ -20,7 +24,7 @@ import java.util.Map;
  */
 
 @Service
-public class QnAServiceImpl implements QnAService {
+public class GeminiServiceImpl implements GeminiService {
     // Access to APIKey and URL [Gemini]
     @Value("${gemini.api.url}")
     private String geminiApiUrl;
@@ -30,17 +34,17 @@ public class QnAServiceImpl implements QnAService {
 
     private final WebClient webClient;
 
-    public QnAServiceImpl(WebClient.Builder webClient) {
+    public GeminiServiceImpl(Builder webClient) {
         this.webClient = webClient.build();
     }
 
     @Override
-    public Map<String, Object> getAnswer(String question) {
+    public GeminiResponseDto getAnswer(GeminiRequestDto requestDto) {
         // Construct the request payload
         Map<String, Object> requestBody = Map.of(
                 "contents", new Object[] {
                         Map.of("parts", new Object[] {
-                                Map.of("text", question)
+                                Map.of("text", requestDto.getPrompt())
                         })
                 }
         );
@@ -75,7 +79,7 @@ public class QnAServiceImpl implements QnAService {
             // "text" 값 가져와서 "prompt" 키로 응답
             String text = parts.get(0).get("text").toString();
 
-            return Map.of("prompt", text);
+            return new GeminiResponseDto(text);
         } catch (JsonProcessingException e) {
             throw new RestApiException(GeminiErrorCode.GEMINI_JSON_PROCESS_ERROR);
         }
