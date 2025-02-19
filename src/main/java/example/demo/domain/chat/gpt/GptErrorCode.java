@@ -9,9 +9,11 @@ import org.springframework.http.HttpStatus;
 @RequiredArgsConstructor
 public enum GptErrorCode implements ErrorCode {
 
-    GPT_JSON_MAPPING_ERROR(HttpStatus.BAD_REQUEST, "Json 매핑 오류입니다 : 조회 실패"),
-    GPT_JSON_PROCESS_ERROR(HttpStatus.BAD_REQUEST, "Json 프로세싱 오류입니다 : 조회 실패"),
-    GPT_API_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 오류입니다 : 조회 실패");
+    GPT_JSON_MAPPING_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Json 매핑 오류입니다 : Json Mapping Error"),
+    GPT_JSON_PROCESS_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Json 프로세싱 오류입니다 : Json Processing Error"),
+    GPT_API_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 오류입니다 : Internal API Server Error"),
+    GPT_NO_RESPONSE(HttpStatus.NOT_FOUND, "GPT 응답 오류입니다 : NO Response Error"),
+    GPT_NO_CONTENT(HttpStatus.NO_CONTENT, "GPT Content 오류입니다. : NO Content Error");
 
     private final HttpStatus httpStatus;
     private final String message;

@@ -25,9 +25,9 @@ public class GeminiController {
     private final QnAService qnAService;
 
     @PostMapping("/ask")
-    public ResponseEntity<String> askQuestion(@RequestBody Map<String, String> payload) {
-        String question = payload.get("question");
-        String answer = qnAService.getAnswer(question);
+    public ResponseEntity<Map<String, Object>> askQuestion(@RequestBody Map<String, String> payload) {
+        String prompt = payload.get("prompt");
+        Map<String, Object> answer = qnAService.getAnswer(prompt);
         return ResponseEntity.ok(answer);
     }
 }

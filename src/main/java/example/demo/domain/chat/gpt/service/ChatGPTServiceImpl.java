@@ -155,8 +155,6 @@ public class ChatGPTServiceImpl implements ChatGPTService {
     public Map<String, Object> prompt(ChatCompletionDto chatCompletionDto) {
         log.debug("[+] 신규 프롬프트를 수행합니다.");
 
-        Map<String, Object> resultMap = new HashMap<>();
-
         // [STEP1] 토큰 정보가 포함된 Header를 가져옵니다.
         HttpHeaders headers = chatGPTConfig.httpHeaders();
 
@@ -168,13 +166,30 @@ public class ChatGPTServiceImpl implements ChatGPTService {
         try {
             // [STEP6] String -> HashMap 역직렬화를 구성합니다.
             ObjectMapper om = new ObjectMapper();
-            resultMap = om.readValue(response.getBody(), new TypeReference<>() {
-            });
+            Map<String, Object> responseBody = om.readValue(response.getBody(), new TypeReference<>() {});
+            List<Map<String, Object>> choices = (List<Map<String, Object>>) responseBody.get("choices");
+
+            if (choices == null || choices.isEmpty()) {
+                throw new RestApiException(GptErrorCode.GPT_NO_RESPONSE);
+            }
+
+            Map<String, Object> firstChoice = choices.get(0);
+            Map<String, Object> message = (Map<String, Object>) firstChoice.get("message");
+
+            if (message == null || !message.containsKey("content")) {
+                throw new RestApiException(GptErrorCode.GPT_NO_CONTENT);
+            }
+
+            // "content" 값만 추출하여 반환
+            String content = message.get("content").toString();
+            Map<String, Object> resultMap = new HashMap<>();
+            resultMap.put("content", content);
+
+            return resultMap;
         } catch (JsonProcessingException e) {
             throw new RestApiException(GptErrorCode.GPT_JSON_PROCESS_ERROR);
         } catch (RuntimeException e) {
             throw new RestApiException(GptErrorCode.GPT_API_ERROR);
         }
-        return resultMap;
     }
 }

@@ -2,6 +2,8 @@ package example.demo.domain.chat.gemini.service;
 
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
+
 /**
  * Gemini Service Interface
  *
@@ -11,5 +13,5 @@ import org.springframework.stereotype.Service;
 
 @Service
 public interface QnAService {
-    String getAnswer(String question);
+    Map<String, Object> getAnswer(String prompt);
 }

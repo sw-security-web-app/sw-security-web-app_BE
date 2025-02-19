@@ -1,6 +1,7 @@
 package example.demo.domain.chat.claude.service;
 
-import org.springframework.http.ResponseEntity;
+import example.demo.domain.chat.claude.dto.ClaudeRequestDto;
+import example.demo.domain.chat.claude.dto.ClaudeResponseDto;
 import org.springframework.stereotype.Service;
 
 /**
@@ -12,7 +13,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public interface ClaudeService {
-    ResponseEntity<String> getCompletion(String prompt);
+    ClaudeResponseDto getCompletion(ClaudeRequestDto requestDto);
 
     /*
     ✔ extractCompletion은 interface와 impl로 구분할 필요 없음!

@@ -1,5 +1,10 @@
 package example.demo.domain.chat.claude.service;
 
+import example.demo.domain.chat.claude.ClaudeErrorCode;
+import example.demo.domain.chat.claude.dto.ClaudeRequestDto;
+import example.demo.domain.chat.claude.dto.ClaudeResponseDto;
+import example.demo.error.CommonErrorCode;
+import example.demo.error.RestApiException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -37,7 +42,8 @@ public class ClaudeServiceImpl implements ClaudeService {
         this.restTemplate = restTemplate;
     }
 
-    public ResponseEntity<String> getCompletion(String prompt) {
+    @Override
+    public ClaudeResponseDto getCompletion(ClaudeRequestDto requestDto) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("x-api-key", claudeApiKey);
@@ -48,33 +54,55 @@ public class ClaudeServiceImpl implements ClaudeService {
         requestBody.put("model", claudeModel);
         requestBody.put("max_tokens", 100); // 응답 오는 토큰 수 => 커질 수록 응답 길이 커짐
         requestBody.put("messages", List.of(
-                Map.of("role", "user", "content", prompt)
+                Map.of("role", "user", "content", requestDto.getPrompt())
         ));
 
         HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, headers);
 
+        /*
+         Body와 Content에 대해서 일시적 예외처리 완료
+        */
         try {
             ResponseEntity<Map> responseEntity = restTemplate.exchange(claudeApiUrl, HttpMethod.POST, requestEntity, Map.class);
 
-            if (responseEntity.getBody() != null) {
-                Object content = extractCompletion(responseEntity.getBody());
-                if (content != null) {
-                    return ResponseEntity.ok(content.toString());
-                }
+            if (responseEntity.getBody() == null) {
+                throw new RestApiException(ClaudeErrorCode.NO_EXIST_BODY);
             }
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("응답 없음");
+            Object content = extractCompletion(responseEntity.getBody());
 
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("오류 발생: " + e.getMessage());
+            if (content == null) {
+                throw new RestApiException(ClaudeErrorCode.NO_EXIST_CONTENT);
+            }
+
+            return ClaudeResponseDto.builder()
+                    .prompt(content.toString())
+                    .build();
+        } catch (RestApiException e) {
+            throw new RestApiException(CommonErrorCode.INTERNAL_SERVER_ERROR);
         }
     }
 
     // 응답에서 메시지 추출
     private Object extractCompletion(Map<String, Object> responseBody) {
-        if (responseBody.containsKey("content")) {
-            return responseBody.get("content");
+        if (responseBody == null) {
+            throw new RestApiException(ClaudeErrorCode.NO_EXIST_BODY);
         }
-        return null;
+
+        Object content = responseBody.get("content");
+        if (!(content instanceof List)) {
+            throw new RestApiException(ClaudeErrorCode.NO_EXIST_CONTENT);
+        }
+
+        List<Map<String, Object>> contentList = (List<Map<String, Object>>) content;
+        if (contentList.isEmpty()) {
+            throw new RestApiException(ClaudeErrorCode.NO_EXIST_CONTENT);
+        }
+
+        Object firstMessage = contentList.get(0).get("text");
+        if (firstMessage == null || firstMessage.toString().isBlank()) {
+            throw new RestApiException(ClaudeErrorCode.NO_EXIST_CONTENT);
+        }
+
+        return firstMessage.toString();
     }
 }
