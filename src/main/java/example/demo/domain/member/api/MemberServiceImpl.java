@@ -40,10 +40,8 @@ public class MemberServiceImpl implements MemberService {
     private final CompanyRepository companyRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
-
    // private final SmsCertificationDao smsCertificationDao;
     private final RedisCustomService redisCustomService;
-    private final JwtUtil jwtUtil;
 
 
     //회원가입 이전 : 이메일 인증, 휴대폰 인증 여부 확인.
@@ -52,9 +50,10 @@ public class MemberServiceImpl implements MemberService {
         Company company;
         //이메일 중복, 휴대폰번호 중복 예외처리는 해당 서비스 계층에서 실시합니다.
         //회원가입 전 이메일 인증 및 휴대폰 번호 인증 여부
-        /*if(smsAndMailValidation(memberRequestDto.getEmail(),memberRequestDto.getPhoneNumber())){
+if(smsAndMailValidation(memberRequestDto.getEmail(),memberRequestDto.getPhoneNumber())){
             throw new RestApiException(MemberErrorCode.INVALID_CERTIFICATION_EMAIL_OR_PHONE);
-        }*/
+        }
+
 
         switch (memberRequestDto.getMemberStatus().toLowerCase()){
             //일반
@@ -106,6 +105,16 @@ public class MemberServiceImpl implements MemberService {
         }
         //DTO조립
         return memberRepository.getCompanyEmployeeInfo(member.getCompany().getCompanyId(),page);
+    }
+
+    @Override
+    public MemberInfoResponseDto getMemberInfo(String token) {
+        Long findMemberId=jwtUtil.getMemberId(token);
+        MemberInfoResponseDto memberInfo = memberRepository.getMemberInfo(findMemberId);
+        if(memberInfo==null){
+            throw new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND);
+        }
+        return memberInfo;
     }
 
 

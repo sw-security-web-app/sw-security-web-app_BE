@@ -90,17 +90,19 @@ public class MemberCustomRepositoryImpl implements MemberCustomRepository {
     private BooleanExpression companyIdOfMemberEq(NumberPath<Long> companyId){
         return companyId==null ? null : member.company.companyId.eq(companyId);
     }
-  
-    private BooleanExpression allCompanyIdEq(NumberPath<Long> companyOfCompanyId, Long inputCompanyId){
-        BooleanExpression companyCondition=companyIdEq(inputCompanyId);
-        BooleanExpression memberCondition=companyIdOfMemberEq(companyOfCompanyId);
 
-        if(companyCondition==null)return memberCondition;
-        if(memberCondition==null) return companyCondition;
+    private BooleanExpression allCompanyIdEq(NumberPath<Long> companyOfCompanyId, Long inputCompanyId) {
+        BooleanExpression companyCondition = companyIdEq(inputCompanyId);
+        BooleanExpression memberCondition = companyIdOfMemberEq(companyOfCompanyId);
+
+        if (companyCondition == null) return memberCondition;
+        if (memberCondition == null) return companyCondition;
         return companyCondition.and(memberCondition);
+    }
 
     public MemberInfoResponseDto getMemberInfo(Long memberId) {
-        return queryFactory
+        return
+                queryFactory
                 .select(new QMemberInfoResponseDto(
                         member.userName,
                         member.email,
