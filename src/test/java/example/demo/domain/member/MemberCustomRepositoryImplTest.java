@@ -2,6 +2,8 @@ package example.demo.domain.member;
 
 import example.demo.domain.member.dto.request.MemberRequestDto;
 import example.demo.domain.member.repository.MemberRepository;
+import jakarta.persistence.EntityManager;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +17,6 @@ import static org.assertj.core.api.Assertions.*;
 class MemberCustomRepositoryImplTest {
     @Autowired
     private MemberRepository memberRepository;
-
     @Test
     @DisplayName("이메일 중복 검사를 실시합니다.")
     void isDuplicatedEmail(){

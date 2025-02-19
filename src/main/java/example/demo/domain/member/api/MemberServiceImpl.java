@@ -3,10 +3,14 @@ package example.demo.domain.member.api;
 import example.demo.data.RedisCustomService;
 import example.demo.domain.company.Company;
 import example.demo.domain.company.CompanyErrorCode;
+import example.demo.domain.company.dto.response.CompanyResponseDto;
 import example.demo.domain.company.repository.CompanyRepository;
 import example.demo.domain.company.dto.CompanyInfoWithUuidDto;
 import example.demo.domain.member.Member;
 import example.demo.domain.member.MemberErrorCode;
+import example.demo.domain.member.MemberStatus;
+import example.demo.domain.member.dto.response.CompanyEmployeeResponseDto;
+
 import example.demo.domain.member.dto.response.MemberInfoResponseDto;
 import example.demo.security.auth.dto.MemberLoginDto;
 import example.demo.domain.member.repository.MemberRepository;
@@ -15,6 +19,8 @@ import example.demo.error.RestApiException;
 import example.demo.security.util.JwtUtil;
 import example.demo.util.CreateRandom;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +39,7 @@ public class MemberServiceImpl implements MemberService {
     private final MemberRepository memberRepository;
     private final CompanyRepository companyRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
 
    // private final SmsCertificationDao smsCertificationDao;
     private final RedisCustomService redisCustomService;
@@ -45,9 +52,9 @@ public class MemberServiceImpl implements MemberService {
         Company company;
         //이메일 중복, 휴대폰번호 중복 예외처리는 해당 서비스 계층에서 실시합니다.
         //회원가입 전 이메일 인증 및 휴대폰 번호 인증 여부
-        if(smsAndMailValidation(memberRequestDto.getEmail(),memberRequestDto.getPhoneNumber())){
+        /*if(smsAndMailValidation(memberRequestDto.getEmail(),memberRequestDto.getPhoneNumber())){
             throw new RestApiException(MemberErrorCode.INVALID_CERTIFICATION_EMAIL_OR_PHONE);
-        }
+        }*/
 
         switch (memberRequestDto.getMemberStatus().toLowerCase()){
             //일반
@@ -87,15 +94,18 @@ public class MemberServiceImpl implements MemberService {
         newMember.setPassword(passwordEncoder.encode(newMember.getPassword()));
         memberRepository.save(newMember);
     }
-    @Transactional(readOnly = true)
+  
     @Override
-    public MemberInfoResponseDto getMemberInfo(String token) {
-        Long findMemberId=jwtUtil.getMemberId(token);
-        MemberInfoResponseDto memberInfo = memberRepository.getMemberInfo(findMemberId);
-        if(memberInfo==null){
-            throw new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND);
+    @Transactional(readOnly = true)
+    public Page<CompanyEmployeeResponseDto>  getAllEmployees(String token, Pageable page) {
+        Member member=memberRepository.findById(jwtUtil.getMemberId(token))
+                .orElseThrow(()->new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
+        //MANAGER인지 판단
+        if(!member.getMemberStatus().equals(MemberStatus.MANAGER)){
+            throw new RestApiException(MemberErrorCode.INVALID_PERMISSION);
         }
-        return memberInfo;
+        //DTO조립
+        return memberRepository.getCompanyEmployeeInfo(member.getCompany().getCompanyId(),page);
     }
 
 
