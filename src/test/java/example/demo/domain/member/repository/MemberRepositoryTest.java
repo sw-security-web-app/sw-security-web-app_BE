@@ -58,6 +58,21 @@ class MemberRepositoryTest {
         //then
         isSameMember(findMember, member);
     }
+    @DisplayName("휴대폰 번호로 유저를 찾습니다.")
+    @Test
+    void findByPhoneNumber(){
+        //given
+        MemberRequestDto general=MemberRequestDto.ofGeneral(
+                "tkv99123@naver.com", "김김김", "rlaehdus00!!", "01012345678","GENERAL"
+        );
+        Member member=Member.createGeneral(general);
+        memberRepository.save(member);
+
+        //when
+        Member findMember=memberRepository.findByPhoneNumber(member.getPhoneNumber()).get();
+        //then
+        isSameMember(findMember,member);
+    }
 
     private  void isSameMember(Member findMember, Member member) {
         assertThat(findMember.getPhoneNumber())

@@ -7,14 +7,17 @@ import example.demo.domain.company.repository.CompanyRepository;
 import example.demo.domain.company.dto.CompanyInfoWithUuidDto;
 import example.demo.domain.member.Member;
 import example.demo.domain.member.MemberErrorCode;
+import example.demo.domain.member.dto.response.MemberInfoResponseDto;
 import example.demo.security.auth.dto.MemberLoginDto;
 import example.demo.domain.member.repository.MemberRepository;
 import example.demo.domain.member.dto.request.MemberRequestDto;
 import example.demo.error.RestApiException;
+import example.demo.security.util.JwtUtil;
 import example.demo.util.CreateRandom;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +36,7 @@ public class MemberServiceImpl implements MemberService {
 
    // private final SmsCertificationDao smsCertificationDao;
     private final RedisCustomService redisCustomService;
+    private final JwtUtil jwtUtil;
 
 
     //회원가입 이전 : 이메일 인증, 휴대폰 인증 여부 확인.
@@ -83,10 +87,15 @@ public class MemberServiceImpl implements MemberService {
         newMember.setPassword(passwordEncoder.encode(newMember.getPassword()));
         memberRepository.save(newMember);
     }
-
+    @Transactional(readOnly = true)
     @Override
-    public void login(MemberLoginDto memberLoginDto) {
-
+    public MemberInfoResponseDto getMemberInfo(String token) {
+        Long findMemberId=jwtUtil.getMemberId(token);
+        MemberInfoResponseDto memberInfo = memberRepository.getMemberInfo(findMemberId);
+        if(memberInfo==null){
+            throw new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND);
+        }
+        return memberInfo;
     }
 
 
