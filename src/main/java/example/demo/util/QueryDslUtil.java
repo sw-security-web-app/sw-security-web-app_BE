@@ -7,6 +7,7 @@ import com.querydsl.core.types.Path;
 import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.NumberExpression;
+
 import example.demo.domain.member.QMember;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
