@@ -20,7 +20,7 @@ import java.util.Map;
 
 @Slf4j
 @RestController
-@RequestMapping(value = "/api/v1/chat-gpt")
+@RequestMapping(value = "/api/chat-gpt")
 public class ChatGPTController {
 
     private final ChatGPTService chatGPTService;
@@ -60,7 +60,7 @@ public class ChatGPTController {
     /**
      * @POST [API] 최신 ChatGPT 프롬프트 명령어 수행
      */
-    @PostMapping("/prompt")
+    @PostMapping("/ask")
     public ResponseEntity<Map<String, Object>> selectPrompt(@RequestBody ChatCompletionDto chatCompletionDto) {
         log.debug("param :: " + chatCompletionDto.toString());
         Map<String, Object> result = chatGPTService.prompt(chatCompletionDto);
