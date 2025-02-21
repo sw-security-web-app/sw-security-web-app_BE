@@ -1,11 +1,13 @@
 package example.demo.security.config;
 
+import example.demo.domain.member.MemberStatus;
 import example.demo.security.auth.CustomMemberDetailService;
 import example.demo.security.util.JwtAuthFilter;
 import example.demo.security.util.JwtUtil;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.EnableGlobalAuthentication;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -70,6 +72,12 @@ public class SecurityConfig {
                 //@PreAuthorization을 사용
                 .anyRequest().authenticated());
 
+        //회사 관리자만 직원 삭제 가능
+        http.authorizeHttpRequests(authorize->{
+            authorize.requestMatchers(AUTH_WHITELIST).permitAll()
+                    .requestMatchers(HttpMethod.DELETE,"/user").hasRole(MemberStatus.MANAGER.getText())
+                    .anyRequest().authenticated()
+        });
         return http.build();
     }
 
