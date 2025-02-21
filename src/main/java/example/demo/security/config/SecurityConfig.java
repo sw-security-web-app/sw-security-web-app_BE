@@ -35,9 +35,13 @@ public class SecurityConfig {
 
     private static final String[] AUTH_WHITELIST={
             "/api/login","/swagger-ui/**","/api-docs", "/swagger-ui-custom.html",
-            "/v3/api-docs/**", "/api-docs/**", "/swagger-ui.html","/api/signup","/api/**"
+            "/v3/api-docs/**", "/api-docs/**", "/swagger-ui.html","/api/signup","/api/mail-send",
+            "/api/mail-check","/api/send-password","/api/sms-certification/send","/api/sms-certification/confirm",
+            "/api/find-email","/api/**"
     };
-
+  /*
+  TODO:White List /api/** 삭제
+   */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
         //CSRF,CORS
