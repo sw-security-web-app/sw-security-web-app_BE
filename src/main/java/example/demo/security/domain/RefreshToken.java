@@ -15,8 +15,6 @@ public class RefreshToken {
 
     //Refresh Token 설정 시간 - 3일
     private static final Long REFRESH_EXPIRATION_TIME=259200000L;
-    //Access Token 설정 시간 - 1시간
-    private static final Long ACCESS_EXPIRATION_TIME=3600000L;
 
     //리프레쉬 토큰 가져오기
     public String getRefreshToken(final String refreshToken){
