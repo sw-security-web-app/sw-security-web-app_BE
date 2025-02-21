@@ -4,6 +4,7 @@ import example.demo.data.RedisCustomService;
 import example.demo.error.RestApiException;
 import example.demo.security.exception.SecurityErrorCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Bean;
 
 import java.util.Optional;
 import java.util.Set;

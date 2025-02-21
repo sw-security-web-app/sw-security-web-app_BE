@@ -2,6 +2,7 @@ package example.demo.security.auth.api;
 
 import example.demo.security.auth.dto.MemberLoginDto;
 import example.demo.util.ValidationSequence;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -14,8 +15,8 @@ public class AuthApiController {
     private final AuthService authService;
 
     @PostMapping("login")
-    public ResponseEntity<?> login(@Validated(ValidationSequence.class) @RequestBody MemberLoginDto loginDto){
-        String token=authService.loginMember(loginDto);
+    public ResponseEntity<?> login(@Validated(ValidationSequence.class) @RequestBody MemberLoginDto loginDto, HttpServletResponse response){
+        String token=authService.loginMember(loginDto,response);
         return ResponseEntity.ok().body(token);
     }
 }
