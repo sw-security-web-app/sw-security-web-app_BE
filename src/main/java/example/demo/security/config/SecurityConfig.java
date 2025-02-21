@@ -76,7 +76,7 @@ public class SecurityConfig {
         http.authorizeHttpRequests(authorize->{
             authorize.requestMatchers(AUTH_WHITELIST).permitAll()
                     .requestMatchers(HttpMethod.DELETE,"/user").hasRole(MemberStatus.MANAGER.getText())
-                    .anyRequest().authenticated()
+                    .anyRequest().authenticated();
         });
         return http.build();
     }
