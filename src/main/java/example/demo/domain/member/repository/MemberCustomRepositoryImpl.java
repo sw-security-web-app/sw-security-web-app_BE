@@ -26,16 +26,18 @@ import java.util.Optional;
 
 import static example.demo.domain.company.QCompany.*;
 import static example.demo.domain.member.QMember.*;
+
 @Repository("memberCustomRepositoryImpl")
 public class MemberCustomRepositoryImpl implements MemberCustomRepository {
     private final JPAQueryFactory queryFactory;
-    public MemberCustomRepositoryImpl(EntityManager em){
-        this.queryFactory=new JPAQueryFactory(em);
+
+    public MemberCustomRepositoryImpl(EntityManager em) {
+        this.queryFactory = new JPAQueryFactory(em);
     }
 
     @Override
     public Long getSameEmailCount(String email) {
-         return Optional.ofNullable(
+        return Optional.ofNullable(
                 queryFactory
                         .select(member.count())
                         .from(member)
@@ -58,11 +60,11 @@ public class MemberCustomRepositoryImpl implements MemberCustomRepository {
     @Override
     public Page<CompanyEmployeeResponseDto> getCompanyEmployeeInfo(Long companyId, Pageable pageable) {
         //정렬 추가
-        List<OrderSpecifier<?>> orderSpecifiers=new ArrayList<>();
+        List<OrderSpecifier<?>> orderSpecifiers = QueryDslUtil.getOrderSpecifiers(pageable);
 
         //정렬 조건
 
-        List<CompanyEmployeeResponseDto> content=queryFactory
+        List<CompanyEmployeeResponseDto> content = queryFactory
                 .select(new QCompanyEmployeeResponseDto(
                         member.companyPosition,
                         member.userName,
@@ -70,25 +72,75 @@ public class MemberCustomRepositoryImpl implements MemberCustomRepository {
                 ))
                 .from(member)
                 .leftJoin(member.company, company)
-                .where(allCompanyIdEq(company.companyId,companyId))
+                .where(allCompanyIdEq(company.companyId, companyId))
                 .orderBy(orderSpecifiers.toArray(new OrderSpecifier[0]))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
 
-        JPAQuery<Long> countQuery=queryFactory
+        JPAQuery<Long> countQuery = queryFactory
                 .select(member.count())
                 .from(member)
-                .leftJoin(member.company,company)
-                .where(allCompanyIdEq(company.companyId,companyId));
+                .leftJoin(member.company, company)
+                .where(allCompanyIdEq(company.companyId, companyId));
 
-        return PageableExecutionUtils.getPage(content,pageable,countQuery::fetchOne);
+        return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
     }
-    private BooleanExpression companyIdEq(Long companyId){
-        return companyId==null?null : company.companyId.eq(companyId);
+
+    public MemberInfoResponseDto getMemberInfo(Long memberId) {
+        return queryFactory
+                .select(new QMemberInfoResponseDto(
+                        member.userName,
+                        member.email,
+                        member.company.companyName,
+                        member.company.companyDept,
+                        member.companyPosition
+                ))
+                .from(member)
+                .leftJoin(member.company, company)
+                .where(member.memberId.eq(memberId))
+                .fetchOne();
+
     }
-    private BooleanExpression companyIdOfMemberEq(NumberPath<Long> companyId){
-        return companyId==null ? null : member.company.companyId.eq(companyId);
+
+    @Override
+    public Page<CompanyEmployeeResponseDto> searchCompanyEmployeeInfo(Long companyId, String search, Pageable pageable) {
+        //정렬 추가
+        List<OrderSpecifier<?>> orderSpecifiers =QueryDslUtil.getOrderSpecifiers(pageable);
+
+        //정렬 조건
+
+        List<CompanyEmployeeResponseDto> content = queryFactory
+                .select(new QCompanyEmployeeResponseDto(
+                        member.companyPosition,
+                        member.userName,
+                        member.email
+                ))
+                .from(member)
+                .leftJoin(member.company, company)
+                .where(allCompanyIdEq(company.companyId, companyId)
+                        .and(member.userName.contains(search)
+                                .or(member.companyPosition.contains(search))))
+                .orderBy(orderSpecifiers.toArray(new OrderSpecifier[0]))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        JPAQuery<Long> countQuery = queryFactory
+                .select(member.count())
+                .from(member)
+                .leftJoin(member.company, company)
+                .where(allCompanyIdEq(company.companyId, companyId));
+
+        return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
+    }
+
+    private BooleanExpression companyIdEq(Long companyId) {
+        return companyId == null ? null : company.companyId.eq(companyId);
+    }
+
+    private BooleanExpression companyIdOfMemberEq(NumberPath<Long> companyId) {
+        return companyId == null ? null : member.company.companyId.eq(companyId);
     }
 
     private BooleanExpression allCompanyIdEq(NumberPath<Long> companyOfCompanyId, Long inputCompanyId) {
@@ -98,22 +150,5 @@ public class MemberCustomRepositoryImpl implements MemberCustomRepository {
         if (companyCondition == null) return memberCondition;
         if (memberCondition == null) return companyCondition;
         return companyCondition.and(memberCondition);
-    }
-
-    public MemberInfoResponseDto getMemberInfo(Long memberId) {
-        return
-                queryFactory
-                .select(new QMemberInfoResponseDto(
-                        member.userName,
-                        member.email,
-                        member.company.companyName,
-                        member.company.companyDept,
-                        member.companyPosition
-                ))
-                .from(member)
-                .leftJoin(member.company,company)
-                .where(member.memberId.eq(memberId))
-                .fetchOne();
-
     }
 }

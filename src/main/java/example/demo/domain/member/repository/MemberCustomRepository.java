@@ -23,5 +23,7 @@ public interface MemberCustomRepository {
 
     //회원의 마이페이지 추출을 위한 쿼리
     MemberInfoResponseDto getMemberInfo(Long memberId);
+    //직원 이름 직책 검색
+    Page<CompanyEmployeeResponseDto> searchCompanyEmployeeInfo(Long companyId,String search,Pageable pageable);
 
 }
