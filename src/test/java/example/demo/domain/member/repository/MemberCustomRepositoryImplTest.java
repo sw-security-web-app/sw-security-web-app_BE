@@ -72,6 +72,74 @@ class MemberCustomRepositoryImplTest {
         memberRepository.saveAll(List.of(member1,member2,member3));
     }
 
+    private record Result(Company company1, Company company2,
+                          Member member1, Member member2,
+                          Member member3, Member member4,
+                          Member member5,Member member6,
+                          Member member7) {
+    }
+
+    @NotNull
+    private Result getResult() {
+        String COMPANY_CODE1="TEST1";
+        String COMPANY_CODE2="TEST2";
+        Company company1 = Company
+                .builder()
+                .companyDept("AI1")
+                .companyName("SK1")
+                .invitationCode(COMPANY_CODE1)
+                .build();
+        Company company2 = Company
+                .builder()
+                .companyDept("AI2")
+                .companyName("SK2")
+                .invitationCode(COMPANY_CODE2)
+                .build();
+        companyRepository.saveAll(List.of(company1, company2));
+
+        MemberRequestDto memberRequestDto1 = MemberRequestDto.ofManager(
+                "tkv123@naver.com", "김도연1", "abcd123!", "01012345678", "SK1", "AI1", "부사장", "MANAGER"
+        );
+        MemberRequestDto memberRequestDto2 = MemberRequestDto.ofManager(
+                "tkv124@naver.com", "김도연2", "abcd123!12", "01012345679", "SK1", "AI1", "부사장", "MANAGER"
+        );
+        MemberRequestDto memberRequestDto3 = MemberRequestDto.ofManager(
+                "tkv124@naver.com", "김도연3", "abcd123!13", "01012345679", "SK2", "AI2", "사장3", "MANAGER"
+        );
+        MemberRequestDto memberRequestDto4 = MemberRequestDto.ofManager(
+                "tkv124@naver.com", "김도연4", "abcd123!14", "01012345679", "SK1", "AI1", "부사장", "MANAGER"
+        );
+
+        MemberRequestDto memberRequestDto5 = MemberRequestDto.ofManager(
+                "tkv125@naver.com", "김도연5", "abcd123!2", "01012345670", "SK1", "AI1", "부사장", "MANAGER"
+        );
+        MemberRequestDto memberRequestDto6 = MemberRequestDto.ofManager(
+                "tkv125@naver.com", "안현석1", "abcd123!2", "01012345672", "SK1", "AI1", "부사장", "MANAGER"
+        );
+        MemberRequestDto memberRequestDto7 = MemberRequestDto.ofManager(
+                "tkv125@naver.com", "안현석2", "abcd123!2", "01012345672", "SK1", "AI1", "사장3", "MANAGER"
+        );
+
+        Member member1 = Member.createManager(memberRequestDto1, company1);
+        Member member2 = Member.createManager(memberRequestDto2, company1);
+        Member member3 = Member.createManager(memberRequestDto3, company2);
+        Member member4 = Member.createManager(memberRequestDto4, company1);
+        Member member5 = Member.createManager(memberRequestDto5, company1);
+        Member member6 = Member.createManager(memberRequestDto6, company1);
+        Member member7 = Member.createManager(memberRequestDto7, company1);
+        member1 = memberRepository.save(member1);
+        member2 = memberRepository.save(member2);
+        member3 = memberRepository.save(member3);
+        member4 = memberRepository.save(member4);
+        member5 = memberRepository.save(member5);
+        member6 = memberRepository.save(member6);
+        member7 = memberRepository.save(member7);
+        em.flush();
+        em.clear();
+        Result result = new Result(company1, company2, member1, member2, member3, member4, member5,member6,member7);
+        return result;
+    }
+
     @Test
     @DisplayName("같은 이메일의 개수를 반환하며 존재하지 않는다면 0L을 반환합니다.")
     void getSameEmailCount() {
@@ -112,8 +180,7 @@ class MemberCustomRepositoryImplTest {
     @DisplayName("회사id로 해당 회사 정보를 불러옵니다.")
     void getCompanyInfo() {
         //given
-        String COMPANY_CODE = "TEST_CODE";
-        Result result = getResult(COMPANY_CODE);
+        Result result = getResult();
 
         //when
         CompanyResponseDto companyResponseDto1 = companyRepository.getCompanyInfo(result.member1().getMemberId());
@@ -136,8 +203,7 @@ class MemberCustomRepositoryImplTest {
     @DisplayName("회사직원 목록을 페이징하여 조회합니다.")
     void getCompanyEmployeeInfo() {
         //given
-        String COMPANY_CODE = "TEST_CODE";
-        Result result = getResult(COMPANY_CODE);
+        Result result = getResult();
 
         //페이징 케이스
         Pageable page1 = PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "name"));
@@ -149,65 +215,9 @@ class MemberCustomRepositoryImplTest {
 
         //then
         assertThat(result1.getTotalPages()).isEqualTo(2);
-        assertThat(result1.getTotalElements()).isEqualTo(4);
+        assertThat(result1.getTotalElements()).isEqualTo(6);
         assertThat(result1.getContent().size()).isEqualTo(3);
-        assertThat(result2.getContent().size()).isEqualTo(1);
-    }
-
-    @NotNull
-    private Result getResult(String COMPANY_CODE) {
-        Company company1 = Company
-                .builder()
-                .companyDept("AI1")
-                .companyName("SK1")
-                .invitationCode(COMPANY_CODE)
-                .build();
-        Company company2 = Company
-                .builder()
-                .companyDept("AI2")
-                .companyName("SK2")
-                .invitationCode(COMPANY_CODE)
-                .build();
-        companyRepository.saveAll(List.of(company1, company2));
-
-        MemberRequestDto memberRequestDto1 = MemberRequestDto.ofManager(
-                "tkv123@naver.com", "김도연1", "abcd123!", "01012345678", "SK1", "AI1", "사장1", "MANAGER"
-        );
-        MemberRequestDto memberRequestDto2 = MemberRequestDto.ofManager(
-                "tkv124@naver.com", "김도연2", "abcd123!12", "01012345679", "SK1", "AI1", "사장2", "MANAGER"
-        );
-        MemberRequestDto memberRequestDto3 = MemberRequestDto.ofManager(
-                "tkv124@naver.com", "김도연3", "abcd123!13", "01012345679", "SK1", "AI1", "사장3", "MANAGER"
-        );
-        MemberRequestDto memberRequestDto4 = MemberRequestDto.ofManager(
-                "tkv124@naver.com", "김도연4", "abcd123!14", "01012345679", "SK1", "AI1", "사장4", "MANAGER"
-        );
-
-        MemberRequestDto memberRequestDto5 = MemberRequestDto.ofManager(
-                "tkv125@naver.com", "김도연5", "abcd123!2", "01012345670", "SK2", "AI2", "사장3", "MANAGER"
-        );
-
-        Member member1 = Member.createManager(memberRequestDto1, company1);
-        Member member2 = Member.createManager(memberRequestDto2, company1);
-        Member member4 = Member.createManager(memberRequestDto4, company1);
-        Member member5 = Member.createManager(memberRequestDto5, company1);
-        Member member3 = Member.createManager(memberRequestDto3, company2);
-        member1 = memberRepository.save(member1);
-        member2 = memberRepository.save(member2);
-        member3 = memberRepository.save(member3);
-        member4 = memberRepository.save(member4);
-        member5 = memberRepository.save(member5);
-        em.flush();
-        em.clear();
-        Result result = new Result(company1, company2, member1, member2, member3, member4, member5);
-        return result;
-    }
-
-    private record Result(Company company1, Company company2, Member member1, Member member2, Member member3,
-                          Member member4, Member member5) {
-
-
-
+        assertThat(result2.getContent().size()).isEqualTo(3);
     }
     @DisplayName("관리자 회원의 정보와 회원의 회사 정보를 가지고 옵니다.")
     void getMemberInfo() {
@@ -285,4 +295,26 @@ class MemberCustomRepositoryImplTest {
         );
 
     }
+
+    @Test
+    @DisplayName("회사직원 이름을 검색하여 페이징 조회합니다.")
+    void searchCompanyEmployeeInfo_name() {
+        //given
+        Result result = getResult();
+
+        //페이징 케이스
+        Pageable page1 = PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "name"));
+        Pageable page2 = PageRequest.of(1, 3, Sort.by(Sort.Direction.DESC, "name"));
+
+        //when
+        Page<CompanyEmployeeResponseDto> result1 = memberRepository.searchCompanyEmployeeInfo(result.company1.getCompanyId(),"안현", page1);
+        Page<CompanyEmployeeResponseDto> result2 = memberRepository.searchCompanyEmployeeInfo(result.company1.getCompanyId(),"김도", page2);
+
+        //then
+        assertThat(result1.getTotalPages()).isEqualTo(1);
+        assertThat(result1.getTotalElements()).isEqualTo(2);
+        assertThat(result1.getContent().size()).isEqualTo(2);
+        assertThat(result2.getContent().size()).isEqualTo(1);
+    }
+
 }
