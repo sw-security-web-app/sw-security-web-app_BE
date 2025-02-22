@@ -60,7 +60,7 @@ public class MemberCustomRepositoryImpl implements MemberCustomRepository {
     @Override
     public Page<CompanyEmployeeResponseDto> getCompanyEmployeeInfo(Long companyId, Pageable pageable) {
         //정렬 추가
-        List<OrderSpecifier<?>> orderSpecifiers = new ArrayList<>();
+        List<OrderSpecifier<?>> orderSpecifiers = QueryDslUtil.getOrderSpecifiers(pageable);
 
         //정렬 조건
 
