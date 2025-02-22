@@ -5,6 +5,7 @@ import example.demo.domain.member.MemberErrorCode;
 import example.demo.domain.member.repository.MemberRepository;
 import example.demo.error.RestApiException;
 import example.demo.security.auth.AuthErrorCode;
+import example.demo.security.auth.dto.AccessTokenResponseDto;
 import example.demo.security.auth.dto.CustomMemberInfoDto;
 import example.demo.security.auth.dto.MemberLoginDto;
 import example.demo.security.domain.RefreshToken;
@@ -26,7 +27,7 @@ public class AuthServiceImpl implements AuthService {
     private final RefreshToken refresh;
 
     @Override
-    public String loginMember(MemberLoginDto loginDto, HttpServletResponse response) {
+    public AccessTokenResponseDto loginMember(MemberLoginDto loginDto, HttpServletResponse response) {
         String email = loginDto.getEmail();
         String password = loginDto.getPassword();
         Member findMember = memberRepository.findByEmail(email).orElseThrow(
@@ -54,11 +55,15 @@ public class AuthServiceImpl implements AuthService {
         refresh.putRefreshToken(refreshToken, infoDto.getMemberId());
 
         //기존 가지고 있는 사용자 refresh Token제거
-        return accessToken;
+        return AccessTokenResponseDto.builder()
+                .accessToken(accessToken)
+                .message("토큰 반환 성공")
+                .code(200)
+                .build();
     }
 
     @Override
-    public String refreshAccessToken(String refreshToken, HttpServletResponse response) {
+    public AccessTokenResponseDto refreshAccessToken(String refreshToken, HttpServletResponse response) {
         //refresh Token 유효성 검증
         checkRefreshToken(refreshToken);
 
@@ -94,7 +99,12 @@ public class AuthServiceImpl implements AuthService {
         //새로운 Refresh 쿠키 설정
         setRefreshToken(refreshToken, response);
 
-        return newAccessToken;
+        return AccessTokenResponseDto
+                .builder()
+                .code(200)
+                .accessToken(newAccessToken)
+                .message("엑세스 토큰 재발행 성공")
+                .build();
     }
 
     private static void setRefreshToken(String refreshToken, HttpServletResponse response) {

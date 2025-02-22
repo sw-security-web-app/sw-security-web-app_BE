@@ -8,9 +8,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.authentication.configuration.EnableGlobalAuthentication;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -67,17 +64,12 @@ public class SecurityConfig {
 
         //권한 규칙 생성
         http.authorizeHttpRequests(authorize->authorize
-                .requestMatchers(AUTH_WHITELIST)
-                .permitAll()
+                .requestMatchers(AUTH_WHITELIST).permitAll()
                 //@PreAuthorization을 사용
+                //회사 관리자만 직원 삭제 가능
+                .requestMatchers(HttpMethod.DELETE,"/user").hasRole(MemberStatus.MANAGER.getText())
                 .anyRequest().authenticated());
 
-        //회사 관리자만 직원 삭제 가능
-        http.authorizeHttpRequests(authorize->{
-            authorize.requestMatchers(AUTH_WHITELIST).permitAll()
-                    .requestMatchers(HttpMethod.DELETE,"/user").hasRole(MemberStatus.MANAGER.getText())
-                    .anyRequest().authenticated();
-        });
         return http.build();
     }
 
@@ -86,9 +78,9 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource(){
         CorsConfiguration corsConfiguration=new CorsConfiguration();
         corsConfiguration.setAllowedOriginPatterns(Arrays.asList("http://localhost:*","http://172.20.10.2:5173"));
-        corsConfiguration.setAllowedMethods(Arrays.asList("GET","POST","DELETE","OPTIONS"));
+        corsConfiguration.setAllowedMethods(Arrays.asList("GET","POST","DELETE","OPTIONS","PUT"));
         corsConfiguration.setAllowedHeaders(List.of("*"));
-        corsConfiguration.setAllowCredentials(false);
+        corsConfiguration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source=new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**",corsConfiguration);

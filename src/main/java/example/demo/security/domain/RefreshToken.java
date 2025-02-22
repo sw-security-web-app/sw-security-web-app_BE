@@ -5,12 +5,14 @@ import example.demo.error.RestApiException;
 import example.demo.security.exception.SecurityErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
+import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 import java.util.Set;
 
 
 @RequiredArgsConstructor
+@Component
 public class RefreshToken {
     private  final RedisCustomService redisCustomService;
 
