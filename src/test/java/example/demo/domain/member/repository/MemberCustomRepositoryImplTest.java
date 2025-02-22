@@ -317,4 +317,25 @@ class MemberCustomRepositoryImplTest {
         assertThat(result2.getContent().size()).isEqualTo(1);
     }
 
+    @Test
+    @DisplayName("회사직원 이름을 검색할 때 Null값일 시 모든 직원 정보를 페이징 조회합니다.")
+    void searchCompanyEmployeeInfo_name_NULL() {
+        //given
+        Result result = getResult();
+
+        //페이징 케이스
+        Pageable page1 = PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "name"));
+        Pageable page2 = PageRequest.of(1, 3, Sort.by(Sort.Direction.DESC, "name"));
+
+        //when
+        Page<CompanyEmployeeResponseDto> result1 = memberRepository.searchCompanyEmployeeInfo(result.company1.getCompanyId(),"", page1);
+        Page<CompanyEmployeeResponseDto> result2 = memberRepository.searchCompanyEmployeeInfo(result.company1.getCompanyId(),"", page2);
+
+        //then
+        assertThat(result1.getTotalPages()).isEqualTo(2);
+        assertThat(result1.getTotalElements()).isEqualTo(6);
+        assertThat(result1.getContent().size()).isEqualTo(3);
+        assertThat(result2.getContent().size()).isEqualTo(3);
+    }
+
 }

@@ -17,6 +17,7 @@ public interface MemberService {
 
 
     MemberInfoResponseDto getMemberInfo(String token);
+    Page<CompanyEmployeeResponseDto> searchEmployees(String token, Pageable page,String search);
 
 
 }

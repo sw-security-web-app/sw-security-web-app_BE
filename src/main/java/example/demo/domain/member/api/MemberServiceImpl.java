@@ -117,6 +117,19 @@ if(smsAndMailValidation(memberRequestDto.getEmail(),memberRequestDto.getPhoneNum
         return memberInfo;
     }
 
+    @Override
+    public Page<CompanyEmployeeResponseDto> searchEmployees(String token, Pageable page, String search) {
+        Member member=memberRepository.findById(jwtUtil.getMemberId(token))
+                .orElseThrow(()->new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
+        //MANAGER 판단
+        if(!member.getMemberStatus().equals(MemberStatus.MANAGER)){
+            throw new RestApiException(MemberErrorCode.INVALID_PERMISSION);
+        }
+
+        //search 널 값 판단
+        return null;
+    }
+
 
     private boolean smsAndMailValidation(String email,String phoneNumber){
         if (isTestMode()) {
