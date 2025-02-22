@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import java.security.Key;
 import java.time.ZonedDateTime;
 import java.util.Date;
+import java.util.function.Function;
 
 @Slf4j
 @Component
@@ -78,4 +79,42 @@ public class JwtUtil {
             return e.getClaims();
         }
     }
+
+    //token 사용자 속성 정보 조회
+    public <T> T getClaimFromToken(final String token, final Function<Claims,T> claimsResolver){
+        //token유효성 검증
+        if(Boolean.FALSE.equals(validateToken(token))){
+            return null;
+        }
+        final Claims claims=parseClaims(token);
+
+        return claimsResolver.apply(claims);
+    }
+
+
+
+    //만료 일자 조회
+    public Date getExpirationDateFromToken(final String token){
+        return getClaimFromToken(token,Claims::getExpiration);
+    }
+
+    //refresh token 생성
+    public String generateRefreshToken(final String id){
+        return doGenerateRefreshToken(id);
+    }
+
+    public String generateRefreshToken(final long id){
+        return doGenerateRefreshToken(String.valueOf(id));
+    }
+
+    public String doGenerateRefreshToken(final String id){
+        return Jwts.builder()
+                .setId(id)
+                .setExpiration(new Date(System.currentTimeMillis()+(long) 259200000))
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .compact();
+    }
+
+
+
 }
