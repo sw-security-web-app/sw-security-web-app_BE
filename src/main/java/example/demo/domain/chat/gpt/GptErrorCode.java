@@ -13,6 +13,7 @@ public enum GptErrorCode implements ErrorCode {
     GPT_JSON_PROCESS_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Json 프로세싱 오류입니다 : Json Processing Error"),
     GPT_API_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 오류입니다 : Internal API Server Error"),
     GPT_NO_RESPONSE(HttpStatus.NOT_FOUND, "GPT 응답 오류입니다 : NO Response Error"),
+    GPT_INVALID_REQUEST(HttpStatus.BAD_REQUEST, "유효하지 않은 GPT 요청입니다. : Invalid Request Error"),
     GPT_NO_CONTENT(HttpStatus.NO_CONTENT, "GPT Content 오류입니다. : NO Content Error");
 
     private final HttpStatus httpStatus;

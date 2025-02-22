@@ -1,10 +1,10 @@
-package example.demo.domain.chat.claude.dto;
+package example.demo.domain.chat.gpt.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class ClaudeResponseDto {
+public class ChatGPTResponseDto {
     private String prompt;
 }
