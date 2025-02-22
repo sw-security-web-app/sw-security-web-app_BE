@@ -108,6 +108,7 @@ if(smsAndMailValidation(memberRequestDto.getEmail(),memberRequestDto.getPhoneNum
     }
 
     @Override
+    @Transactional(readOnly = true)
     public MemberInfoResponseDto getMemberInfo(String token) {
         Long findMemberId=jwtUtil.getMemberId(token);
         MemberInfoResponseDto memberInfo = memberRepository.getMemberInfo(findMemberId);
@@ -118,6 +119,7 @@ if(smsAndMailValidation(memberRequestDto.getEmail(),memberRequestDto.getPhoneNum
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<CompanyEmployeeResponseDto> searchEmployees(String token, Pageable page, String search) {
         Member member=memberRepository.findById(jwtUtil.getMemberId(token))
                 .orElseThrow(()->new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
@@ -126,8 +128,8 @@ if(smsAndMailValidation(memberRequestDto.getEmail(),memberRequestDto.getPhoneNum
             throw new RestApiException(MemberErrorCode.INVALID_PERMISSION);
         }
 
-        //search 널 값 판단
-        return null;
+
+        return memberRepository.searchCompanyEmployeeInfo(member.getCompany().getCompanyId(),search,page);
     }
 
 

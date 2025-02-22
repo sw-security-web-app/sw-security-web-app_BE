@@ -41,5 +41,13 @@ public class MemberController {
 
     }
 
+    @GetMapping("/api/employee-list")
+    public ResponseEntity<?>searchEmployees(@RequestHeader("Authorization")String token,
+                                            @PageableDefault(sort = "name")Pageable pageable,
+                                            @RequestParam(value = "search",required = true)String search){
+        Page<CompanyEmployeeResponseDto> employees=memberService.searchEmployees(token,pageable,search);
+        return ResponseEntity.ok(employees);
+    }
+
 
 }
