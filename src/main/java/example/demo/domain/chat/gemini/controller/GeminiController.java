@@ -3,12 +3,10 @@ package example.demo.domain.chat.gemini.controller;
 import example.demo.domain.chat.gemini.dto.GeminiRequestDto;
 import example.demo.domain.chat.gemini.dto.GeminiResponseDto;
 import example.demo.domain.chat.gemini.service.GeminiService;
+import example.demo.security.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * Gemini API
@@ -23,10 +21,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class GeminiController {
 
     private final GeminiService geminiService;
+    private final JwtUtil jwtUtil;
 
     @PostMapping("/ask")
-    public ResponseEntity<GeminiResponseDto> askQuestion(@RequestBody GeminiRequestDto requestDto) {
-        GeminiResponseDto responseDto = geminiService.getAnswer(requestDto);
+    public ResponseEntity<?> askQuestion(@RequestBody GeminiRequestDto requestDto,
+                                         @RequestHeader("Authorization") String token) {
+        Long memberId = jwtUtil.getMemberId(token);
+        GeminiResponseDto responseDto = geminiService.getAnswer(requestDto, memberId);
         return ResponseEntity.ok(responseDto);
     }
 }
