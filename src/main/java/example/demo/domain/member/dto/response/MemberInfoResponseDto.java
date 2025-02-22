@@ -1,6 +1,7 @@
 package example.demo.domain.member.dto.response;
 
 import com.querydsl.core.annotations.QueryProjection;
+import example.demo.domain.member.MemberStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -17,14 +18,17 @@ public class MemberInfoResponseDto {
     private String companyDept;
     //직책
     private String companyPosition;
+    //유저 종류
+    private MemberStatus memberStatus;
 
     @QueryProjection
     @Builder
-    public MemberInfoResponseDto(String name, String email, String companyName, String companyDept, String companyPosition) {
+    public MemberInfoResponseDto(String name, String email, String companyName, String companyDept, String companyPosition,MemberStatus memberStatus) {
         this.name = name;
         this.email = email;
         this.companyName = companyName;
         this.companyDept = companyDept;
         this.companyPosition = companyPosition;
+        this.memberStatus=memberStatus;
     }
 }

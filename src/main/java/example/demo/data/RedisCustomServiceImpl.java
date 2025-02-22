@@ -7,6 +7,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -36,5 +37,10 @@ public class RedisCustomServiceImpl implements RedisCustomService{
     @Override
     public boolean hasKey(String key) {
         return redisTemplate.hasKey(key);
+    }
+
+    @Override
+    public Set<String> getKeysByPattern(String pattern) {
+        return redisTemplate.keys(pattern);
     }
 }
