@@ -7,6 +7,7 @@ import example.demo.domain.chat.dto.QChatDto;
 import jakarta.persistence.EntityManager;
 
 import java.util.List;
+import java.util.Optional;
 
 import static example.demo.domain.chat.QChat.chat;
 
@@ -19,12 +20,12 @@ public class ChatRepositoryCustomImpl implements ChatRepositoryCustom {
     }
 
     @Override
-    public List<Chat> findChatListByChatRoomId(Long chatRoomId) {
-        return queryFactory
+    public Optional<Chat> findChatListByChatRoomId(Long chatRoomId) {
+        return Optional.ofNullable(queryFactory
                 .selectFrom(chat)
                 .where(chat.chatRoom.chatRoomId.eq(chatRoomId))
                 .orderBy(chat.createdAt.desc())
-                .fetch();
+                .fetchFirst());
     }
 
 }

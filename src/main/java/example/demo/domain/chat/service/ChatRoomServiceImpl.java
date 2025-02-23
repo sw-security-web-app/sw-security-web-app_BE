@@ -15,8 +15,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -43,19 +44,12 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 
     @Override
     public List<ChatDto> getChatListByChatRoomId(Long chatRoomId) {
-
         if (!chatRoomRepository.existsById(chatRoomId)) {
             throw new RestApiException(ChatRoomErrorCode.CHAT_ROOM_NOT_FOUND);
         }
-
-        List<Chat> chatList = chatRepository.findChatListByChatRoomId(chatRoomId);
-        if (chatList == null || chatList.isEmpty()) {
-            throw new RestApiException(ChatRoomErrorCode.CHAT_ROOM_NOT_FOUND);
-        }
-
-        return chatRepository.findChatListByChatRoomId(chatRoomId).stream()
-                .map(this::convertToDto)
-                .collect(Collectors.toList());
+        Optional<Chat> optionalChat = chatRepository.findChatListByChatRoomId(chatRoomId);
+        Chat chat = optionalChat.get();
+        return Collections.singletonList(convertToDto(chat));
     }
 
     private ChatDto convertToDto(Chat chat) {

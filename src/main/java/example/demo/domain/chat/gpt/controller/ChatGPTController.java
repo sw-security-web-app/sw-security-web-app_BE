@@ -4,6 +4,7 @@ import example.demo.domain.chat.gpt.dto.ChatGPTRequestDto;
 import example.demo.domain.chat.gpt.dto.ChatGPTResponseDto;
 import example.demo.domain.chat.gpt.service.ChatGPTService;
 import example.demo.security.util.JwtUtil;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +30,7 @@ public class ChatGPTController {
      * @POST [API] 최신 ChatGPT 프롬프트 명령어 수행
      */
     @PostMapping("/ask")
-    public ResponseEntity<?> selectPrompt(@RequestBody ChatGPTRequestDto requestDto,
+    public ResponseEntity<?> selectPrompt(@Valid @RequestBody ChatGPTRequestDto requestDto,
                                           @RequestHeader("Authorization") String token,
                                           @RequestHeader("X-ChatRoom-Id") Long chatRoomId) {
         Long memberId = jwtUtil.getMemberId(token);

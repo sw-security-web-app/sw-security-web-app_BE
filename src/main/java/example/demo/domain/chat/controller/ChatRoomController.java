@@ -5,6 +5,7 @@ import example.demo.domain.chat.dto.ChatRoomRequestDto;
 import example.demo.domain.chat.dto.ChatRoomResponseDto;
 import example.demo.domain.chat.service.ChatRoomService;
 import example.demo.security.util.JwtUtil;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,7 +29,7 @@ public class ChatRoomController {
     }
 
     @GetMapping("/get")
-    public ResponseEntity<?> getChatList(@RequestBody ChatRoomRequestDto requestDto,
+    public ResponseEntity<?> getChatList(@Valid @RequestBody ChatRoomRequestDto requestDto,
                                          @RequestHeader("Authorization") String token) {
         Long memberId = jwtUtil.getMemberId(token);
         List<ChatDto> messages = chatRoomService.getChatListByChatRoomId(requestDto.getChatRoomId());

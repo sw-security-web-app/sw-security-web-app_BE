@@ -2,8 +2,8 @@ package example.demo.domain.chat.repository;
 
 import example.demo.domain.chat.Chat;
 
-import java.util.List;
+import java.util.Optional;
 
 public interface ChatRepositoryCustom {
-    List<Chat> findChatListByChatRoomId(Long chatRoomId);
+    Optional<Chat> findChatListByChatRoomId(Long chatRoomId);
 }

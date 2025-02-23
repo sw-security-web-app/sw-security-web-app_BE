@@ -4,6 +4,7 @@ import example.demo.domain.chat.gemini.dto.GeminiRequestDto;
 import example.demo.domain.chat.gemini.dto.GeminiResponseDto;
 import example.demo.domain.chat.gemini.service.GeminiService;
 import example.demo.security.util.JwtUtil;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +25,7 @@ public class GeminiController {
     private final JwtUtil jwtUtil;
 
     @PostMapping("/ask")
-    public ResponseEntity<?> askQuestion(@RequestBody GeminiRequestDto requestDto,
+    public ResponseEntity<?> askQuestion(@Valid @RequestBody GeminiRequestDto requestDto,
                                          @RequestHeader("Authorization") String token) {
         Long memberId = jwtUtil.getMemberId(token);
         GeminiResponseDto responseDto = geminiService.getAnswer(requestDto, memberId);
