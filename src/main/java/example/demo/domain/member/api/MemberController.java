@@ -42,7 +42,7 @@ public class MemberController {
     }
 
     //TODO:Test Code 작성
-    @GetMapping("/api/employee-list")
+    @GetMapping("/api/employee-list/search")
     public ResponseEntity<?>searchEmployees(@RequestHeader("Authorization")String token,
                                             @PageableDefault(sort = "name")Pageable pageable,
                                             @RequestParam(value = "search",required = true)String search){

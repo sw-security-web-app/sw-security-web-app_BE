@@ -87,6 +87,7 @@ public class MemberCustomRepositoryImpl implements MemberCustomRepository {
         return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
     }
 
+
     public MemberInfoResponseDto getMemberInfo(Long memberId) {
         return queryFactory
                 .select(new QMemberInfoResponseDto(
@@ -94,7 +95,8 @@ public class MemberCustomRepositoryImpl implements MemberCustomRepository {
                         member.email,
                         member.company.companyName,
                         member.company.companyDept,
-                        member.companyPosition
+                        member.companyPosition,
+                        member.memberStatus
                 ))
                 .from(member)
                 .leftJoin(member.company, company)
@@ -151,4 +153,5 @@ public class MemberCustomRepositoryImpl implements MemberCustomRepository {
         if (memberCondition == null) return companyCondition;
         return companyCondition.and(memberCondition);
     }
+
 }
