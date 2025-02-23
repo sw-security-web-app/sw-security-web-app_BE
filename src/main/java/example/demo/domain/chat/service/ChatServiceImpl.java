@@ -35,6 +35,15 @@ public class ChatServiceImpl implements ChatService {
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
                 .orElseThrow(() -> new RestApiException(ChatRoomErrorCode.CHAT_ROOM_NOT_FOUND));
 
+        if (
+                chatDto == null ||
+                        chatDto.getModelType() == null ||
+                        chatDto.getQuestion() == null ||
+                        chatDto.getAnswer() == null
+        ) {
+            throw new RestApiException(ChatRoomErrorCode.INVALID_CHAT_DATA);
+        }
+
         Chat chat = Chat.builder()
                 .modelType(chatDto.getModelType())
                 .question(chatDto.getQuestion())

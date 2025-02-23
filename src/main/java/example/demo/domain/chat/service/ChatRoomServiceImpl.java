@@ -2,6 +2,7 @@ package example.demo.domain.chat.service;
 
 import example.demo.domain.chat.Chat;
 import example.demo.domain.chat.ChatRoom;
+import example.demo.domain.chat.ChatRoomErrorCode;
 import example.demo.domain.chat.dto.ChatDto;
 import example.demo.domain.chat.dto.ChatRoomResponseDto;
 import example.demo.domain.chat.repository.ChatRepository;
@@ -42,6 +43,16 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 
     @Override
     public List<ChatDto> getChatListByChatRoomId(Long chatRoomId) {
+
+        if (!chatRoomRepository.existsById(chatRoomId)) {
+            throw new RestApiException(ChatRoomErrorCode.CHAT_ROOM_NOT_FOUND);
+        }
+
+        List<Chat> chatList = chatRepository.findChatListByChatRoomId(chatRoomId);
+        if (chatList == null || chatList.isEmpty()) {
+            throw new RestApiException(ChatRoomErrorCode.CHAT_ROOM_NOT_FOUND);
+        }
+
         return chatRepository.findChatListByChatRoomId(chatRoomId).stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
