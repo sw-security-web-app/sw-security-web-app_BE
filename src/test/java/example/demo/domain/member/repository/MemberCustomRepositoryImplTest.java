@@ -1,3 +1,4 @@
+
 package example.demo.domain.member.repository;
 
 import example.demo.domain.company.Company;

@@ -13,5 +13,5 @@ import org.springframework.stereotype.Service;
 
 @Service
 public interface GeminiService {
-    GeminiResponseDto getAnswer(GeminiRequestDto requestDto);
+    GeminiResponseDto getAnswer(GeminiRequestDto requestDto, Long memberId);
 }

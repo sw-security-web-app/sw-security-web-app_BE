@@ -7,7 +7,7 @@ import lombok.*;
 
 @Getter
 @AllArgsConstructor
-
+@NoArgsConstructor
 public class MemberLoginDto {
     @NotBlank(message = "이메일은 필수 입력 값입니다.",
             groups = ValidationGroups.NotEmptyGroup.class)

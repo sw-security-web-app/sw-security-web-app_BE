@@ -1,5 +1,6 @@
 package example.demo.security.util;
 
+import example.demo.domain.member.MemberStatus;
 import example.demo.security.auth.dto.CustomMemberInfoDto;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
@@ -36,7 +37,7 @@ public class JwtUtil {
         Claims claims= Jwts.claims();
         claims.put("memberId",memberInfoDto.getMemberId());
         claims.put("email",memberInfoDto.getEmail());
-        claims.put("memberStatus",memberInfoDto.getMemberStatus());
+        claims.put("memberStatus",memberInfoDto.getMemberStatus().toString());
         claims.put("accountLocked",memberInfoDto.isAccountLocked());
 
         ZonedDateTime now=ZonedDateTime.now();
@@ -55,6 +56,8 @@ public class JwtUtil {
         return parseClaims(token).get("memberId",Long.class);
     }
 
+    //Member 권한 추출
+    public String getMemberStatus(String token){return parseClaims(token).get("memberStatus",String.class);}
     //JWT검증
     public boolean validateToken(String token){
         try {
