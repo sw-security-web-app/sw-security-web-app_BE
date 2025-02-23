@@ -52,6 +52,7 @@ public class MailServiceImpl implements MailService {
         if(smsValidation(requestDto.getPhoneNumber())){
             throw new RestApiException(MemberErrorCode.INVALID_PHONE_CERTIFICATION_NUMBER);
         }
+        //유저의 이메일
         javaMailSender.send(createTemporaryPassword(requestDto.getEmail()));
     }
     @Override

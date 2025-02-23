@@ -1,5 +1,6 @@
 package example.demo.domain.member.sms;
 
+import example.demo.domain.member.dto.request.MemberFindEmailRequestDto;
 import example.demo.domain.member.dto.request.SmsCertificationRequestDto;
 import example.demo.util.ValidationSequence;
 import lombok.RequiredArgsConstructor;
@@ -26,8 +27,8 @@ public class SmsController {
     }
 
     @PostMapping ("/api/find-email")
-    public ResponseEntity<?> findEmail(@RequestParam String phoneNumber){
-        smsService.sendMemberEmail(phoneNumber);
+    public ResponseEntity<?> findEmail(@Validated(ValidationSequence.class) @RequestBody MemberFindEmailRequestDto requestDto){
+        smsService.sendMemberEmail(requestDto);
         return ResponseEntity.ok("전송 성공");
     }
 }
