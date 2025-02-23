@@ -50,17 +50,38 @@ public class SmsServiceImpl implements SmsService{
     //휴대폰 번호로 가입한 이메일 정보 전송
     @Override
     public void sendMemberEmail(MemberFindEmailRequestDto requestDto) {
-
-        /*Member findMember=memberRepository.findByPhoneNumber(requestDto.getPhoneNumber())
+        //이메일과 전화번호로 멤버 조회
+        Member findMember=memberRepository.findMemberByNameAndPhoneNumber(requestDto.getName(),requestDto.getPhoneNumber())
                 .orElseThrow(()->new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
         //DTO로 반환
-        FindEmailResponseDto email=FindEmailResponseDto.builder()
-                .email(findMember.getEmail())
+        //email Masking
+        String maskingEmail=screenEmail(findMember.getEmail());
+        FindEmailResponseDto email=FindEmailResponseDto
+                .builder()
+                .email(maskingEmail)
                 .build();
-        smsUtil.sendMemberEmail(phoneNumber, email.getEmail());*/
+        smsUtil.sendMemberEmail(requestDto.getPhoneNumber(), email.getEmail());
 
     }
 
+    //유저의 가입된 이메일 부분 가리기
+    private static String screenEmail(String email){
+        String[] emailToSplit =email.split("@");
+        String localPart=emailToSplit[0];
+        String domainPart=emailToSplit[1];
+
+        //@앞 길이 측정
+        int size=localPart.length();
+        if(size>2){
+            int mask=Math.max(3,size-2);
+            StringBuilder sb=new StringBuilder();
+            for (int i=0;i<mask;i++){
+                sb.setCharAt(i,'*');
+            }
+            localPart=sb.toString();
+        }
+        return localPart+"@"+domainPart;
+    }
 
 
 }
