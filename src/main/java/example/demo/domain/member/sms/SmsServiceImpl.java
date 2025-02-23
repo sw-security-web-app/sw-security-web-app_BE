@@ -56,12 +56,8 @@ public class SmsServiceImpl implements SmsService{
         //DTO로 반환
         //email Masking
         String maskingEmail=screenEmail(findMember.getEmail());
-        FindEmailResponseDto email=FindEmailResponseDto
-                .builder()
-                .email(maskingEmail)
-                .build();
-        smsUtil.sendMemberEmail(requestDto.getPhoneNumber(), email.getEmail());
 
+        smsUtil.sendMemberEmail(requestDto.getPhoneNumber(), maskingEmail);
     }
 
     //유저의 가입된 이메일 부분 가리기
@@ -73,8 +69,8 @@ public class SmsServiceImpl implements SmsService{
         //@앞 길이 측정
         int size=localPart.length();
         if(size>2){
-            int mask=Math.max(3,size-2);
-            StringBuilder sb=new StringBuilder();
+            int mask=Math.min(3,size-2);
+            StringBuilder sb=new StringBuilder(localPart);
             for (int i=0;i<mask;i++){
                 sb.setCharAt(i,'*');
             }
