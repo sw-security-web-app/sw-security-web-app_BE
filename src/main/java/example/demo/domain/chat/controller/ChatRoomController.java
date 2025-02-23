@@ -29,9 +29,7 @@ public class ChatRoomController {
     }
 
     @GetMapping("/get")
-    public ResponseEntity<?> getChatList(@Valid @RequestBody ChatRoomRequestDto requestDto,
-                                         @RequestHeader("Authorization") String token) {
-        Long memberId = jwtUtil.getMemberId(token);
+    public ResponseEntity<?> getChatList(@Valid @RequestBody ChatRoomRequestDto requestDto) {
         List<ChatDto> messages = chatRoomService.getChatListByChatRoomId(requestDto.getChatRoomId());
         return ResponseEntity.ok(messages);
     }
