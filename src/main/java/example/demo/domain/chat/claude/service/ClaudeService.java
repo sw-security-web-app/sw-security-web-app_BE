@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public interface ClaudeService {
-    ClaudeResponseDto getCompletion(ClaudeRequestDto requestDto);
+    ClaudeResponseDto getCompletion(ClaudeRequestDto requestDto, Long memberId);
 
     /*
     ✔ extractCompletion은 interface와 impl로 구분할 필요 없음!

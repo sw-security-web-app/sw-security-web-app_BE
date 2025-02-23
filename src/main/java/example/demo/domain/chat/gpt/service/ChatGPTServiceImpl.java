@@ -3,10 +3,20 @@ package example.demo.domain.chat.gpt.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import example.demo.domain.chat.AIModelType;
+import example.demo.domain.chat.ChatRoom;
+import example.demo.domain.chat.ChatRoomErrorCode;
+import example.demo.domain.chat.dto.ChatDto;
 import example.demo.domain.chat.gpt.GptErrorCode;
 import example.demo.domain.chat.gpt.config.ChatGPTConfig;
 import example.demo.domain.chat.gpt.dto.ChatCompletionDto;
+import example.demo.domain.chat.gpt.dto.ChatGPTRequestDto;
+import example.demo.domain.chat.gpt.dto.ChatGPTResponseDto;
+import example.demo.domain.chat.gpt.dto.ChatRequestMsgDto;
+import example.demo.domain.chat.repository.ChatRoomRepository;
+import example.demo.domain.chat.service.ChatService;
 import example.demo.error.RestApiException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -15,6 +25,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,13 +40,12 @@ import java.util.Map;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class ChatGPTServiceImpl implements ChatGPTService {
 
     private final ChatGPTConfig chatGPTConfig;
-
-    public ChatGPTServiceImpl(ChatGPTConfig chatGPTConfig) {
-        this.chatGPTConfig = chatGPTConfig;
-    }
+    private final ChatService chatService;
+    private final ChatRoomRepository chatRoomRepository;
 
     @Value("${openai.url.prompt}")
     private String promptUrl;
@@ -44,8 +54,26 @@ public class ChatGPTServiceImpl implements ChatGPTService {
      * 신규 모델에 대한 프롬프트
      */
     @Override
-    public Map<String, Object> prompt(ChatCompletionDto chatCompletionDto) {
-        log.debug("[+] 신규 프롬프트를 수행합니다.");
+    public ChatGPTResponseDto prompt(ChatGPTRequestDto requestDto, Long memberId) {
+        Long chatRoomId = requestDto.getChatRoomId();
+        String prompt = requestDto.getPrompt();
+        String model = requestDto.getModel();
+
+        if (chatRoomId == null || prompt == null || model == null) {
+            throw new RestApiException(GptErrorCode.GPT_INVALID_REQUEST);
+        }
+
+        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
+                .orElseThrow(() -> new RestApiException(ChatRoomErrorCode.CHAT_ROOM_NOT_FOUND));
+        List<ChatRequestMsgDto> messages = new ArrayList<>();
+        messages.add(ChatRequestMsgDto.builder()
+                .role("user")
+                .content(prompt)
+                .build());
+        ChatCompletionDto chatCompletionDto = ChatCompletionDto.builder()
+                .model(model)
+                .messages(messages)
+                .build();
 
         // 토큰 정보가 포함된 Header를 가져옵니다.
         HttpHeaders headers = chatGPTConfig.httpHeaders();
@@ -77,7 +105,17 @@ public class ChatGPTServiceImpl implements ChatGPTService {
             Map<String, Object> resultMap = new HashMap<>();
             resultMap.put("content", content);
 
-            return resultMap;
+            String question = requestDto.getPrompt();
+
+            ChatDto chatDto = ChatDto.builder()
+                    .modelType(AIModelType.ChatGPT)
+                    .question(question)
+                    .answer(content)
+                    .chatRoomId(chatRoom.getChatRoomId())
+                    .build();
+
+            chatService.saveChat(memberId, chatDto, chatRoomId);
+            return new ChatGPTResponseDto(content);
         } catch (JsonProcessingException e) {
             throw new RestApiException(GptErrorCode.GPT_JSON_PROCESS_ERROR);
         } catch (RuntimeException e) {

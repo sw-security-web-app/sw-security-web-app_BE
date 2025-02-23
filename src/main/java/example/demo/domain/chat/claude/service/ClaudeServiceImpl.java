@@ -1,8 +1,14 @@
 package example.demo.domain.chat.claude.service;
 
+import example.demo.domain.chat.AIModelType;
+import example.demo.domain.chat.ChatRoom;
+import example.demo.domain.chat.ChatRoomErrorCode;
 import example.demo.domain.chat.claude.ClaudeErrorCode;
 import example.demo.domain.chat.claude.dto.ClaudeRequestDto;
 import example.demo.domain.chat.claude.dto.ClaudeResponseDto;
+import example.demo.domain.chat.dto.ChatDto;
+import example.demo.domain.chat.repository.ChatRoomRepository;
+import example.demo.domain.chat.service.ChatService;
 import example.demo.error.CommonErrorCode;
 import example.demo.error.RestApiException;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,13 +43,17 @@ public class ClaudeServiceImpl implements ClaudeService {
     private String claudeVersion;
 
     private final RestTemplate restTemplate;
+    private final ChatRoomRepository chatRoomRepository;
+    private final ChatService chatService;
 
-    public ClaudeServiceImpl(RestTemplate restTemplate) {
+    public ClaudeServiceImpl(RestTemplate restTemplate, ChatRoomRepository chatRoomRepository, ChatService chatService) {
         this.restTemplate = restTemplate;
+        this.chatRoomRepository = chatRoomRepository;
+        this.chatService = chatService;
     }
 
     @Override
-    public ClaudeResponseDto getCompletion(ClaudeRequestDto requestDto) {
+    public ClaudeResponseDto getCompletion(ClaudeRequestDto requestDto, Long memberId) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("x-api-key", claudeApiKey);
@@ -59,6 +69,10 @@ public class ClaudeServiceImpl implements ClaudeService {
 
         HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, headers);
 
+        Long chatRoomId = requestDto.getChatRoomId();
+        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
+                .orElseThrow(() -> new RestApiException(ChatRoomErrorCode.CHAT_ROOM_NOT_FOUND));
+
         /*
          Body와 Content에 대해서 일시적 예외처리 완료
         */
@@ -68,22 +82,28 @@ public class ClaudeServiceImpl implements ClaudeService {
             if (responseEntity.getBody() == null) {
                 throw new RestApiException(ClaudeErrorCode.NO_EXIST_BODY);
             }
-            Object content = extractCompletion(responseEntity.getBody());
+            String content = extractCompletion(responseEntity.getBody());
 
             if (content == null) {
                 throw new RestApiException(ClaudeErrorCode.NO_EXIST_CONTENT);
             }
 
-            return ClaudeResponseDto.builder()
-                    .prompt(content.toString())
+            ChatDto chatDto = ChatDto.builder()
+                    .modelType(AIModelType.Claude)
+                    .question(requestDto.getPrompt())
+                    .answer(content)
+                    .chatRoomId(chatRoom.getChatRoomId())
                     .build();
+            chatService.saveChat(memberId, chatDto, chatRoomId);
+
+            return new ClaudeResponseDto(content);
         } catch (RestApiException e) {
             throw new RestApiException(CommonErrorCode.INTERNAL_SERVER_ERROR);
         }
     }
 
     // 응답에서 메시지 추출
-    private Object extractCompletion(Map<String, Object> responseBody) {
+    private String extractCompletion(Map<String, Object> responseBody) {
         if (responseBody == null) {
             throw new RestApiException(ClaudeErrorCode.NO_EXIST_BODY);
         }

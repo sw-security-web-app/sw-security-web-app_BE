@@ -1,9 +1,8 @@
 package example.demo.domain.chat.gpt.service;
 
-import example.demo.domain.chat.gpt.dto.ChatCompletionDto;
+import example.demo.domain.chat.gpt.dto.ChatGPTRequestDto;
+import example.demo.domain.chat.gpt.dto.ChatGPTResponseDto;
 import org.springframework.stereotype.Service;
-
-import java.util.Map;
 
 /**
  * ChatGPT 서비스 인터페이스
@@ -15,5 +14,5 @@ import java.util.Map;
 
 @Service
 public interface ChatGPTService {
-    Map<String, Object> prompt(ChatCompletionDto chatCompletionDto);
+    ChatGPTResponseDto prompt(ChatGPTRequestDto requestDto, Long memberId);
 }
