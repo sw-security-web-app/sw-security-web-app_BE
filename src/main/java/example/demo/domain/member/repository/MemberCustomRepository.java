@@ -1,6 +1,7 @@
 package example.demo.domain.member.repository;
 
 
+import example.demo.domain.member.Member;
 import example.demo.domain.member.dto.response.CompanyEmployeeResponseDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,5 +24,7 @@ public interface MemberCustomRepository {
 
     //회원의 마이페이지 추출을 위한 쿼리
     MemberInfoResponseDto getMemberInfo(Long memberId);
+    //회원의 이름과 휴대폰 번호로 회원 조회
+    Optional<Member> findMemberByNameAndPhoneNumber(String name,String phoneNumber);
 
 }

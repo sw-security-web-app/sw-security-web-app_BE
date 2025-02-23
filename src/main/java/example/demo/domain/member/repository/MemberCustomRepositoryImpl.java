@@ -6,6 +6,7 @@ import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import example.demo.domain.member.Member;
+import example.demo.domain.member.QMember;
 import example.demo.domain.member.dto.response.CompanyEmployeeResponseDto;
 import example.demo.domain.member.dto.response.QCompanyEmployeeResponseDto;
 import example.demo.util.QueryDslUtil;
@@ -87,6 +88,31 @@ public class MemberCustomRepositoryImpl implements MemberCustomRepository {
         return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
     }
 
+    public MemberInfoResponseDto getMemberInfo(Long memberId) {
+        return queryFactory
+                .select(new QMemberInfoResponseDto(
+                        member.userName,
+                        member.email,
+                        member.company.companyName,
+                        member.company.companyDept,
+                        member.companyPosition,
+                        member.memberStatus
+                        ))
+                .from(member)
+                .leftJoin(member.company, company)
+                .where(member.memberId.eq(memberId))
+                .fetchOne();
+
+    }
+
+    @Override
+    public Optional<Member> findMemberByNameAndPhoneNumber(String name, String phoneNumber) {
+        return Optional.ofNullable(queryFactory
+                .selectFrom(member)
+                .where(phoneNumberEq(phoneNumber).and(memberNameEq(name)))
+                .fetchOne());
+    }
+
     private BooleanExpression companyIdEq(Long companyId) {
         return companyId == null ? null : company.companyId.eq(companyId);
     }
@@ -104,20 +130,11 @@ public class MemberCustomRepositoryImpl implements MemberCustomRepository {
         return companyCondition.and(memberCondition);
     }
 
-    public MemberInfoResponseDto getMemberInfo(Long memberId) {
-        return queryFactory
-                .select(new QMemberInfoResponseDto(
-                        member.userName,
-                        member.email,
-                        member.company.companyName,
-                        member.company.companyDept,
-                        member.companyPosition,
-                        member.memberStatus
-                        ))
-                .from(member)
-                .leftJoin(member.company, company)
-                .where(member.memberId.eq(memberId))
-                .fetchOne();
+    private BooleanExpression phoneNumberEq(String phoneNumber){
+        return phoneNumber == null ? null : member.phoneNumber.eq(phoneNumber);
+    }
 
+    private BooleanExpression memberNameEq(String name){
+        return name == null ? null : member.userName.eq(name);
     }
 }
