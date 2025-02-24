@@ -2,8 +2,8 @@ package example.demo.domain.chat.service;
 
 import example.demo.domain.chat.Chat;
 import example.demo.domain.chat.ChatRoom;
-import example.demo.domain.chat.ChatRoomErrorCode;
 import example.demo.domain.chat.dto.ChatDto;
+import example.demo.domain.chat.dto.ChatRoomRecentResponseDto;
 import example.demo.domain.chat.dto.ChatRoomResponseDto;
 import example.demo.domain.chat.repository.ChatRepository;
 import example.demo.domain.chat.repository.ChatRoomRepository;
@@ -17,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -43,22 +42,11 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     }
 
     @Override
-    public List<ChatDto> getChatListByChatRoomId(Long chatRoomId) {
-        if (!chatRoomRepository.existsById(chatRoomId)) {
-            throw new RestApiException(ChatRoomErrorCode.CHAT_ROOM_NOT_FOUND);
+    public List<ChatRoomRecentResponseDto> getLatestChatRoom(Long memberId) {
+        List<ChatRoomRecentResponseDto> latestChatRoom = chatRoomRepository.findLatestChatRoomWithLatestAnswer(memberId);
+        if (latestChatRoom.isEmpty()) {
+            return Collections.emptyList();
         }
-        Optional<Chat> optionalChat = chatRepository.findChatListByChatRoomId(chatRoomId);
-        Chat chat = optionalChat.get();
-        return Collections.singletonList(convertToDto(chat));
-    }
-
-    private ChatDto convertToDto(Chat chat) {
-        return ChatDto.builder()
-                .chatId(chat.getChatId())
-                .modelType(chat.getModelType())
-                .question(chat.getQuestion())
-                .answer(chat.getAnswer())
-                .chatRoomId(chat.getChatRoom().getChatRoomId())
-                .build();
+        return latestChatRoom;
     }
 }

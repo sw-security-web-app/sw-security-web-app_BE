@@ -1,6 +1,7 @@
 package example.demo.domain.chat.controller;
 
 import example.demo.domain.chat.dto.ChatDto;
+import example.demo.domain.chat.dto.ChatRoomRecentResponseDto;
 import example.demo.domain.chat.dto.ChatRoomRequestDto;
 import example.demo.domain.chat.dto.ChatRoomResponseDto;
 import example.demo.domain.chat.service.ChatRoomService;
@@ -28,9 +29,10 @@ public class ChatRoomController {
         return ResponseEntity.ok(chatRoom);
     }
 
-    @GetMapping("/get")
-    public ResponseEntity<?> getChatList(@Valid @RequestBody ChatRoomRequestDto requestDto) {
-        List<ChatDto> messages = chatRoomService.getChatListByChatRoomId(requestDto.getChatRoomId());
-        return ResponseEntity.ok(messages);
+    @GetMapping("/latest")
+    public ResponseEntity<?> getLatestChatRoom(@RequestHeader("Authorization") String token) {
+        Long memberId = jwtUtil.getMemberId(token);
+        List<ChatRoomRecentResponseDto> latestChatRoom = chatRoomService.getLatestChatRoom(memberId);
+        return ResponseEntity.ok(latestChatRoom);
     }
 }
