@@ -2,10 +2,9 @@ package example.demo.domain.chat.repository;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import example.demo.domain.chat.ChatRoom;
 import example.demo.domain.chat.QChatRoom;
-import example.demo.domain.chat.dto.ChatRoomRecentResponseDto;
-import example.demo.domain.chat.dto.QChatRoomRecentResponseDto;
-import example.demo.domain.chat.dto.QChatRoomResponseDto;
+import example.demo.domain.chat.dto.*;
 import jakarta.persistence.EntityManager;
 
 import java.util.List;
@@ -29,6 +28,18 @@ public class ChatRoomRepositoryCustomImpl implements ChatRoomRepositoryCustom {
         return latestChatRoomIds.stream()
                 .map(this::getChatRoomRecentResponseDto)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ChatRoomRequestDto> findByMemberOrderByCreatedAtAsc(Long memberId) {
+        return queryFactory
+                .select(new QChatRoomRequestDto(chatRoom.chatRoomId,
+                        chatRoom.createdAt)
+                )
+                .from(chatRoom)
+                .where(memberIdEq(memberId))
+                .orderBy(chatRoom.createdAt.asc())
+                .fetch();
     }
 
     private BooleanExpression memberIdEq(Long memberId) {

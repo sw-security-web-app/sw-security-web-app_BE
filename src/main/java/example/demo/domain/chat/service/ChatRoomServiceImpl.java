@@ -4,6 +4,7 @@ import example.demo.domain.chat.Chat;
 import example.demo.domain.chat.ChatRoom;
 import example.demo.domain.chat.dto.ChatDto;
 import example.demo.domain.chat.dto.ChatRoomRecentResponseDto;
+import example.demo.domain.chat.dto.ChatRoomRequestDto;
 import example.demo.domain.chat.dto.ChatRoomResponseDto;
 import example.demo.domain.chat.repository.ChatRepository;
 import example.demo.domain.chat.repository.ChatRoomRepository;
@@ -26,6 +27,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     private final ChatRoomRepository chatRoomRepository;
     private final ChatRepository chatRepository;
     private final MemberRepository memberRepository;
+    private static final int MAX_CHAT_ROOM_COUNT = 7;
 
     @Transactional
     @Override
@@ -38,6 +40,8 @@ public class ChatRoomServiceImpl implements ChatRoomService {
                 .build();
 
         chatRoomRepository.save(chatRoom);
+        limitChatRoomCount(memberId);
+
         return new ChatRoomResponseDto(chatRoom.getChatRoomId());
     }
 
@@ -48,5 +52,21 @@ public class ChatRoomServiceImpl implements ChatRoomService {
             return Collections.emptyList();
         }
         return latestChatRoom;
+    }
+
+    private void limitChatRoomCount(Long memberId) {
+        List<ChatRoomRequestDto> chatRoomList = chatRoomRepository.findByMemberOrderByCreatedAtAsc(memberId);
+        if (chatRoomList.size() > MAX_CHAT_ROOM_COUNT) {
+            ChatRoomRequestDto result = chatRoomList.get(0);
+            deleteChatRoomAndChatList(result.getChatRoomId());
+        }
+    }
+
+    private void deleteChatRoomAndChatList(Long chatRoomId) {
+        ChatRoom result = chatRoomRepository.findById(chatRoomId)
+                .orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
+        List<Chat> chatList = chatRepository.findByChatRoom(result);
+        chatRepository.deleteAll(chatList);
+        chatRoomRepository.delete(result);
     }
 }

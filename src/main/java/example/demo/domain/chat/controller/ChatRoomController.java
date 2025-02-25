@@ -1,12 +1,9 @@
 package example.demo.domain.chat.controller;
 
-import example.demo.domain.chat.dto.ChatDto;
 import example.demo.domain.chat.dto.ChatRoomRecentResponseDto;
-import example.demo.domain.chat.dto.ChatRoomRequestDto;
 import example.demo.domain.chat.dto.ChatRoomResponseDto;
 import example.demo.domain.chat.service.ChatRoomService;
 import example.demo.security.util.JwtUtil;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
