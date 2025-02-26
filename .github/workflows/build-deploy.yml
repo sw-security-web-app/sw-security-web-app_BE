@@ -37,7 +37,7 @@ jobs:
         shell: bash
 
       - name: Build and Test
-        run: ./gradlew build -x test
+        run: ./gradlew clean build -x test
 
       - name: Make Zip File
         run: |
@@ -58,7 +58,7 @@ jobs:
           aws deploy push \
             --application-name ${{ env.CODE_DEPLOY_APP_NAME }} \
             --ignore-hidden-files \
-            --s3-location s3://${{ env.BUCKET_NAME }}/$GITHUB_SHA.zip \
+            --s3-location s3://$BUCKET_NAME/$GITHUB_SHA.zip \
             --source ./build/zip
 
       - name: Debug Deployment Group Name
@@ -71,4 +71,4 @@ jobs:
             --application-name ${{ env.CODE_DEPLOY_APP_NAME }} \
             --deployment-config-name CodeDeployDefault.AllAtOnce \
             --deployment-group-name ${{ env.CODE_DEPLOY_DEPLOYMENT_GROUP_NAME }} \
-            --s3-location bucket=${{ env.BUCKET_NAME }},key=$GITHUB_SHA.zip,bundleType=zip
+            --s3-location bucket=$BUCKET_NAME,key=$GITHUB_SHA.zip,bundleType=zip
