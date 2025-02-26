@@ -13,22 +13,24 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
 @SpringBootTest
-
+@Transactional
 class AuthServiceImplTest {
     @Autowired
     private AuthService authService;
 
-    @MockitoBean
     @Autowired
     private MemberRepository memberRepository;
 
-    @Autowired
+    @MockitoBean
     private PasswordEncoder encoder;
 
     @MockitoBean
@@ -43,23 +45,27 @@ class AuthServiceImplTest {
 
         Member member=Member.createGeneral(requestDto);
         member=memberRepository.save(member);
+        memberRepository.flush();
+
         String token="token";
 
-        ChangePasswordRequestDto passwordRequestDto= (ChangePasswordRequestDto) ChangePasswordRequestDto
+        ChangePasswordRequestDto passwordRequestDto= ChangePasswordRequestDto
                 .builder()
                 .newPassword("rlaehdus00123!!")
                 .email(requestDto.getEmail())
                 .password(requestDto.getPassword())
                 .build();
 
-        //when
-        //비밀번호 변경
-        authService.changePassword(token,passwordRequestDto);
         when(jwtUtil.getMemberId(token)).thenReturn(member.getMemberId());
+        when(encoder.encode(anyString())).thenAnswer(invocation -> "ENCODED_" + invocation.getArgument(0));
+        when(encoder.matches(anyString(),anyString())).thenReturn(true);
+        // when
+        authService.changePassword(token,passwordRequestDto);
+
 
         //then
-        Member newPasswordMember=memberRepository.findById(member.getMemberId()).orElseThrow();
-        assertThat(encoder.matches(newPasswordMember.getPassword(),
-                encoder.encode(passwordRequestDto.getPassword()))).isTrue();
+        Member updatedMember=memberRepository.findById(member.getMemberId()).get();
+        assertThat(encoder.matches(updatedMember.getPassword(),
+                encoder.encode(passwordRequestDto.getNewPassword()))).isTrue();
     }
 }

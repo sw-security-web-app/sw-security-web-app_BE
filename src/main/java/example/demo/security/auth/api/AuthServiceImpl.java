@@ -116,9 +116,9 @@ public class AuthServiceImpl implements AuthService {
         /*
          *유저 아이디와 비밀번호 일치 체크
          */
-        String newPassword = encoder.encode(requestDto.getPassword());
+        String newPassword = encoder.encode(requestDto.getNewPassword());
         if (!findMember.getEmail().equals(requestDto.getEmail()) ||
-                !encoder.matches(findMember.getPassword(), newPassword)
+                !encoder.matches(encoder.encode(requestDto.getPassword()), findMember.getPassword())
         ) {
             throw new RestApiException(AuthErrorCode.INVALID_EMAIL_OR_PASSWORD);
         }
