@@ -38,7 +38,7 @@ public class AuthApiController {
         return ResponseEntity.ok(accessTokenResponseDto);
     }
 
-    @PutMapping("change-passowd")
+    @PutMapping("change-password")
     public ResponseEntity<?> changePassword(@Validated(ValidationSequence.class) @RequestBody ChangePasswordRequestDto requestDto,
                                             @RequestHeader("Authorization")String token){
         authService.changePassword(token,requestDto);
