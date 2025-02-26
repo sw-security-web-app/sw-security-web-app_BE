@@ -37,13 +37,16 @@ public class Member extends BaseEntity {
     private String companyPosition;
 
     //계정 잠금 여부
-    @Column(name = "account_locked")
+    @Column(name = "account_locked",columnDefinition = "BOOLEAN DEFAULT false")
     private boolean accountLocked;
     //Company랑 양방향
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company_id")
     private Company company;
 
+    //계정 로그인 시도 횟수
+    @Column(name = "failed_attemps",columnDefinition = "INT DEFAULT 0")
+    private int failedAttempts;
     public Member(String email, String userName, String password, MemberStatus memberStatus, String phoneNumber, String companyPosition,Company company) {
         this.email = email;
         this.userName = userName;
@@ -83,4 +86,9 @@ public class Member extends BaseEntity {
         this.password = password;
     }
     public void setMemberId(Long memberId){this.memberId=memberId;}
+
+    //로그인 실패 횟수 증가
+    public void incrementFailedAttempts(){
+        this.failedAttempts++;
+    }
 }
