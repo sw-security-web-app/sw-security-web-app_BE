@@ -1,11 +1,13 @@
 package example.demo.security.auth.api;
 
+import example.demo.common.ResponseDto;
 import example.demo.domain.member.Member;
 import example.demo.domain.member.MemberErrorCode;
 import example.demo.domain.member.repository.MemberRepository;
 import example.demo.error.RestApiException;
 import example.demo.security.auth.AuthErrorCode;
 import example.demo.security.auth.dto.AccessTokenResponseDto;
+import example.demo.security.auth.dto.ChangePasswordRequestDto;
 import example.demo.security.auth.dto.CustomMemberInfoDto;
 import example.demo.security.auth.dto.MemberLoginDto;
 import example.demo.security.domain.RefreshToken;
@@ -68,10 +70,10 @@ public class AuthServiceImpl implements AuthService {
         checkRefreshToken(refreshToken);
 
         //Redis에 리프레시 토큰 저장유무 확인
-        Long memberId=jwtUtil.getMemberId(refreshToken);
-        String storedToken=refresh.getRefreshToken(refreshToken);
+        Long memberId = jwtUtil.getMemberId(refreshToken);
+        String storedToken = refresh.getRefreshToken(refreshToken);
 
-        if(!refreshToken.equals(storedToken)){
+        if (!refreshToken.equals(storedToken)) {
             throw new RestApiException(SecurityErrorCode.INVALID_TOKEN);
         }
 
@@ -79,9 +81,9 @@ public class AuthServiceImpl implements AuthService {
         refresh.removeUserRefreshToken(memberId);
 
         //새 토큰 발급
-        Member member=memberRepository.findById(memberId)
-                .orElseThrow(()->new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
-        CustomMemberInfoDto infoDto=CustomMemberInfoDto
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
+        CustomMemberInfoDto infoDto = CustomMemberInfoDto
                 .builder()
                 .memberId(memberId)
                 .accountLocked(false)
@@ -90,11 +92,11 @@ public class AuthServiceImpl implements AuthService {
                 .password(member.getPassword())
                 .build();
 
-        String newAccessToken=jwtUtil.createAccessToken(infoDto);
-        String newRefreshToken=jwtUtil.generateRefreshToken(memberId);
+        String newAccessToken = jwtUtil.createAccessToken(infoDto);
+        String newRefreshToken = jwtUtil.generateRefreshToken(memberId);
 
         //새 Refresh 저장
-        refresh.putRefreshToken(newRefreshToken,memberId);
+        refresh.putRefreshToken(newRefreshToken, memberId);
 
         //새로운 Refresh 쿠키 설정
         setRefreshToken(refreshToken, response);
@@ -107,16 +109,34 @@ public class AuthServiceImpl implements AuthService {
                 .build();
     }
 
+    @Override
+    public void changePassword(String token, ChangePasswordRequestDto requestDto) {
+        Member findMember = memberRepository.findById(jwtUtil.getMemberId(token))
+                .orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
+        /*
+         *유저 아이디와 비밀번호 일치 체크
+         */
+        String newPassword = encoder.encode(requestDto.getPassword());
+        if (!findMember.getEmail().equals(requestDto.getEmail()) ||
+                !encoder.matches(findMember.getPassword(), newPassword)
+        ) {
+            throw new RestApiException(AuthErrorCode.INVALID_EMAIL_OR_PASSWORD);
+        }
+
+        findMember.setPassword(newPassword);
+        memberRepository.save(findMember);
+    }
+
     private static void setRefreshToken(String refreshToken, HttpServletResponse response) {
         Cookie cookie = new Cookie("refreshToken", refreshToken);
-        cookie.setMaxAge(3*24*60*60);
+        cookie.setMaxAge(3 * 24 * 60 * 60);
         cookie.setPath("/");
         response.addCookie(cookie);
     }
 
 
-    private void checkRefreshToken(String refreshToken){
-        if(Boolean.FALSE.equals(jwtUtil.validateToken(refreshToken))){
+    private void checkRefreshToken(String refreshToken) {
+        if (Boolean.FALSE.equals(jwtUtil.validateToken(refreshToken))) {
             throw new RestApiException(SecurityErrorCode.INVALID_TOKEN);
 
         }
