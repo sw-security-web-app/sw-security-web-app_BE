@@ -44,9 +44,6 @@ public class Member extends BaseEntity {
     @JoinColumn(name = "company_id")
     private Company company;
 
-    //계정 로그인 시도 횟수
-    @Column(name = "failed_attemps",columnDefinition = "INT DEFAULT 0")
-    private int failedAttempts;
     public Member(String email, String userName, String password, MemberStatus memberStatus, String phoneNumber, String companyPosition,Company company) {
         this.email = email;
         this.userName = userName;
@@ -87,8 +84,4 @@ public class Member extends BaseEntity {
     }
     public void setMemberId(Long memberId){this.memberId=memberId;}
 
-    //로그인 실패 횟수 증가
-    public void incrementFailedAttempts(){
-        this.failedAttempts++;
-    }
 }

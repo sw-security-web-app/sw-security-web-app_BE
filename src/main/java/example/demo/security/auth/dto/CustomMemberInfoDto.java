@@ -12,6 +12,8 @@ public class CustomMemberInfoDto extends MemberLoginDto {
     private Long memberId;
     private MemberStatus memberStatus;
     private boolean accountLocked;
+    //로그인 실패 횟수
+    private int failedAttempts;
 
     @Builder
     public CustomMemberInfoDto(Long memberId,@NotBlank(message = "이메일은 필수 입력 값입니다.",

@@ -47,7 +47,11 @@ public class AuthServiceImpl implements AuthService {
         }
 
         CustomMemberInfoDto infoDto = new CustomMemberInfoDto(
-                findMember.getMemberId(), email, password, findMember.getMemberStatus(), findMember.isAccountLocked()
+                findMember.getMemberId(),
+                email,
+                password,
+                findMember.getMemberStatus(),
+                false
         );
         //기존 refresh 삭제
         refresh.removeUserRefreshToken(infoDto.getMemberId());
