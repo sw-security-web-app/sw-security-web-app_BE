@@ -21,8 +21,9 @@ jobs:
       - name: make application-secret.yml
         run: |
           cd ./src/main/resources
-          touch ./application-secret.yml
-          echo "${{ secrets.YML_SECRET }}" > ./application-secret.yml
+          cat > ./application-secret.yml <<EOF
+          ${{ secrets.YML_SECRET }}
+          EOF
         shell: bash
 
       - name: Set up JDK 21
@@ -39,7 +40,9 @@ jobs:
         run: ./gradlew build -x test
 
       - name: Make Zip File
-        run: zip -qq -r ./$GITHUB_SHA.zip .
+        run: |
+          mkdir ./build/zip
+          zip -qq -r ./build/zip/$GITHUB_SHA.zip .
         shell: bash
 
       - name: Configure AWS credentials
@@ -49,18 +52,21 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_PRIVATE_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
+      - name: Debug Environment Variables
+        run: echo "CODE_DEPLOY_APP_NAME: ${{ env.CODE_DEPLOY_APP_NAME }}"
+
       - name: Upload to AWS S3
         run: |
           aws deploy push \
-            --application-name ${{ env.CODE_DEPLOY_APPLICATION_NAME }} \
+            --application-name ${{ env.CODE_DEPLOY_APP_NAME }} \
             --ignore-hidden-files \
-            --s3-location s3://$BUCKET_NAME/$GITHUB_SHA.zip \
-            --source .
+            --s3-location s3://${{ env.BUCKET_NAME }}/$GITHUB_SHA.zip \
+            --source ./build/zip
 
       - name: Deploy to AWS EC2 from S3
         run: |
           aws deploy create-deployment \
-            --application-name ${{ env.CODE_DEPLOY_APPLICATION_NAME }} \
+            --application-name ${{ env.CODE_DEPLOY_APP_NAME }} \
             --deployment-config-name CodeDeployDefault.AllAtOnce \
             --deployment-group-name ${{ env.CODE_DEPLOY_DEPLOYMENT_GROUP_NAME }} \
             --s3-location bucket=$BUCKET_NAME,key=$GITHUB_SHA.zip,bundleType=zip
