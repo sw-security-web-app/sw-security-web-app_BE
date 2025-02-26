@@ -22,22 +22,20 @@ import java.io.IOException;
 @Slf4j(topic = "FAILURE_HANDLER")
 @AllArgsConstructor
 @Component
-public class CustomAuthenticationFailureHandler implements AuthenticationFailureHandler {
+public class CustomAuthenticationFailureHandler{
     ///최대 실패 횟수
     private static final int MAX_FAILED_ATTEMPTS=5;
 
     //잠금 시간(30분)
-    private static final long LOCK_TIME=1800000;
+    private static final long LOCK_TIME=1800;
     //로그인 시도 시간(10분)
-    private static final long ATTEMPT_TIME=600000;
+    private static final long ATTEMPT_TIME=600;
     private final RedisCustomService redisCustomService;
     private final String PREFIX="login :";
 
 
-    @Override
-    public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
-        String userEmail=request.getParameter("email");
 
+    public void filteringLoginAttempts(String userEmail)  {
         /*
         * 유저의 락 정보는 로그인 서비스단에서 조회
         * failureHandler는 로그인 실패 시 실패 횟수 추적만 하면됨

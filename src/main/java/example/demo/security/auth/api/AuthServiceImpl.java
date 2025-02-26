@@ -10,6 +10,7 @@ import example.demo.security.auth.dto.AccessTokenResponseDto;
 import example.demo.security.auth.dto.ChangePasswordRequestDto;
 import example.demo.security.auth.dto.CustomMemberInfoDto;
 import example.demo.security.auth.dto.MemberLoginDto;
+import example.demo.security.config.CustomAuthenticationFailureHandler;
 import example.demo.security.domain.RefreshToken;
 import example.demo.security.exception.SecurityErrorCode;
 import example.demo.security.util.JwtUtil;
@@ -28,6 +29,7 @@ public class AuthServiceImpl implements AuthService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder encoder;
     private final RefreshToken refresh;
+    private final CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
 
     @Override
     public AccessTokenResponseDto loginMember(MemberLoginDto loginDto, HttpServletResponse response) {
@@ -36,6 +38,8 @@ public class AuthServiceImpl implements AuthService {
         Member findMember = memberRepository.findByEmail(email).orElseThrow(
                 () -> new RestApiException(AuthErrorCode.INVALID_EMAIL_OR_PASSWORD)
         );
+
+        customAuthenticationFailureHandler.filteringLoginAttempts(email);
 
         if (!encoder.matches(password, findMember.getPassword())) {
             throw new RestApiException(AuthErrorCode.INVALID_EMAIL_OR_PASSWORD);
@@ -129,7 +133,7 @@ public class AuthServiceImpl implements AuthService {
          */
         String newPassword = encoder.encode(requestDto.getNewPassword());
         if (!findMember.getEmail().equals(requestDto.getEmail()) ||
-                !encoder.matches(encoder.encode(requestDto.getPassword()), findMember.getPassword())
+                !encoder.matches(requestDto.getPassword(), findMember.getPassword())
         ) {
             throw new RestApiException(AuthErrorCode.INVALID_EMAIL_OR_PASSWORD);
         }
