@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-REPOSITORY=/home/ec2-user/vero
+REPOSITORY=/home/ec2-user/sw-security-web-app_BE
 cd $REPOSITORY
 
 APP_NAME=vero
