@@ -25,7 +25,6 @@ import java.util.List;
 public class ChatRoomServiceImpl implements ChatRoomService {
 
     private final ChatRoomRepository chatRoomRepository;
-    private final ChatRepository chatRepository;
     private final MemberRepository memberRepository;
     private static final int MAX_CHAT_ROOM_COUNT = 7;
 
@@ -65,8 +64,6 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     private void deleteChatRoomAndChatList(Long chatRoomId) {
         ChatRoom result = chatRoomRepository.findById(chatRoomId)
                 .orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
-        List<Chat> chatList = chatRepository.findByChatRoom(result);
-        chatRepository.deleteAll(chatList);
         chatRoomRepository.delete(result);
     }
 }
