@@ -61,6 +61,10 @@ jobs:
             --s3-location s3://${{ env.BUCKET_NAME }}/$GITHUB_SHA.zip \
             --source ./build/zip
 
+      - name: Debug Deployment Group Name
+        run: |
+          echo "DEPLOYMENT_GROUP_NAME: ${{ env.DEPLOYMENT_GROUP_NAME }}"
+
       - name: Deploy to AWS EC2 from S3
         run: |
           aws deploy create-deployment \
