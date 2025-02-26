@@ -43,6 +43,7 @@ jobs:
         run: |
           mkdir ./build/zip
           cp appspec.yml ./build/zip/
+          cp -r scripts ./build/zip/
           zip -qq -r ./build/zip/$GITHUB_SHA.zip .
         shell: bash
 
