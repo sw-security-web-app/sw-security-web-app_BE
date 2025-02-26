@@ -18,14 +18,4 @@ public class ChatRepositoryCustomImpl implements ChatRepositoryCustom {
     public ChatRepositoryCustomImpl(EntityManager em) {
         this.queryFactory = new JPAQueryFactory(em);
     }
-
-    @Override
-    public Optional<Chat> findChatListByChatRoomId(Long chatRoomId) {
-        return Optional.ofNullable(queryFactory
-                .selectFrom(chat)
-                .where(chat.chatRoom.chatRoomId.eq(chatRoomId))
-                .orderBy(chat.createdAt.desc())
-                .fetchFirst());
-    }
-
 }
