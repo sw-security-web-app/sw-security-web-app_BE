@@ -51,10 +51,7 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_PRIVATE_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
-
-      - name: Debug Environment Variables
-        run: echo "CODE_DEPLOY_APP_NAME: ${{ env.CODE_DEPLOY_APP_NAME }}"
-
+          
       - name: Upload to AWS S3
         run: |
           aws deploy push \
@@ -69,4 +66,4 @@ jobs:
             --application-name ${{ env.CODE_DEPLOY_APP_NAME }} \
             --deployment-config-name CodeDeployDefault.AllAtOnce \
             --deployment-group-name ${{ env.CODE_DEPLOY_DEPLOYMENT_GROUP_NAME }} \
-            --s3-location bucket=$BUCKET_NAME,key=$GITHUB_SHA.zip,bundleType=zip
+            --s3-location bucket=${{ env.BUCKET_NAME }},key=$GITHUB_SHA.zip,bundleType=zip
