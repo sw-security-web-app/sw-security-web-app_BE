@@ -41,6 +41,11 @@ public class AuthServiceImpl implements AuthService {
             throw new RestApiException(AuthErrorCode.INVALID_EMAIL_OR_PASSWORD);
         }
 
+        //계정 잠금 유무 확인
+        if(findMember.isAccountLocked()){
+            throw new RestApiException(AuthErrorCode.LOCKED_ACCOUT);
+        }
+
         CustomMemberInfoDto infoDto = new CustomMemberInfoDto(
                 findMember.getMemberId(), email, password, findMember.getMemberStatus(), findMember.isAccountLocked()
         );
