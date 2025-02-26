@@ -42,6 +42,7 @@ jobs:
       - name: Make Zip File
         run: |
           mkdir ./build/zip
+          cp appspec.yml ./build/zip/
           zip -qq -r ./build/zip/$GITHUB_SHA.zip .
         shell: bash
 
