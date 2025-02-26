@@ -5,6 +5,7 @@ import example.demo.util.ValidationGroups;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @Getter
 public class CustomMemberInfoDto extends MemberLoginDto {
