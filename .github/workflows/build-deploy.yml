@@ -20,16 +20,12 @@ jobs:
       - uses: actions/checkout@v3
       - name: make application-secret.yml
         run: |
-          mkdir -p src/main/resources
-          echo "${{ secrets.YML_SECRET }}" | base64 --decode > src/main/resources/application-secret.yml
-          find src
+          mkdir -p ./src/main/resources
+          cd ./src/main/resources
+          touch ./application.yml
+          echo "${{ secrets.YML_SECRET }}" | base64 --decode > ./application-secret.yml
         shell: bash
-
-      - name: Debug YML_SECRET
-        run: |
-          echo "${{ secrets.YML_SECRET }}" > temp.yml
-          cat temp.yml
-
+        
       - name: Set up JDK 21
         uses: actions/setup-java@v3
         with:
