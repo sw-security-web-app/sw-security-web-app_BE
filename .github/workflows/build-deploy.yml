@@ -21,9 +21,8 @@ jobs:
       - name: make application-secret.yml
         run: |
           cd ./src/main/resources
-          cat > ./application-secret.yml <<EOF
-          ${{ secrets.YML_SECRET }}
-          EOF
+          echo "${{ secrets.YML_SECRET }}" | base64 --decode > src/main/resources/application-secret.yml
+          find src
         shell: bash
 
       - name: Debug YML_SECRET
