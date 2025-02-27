@@ -2,7 +2,7 @@ version: 0.0
 os: linux
 
 files:
-  - source: src/main/resources/application-secret.yml
+  - source: /src/main/resources/application-secret.yml
     destination: /home/ec2-user/sw-security-web-app_BE/src/main/resources/application-secret.yml
 permissions:
   - object: /home/ec2-user/sw-security-web-app_BE/
