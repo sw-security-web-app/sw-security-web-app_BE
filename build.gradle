@@ -20,6 +20,10 @@ configurations {
 	}
 }
 
+processResources {
+	from 'src/main/resources'
+}
+
 repositories {
 	mavenCentral()
 	maven { url 'https://repo.spring.io/milestone' }
