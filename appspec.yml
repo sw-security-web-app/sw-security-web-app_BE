@@ -3,7 +3,8 @@ os: linux
 
 files:
   - source: /
-    destination: /home/ec2-user/sw-security-web-app_BE
+    destination: /home/ec2-user/sw-security-web-app_BE/
+    overwrite: true
 permissions:
   - object: /home/ec2-user/sw-security-web-app_BE/
     owner: ec2-user
