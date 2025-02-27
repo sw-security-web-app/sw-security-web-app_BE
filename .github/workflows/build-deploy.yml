@@ -2,10 +2,10 @@ name: Build and Deploy to EC2
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "main" ]
   pull_request:
     types: [closed]
-    branches: [ "master" ]
+    branches: [ "main" ]
 
 env:
   AWS_REGION: ap-northeast-2
