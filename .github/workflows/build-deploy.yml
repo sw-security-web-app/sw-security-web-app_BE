@@ -2,10 +2,10 @@ name: Build and Deploy to EC2
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "main" ]
   pull_request:
     types: [closed]
-    branches: [ "master" ]
+    branches: [ "main" ]
 
 env:
   AWS_REGION: ap-northeast-2
@@ -21,8 +21,9 @@ jobs:
       - name: make application-secret.yml
         run: |
           cd ./src/main/resources
-          touch ./application-secret.yml
-          echo "${{ secrets.YML_SECRET }}" > ./application-secret.yml
+          cat > ./application-secret.yml <<EOF
+          ${{ secrets.YML_SECRET }}
+          EOF
         shell: bash
 
       - name: Set up JDK 21
@@ -36,31 +37,35 @@ jobs:
         shell: bash
 
       - name: Build and Test
-        run: ./gradlew build -x test
+        run: ./gradlew clean build -x test
 
       - name: Make Zip File
-        run: zip -qq -r ./$GITHUB_SHA.zip .
+        run: |
+          mkdir ./build/zip
+          cp appspec.yml ./build/zip/
+          cp -r scripts ./build/zip/
+          zip -qq -r ./build/zip/$GITHUB_SHA.zip .
         shell: bash
 
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_PRIVATE_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
-
+          
       - name: Upload to AWS S3
         run: |
           aws deploy push \
-            --application-name ${{ env.CODE_DEPLOY_APPLICATION_NAME }} \
+            --application-name ${{ env.CODE_DEPLOY_APP_NAME }} \
             --ignore-hidden-files \
-            --s3-location s3://$S3_BUCKET_NAME/$GITHUB_SHA.zip \
-            --source .
+            --s3-location s3://$BUCKET_NAME/$GITHUB_SHA.zip \
+            --source ./build/zip
 
       - name: Deploy to AWS EC2 from S3
         run: |
           aws deploy create-deployment \
-            --application-name ${{ env.CODE_DEPLOY_APPLICATION_NAME }} \
+            --application-name ${{ env.CODE_DEPLOY_APP_NAME }} \
             --deployment-config-name CodeDeployDefault.AllAtOnce \
-            --deployment-group-name ${{ env.CODE_DEPLOY_DEPLOYMENT_GROUP_NAME }} \
-            --s3-location bucket=$S3_BUCKET_NAME,key=$GITHUB_SHA.zip,bundleType=zip
+            --deployment-group-name ${{ env.DEPLOYMENT_GROUP_NAME }} \
+            --s3-location bucket=$BUCKET_NAME,key=$GITHUB_SHA.zip,bundleType=zip
