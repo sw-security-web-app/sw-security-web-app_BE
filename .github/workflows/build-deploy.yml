@@ -3,10 +3,7 @@ name: Build and Deploy to EC2
 on:
   push:
     branches: [ "main" ]
-  pull_request:
-    types: [closed]
-    branches: [ "main" ]
-
+    
 env:
   AWS_REGION: ap-northeast-2
   BUCKET_NAME: vero-cicd-bucket
