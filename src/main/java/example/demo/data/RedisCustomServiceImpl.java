@@ -43,4 +43,10 @@ public class RedisCustomServiceImpl implements RedisCustomService{
     public Set<String> getKeysByPattern(String pattern) {
         return redisTemplate.keys(pattern);
     }
+
+    //남은 TTL 가져오기
+    @Override
+    public Long getRemainingTime(String key) {
+        return redisTemplate.getExpire(key,TimeUnit.MILLISECONDS);
+    }
 }

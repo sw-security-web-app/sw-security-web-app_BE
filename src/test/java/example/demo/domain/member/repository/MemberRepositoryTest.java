@@ -53,7 +53,7 @@ class MemberRepositoryTest {
         memberRepository.save(member);
 
         //when
-        Member findMember=memberRepository.findByEmail(member.getEmail()).get();
+        Member findMember=memberRepository.findByEmail(general.getEmail()).get();
 
         //then
         isSameMember(findMember, member);
