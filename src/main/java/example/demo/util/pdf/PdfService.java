@@ -1,4 +1,4 @@
-package example.demo.domain.chatting.api;
+package example.demo.util.pdf;
 
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.web.multipart.MultipartFile;

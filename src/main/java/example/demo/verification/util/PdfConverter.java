@@ -1,4 +1,4 @@
-package example.demo.domain.chatting.util;
+package example.demo.verification.util;
 
 import example.demo.util.CreateRandom;
 import org.apache.pdfbox.pdmodel.PDDocument;
