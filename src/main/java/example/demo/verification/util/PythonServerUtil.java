@@ -1,6 +1,7 @@
-package example.demo.util;
+package example.demo.verification.util;
 
 import example.demo.error.RestApiException;
+import example.demo.util.UtilErrorCode;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;

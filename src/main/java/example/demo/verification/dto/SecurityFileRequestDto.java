@@ -1,4 +1,4 @@
-package example.demo.domain.company.dto.request;
+package example.demo.verification.dto;
 
 import lombok.Builder;
 import lombok.Data;

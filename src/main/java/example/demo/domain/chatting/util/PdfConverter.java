@@ -12,7 +12,7 @@ import java.nio.charset.StandardCharsets;
 @Component
 public class PdfConverter {
 
-    public ByteArrayResource convertToTxt(MultipartFile multipartFile,Long userId) throws IOException{
+    public ByteArrayResource convertToTxt(MultipartFile multipartFile,Long companyId) throws IOException{
         try (PDDocument document=PDDocument.load(multipartFile.getInputStream())){
             ByteArrayOutputStream outputStream=new ByteArrayOutputStream();
 
@@ -24,15 +24,15 @@ public class PdfConverter {
             return new ByteArrayResource(outputStream.toByteArray()){
                 @Override
                 public String getFilename(){
-                    return makeFileName(userId);
+                    return makeFileName(companyId);
                 }
             };
         }
     }
 
     //파일 이름 생성 랜덤 Uuid_유저id값
-    private String makeFileName(Long userId){
+    private String makeFileName(Long companyId){
         String uuid= CreateRandom.createShortUuid();
-        return uuid+"_"+userId+".txt";
+        return uuid+"_"+companyId+".txt";
     }
 }

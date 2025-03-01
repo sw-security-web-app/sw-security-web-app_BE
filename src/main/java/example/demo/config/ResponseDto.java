@@ -10,10 +10,10 @@ import lombok.RequiredArgsConstructor;
 @Builder
 @Getter
 public class ResponseDto {
-    private final String code;
+    private final Integer code;
     private final String message;
 
-    ResponseDto of(String code,String message){
+    public static ResponseDto of(Integer code,String message){
         return ResponseDto
                 .builder()
                 .code(code)
