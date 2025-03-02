@@ -14,15 +14,24 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.*;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.util.UriComponentsBuilder;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.netty.http.client.HttpClient;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -35,10 +44,17 @@ public class VerificationServiceImpl implements VerificationService {
     private String SERVER_URL;
     //허용 파일 타입
     private static final String[] fileType = {".txt", ".csv", ".pdf"};
-    private final RestTemplate restTemplate;
     private final JwtUtil jwtUtil;
     private final MemberRepository memberRepository;
     private final PdfService pdfService;
+    private final WebClient webClient=WebClient.builder()
+            .baseUrl(SERVER_URL)
+            .clientConnector(new ReactorClientHttpConnector(
+                    HttpClient.create()
+                            .responseTimeout(Duration.ofSeconds(10))//응답 시간 10초
+            ))
+            .build();
+
 
 
     @Override
@@ -54,8 +70,6 @@ public class VerificationServiceImpl implements VerificationService {
             throw new RestApiException(VerificationErrorCode.ERROR_OF_CREATE_COMPANY);
         }
 
-        HttpHeaders headers = new org.springframework.http.HttpHeaders();
-        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
         String extractFileName = multipartFile.getOriginalFilename();
         body.add("company_name", companyId);
@@ -88,6 +102,11 @@ public class VerificationServiceImpl implements VerificationService {
         else {
             body.add("text", requestDto.getContent());
         }
+        SimpleClientHttpRequestFactory factory=new SimpleClientHttpRequestFactory();
+        RestTemplate restTemplate=new RestTemplate(factory);
+
+        factory.setConnectTimeout(5000);//연결 시간 5초
+        factory.setReadTimeout(5000);   //읽기 시간5초
 
         HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body);
 
@@ -100,7 +119,7 @@ public class VerificationServiceImpl implements VerificationService {
          * 전송 성공 유무 처리
          * 성공 - 200 실패 - 422
          * */
-        if (request.getStatusCode().equals(422)) {
+        if (request.getStatusCode().is4xxClientError()) {
             throw new RestApiException(VerificationErrorCode.ERROR_OF_CREATE_COMPANY);
         }
         return ResponseDto.of(200, "파일을 성공적으로 업로드하였습니다.");
@@ -129,13 +148,15 @@ public class VerificationServiceImpl implements VerificationService {
         Map<String, String> json = new HashMap<>();
         json.put("company_name", String.valueOf(companyId));
 
-        HttpHeaders headers = new HttpHeaders();
-        //headers.setContentType(MediaType.APPLICATION_JSON);
-
         //요청 만들기
         HttpEntity<Map<String, String>> request = new HttpEntity<>(json);
+        SimpleClientHttpRequestFactory factory=new SimpleClientHttpRequestFactory();
+        RestTemplate restTemplate=new RestTemplate(factory);
+
+        factory.setConnectTimeout(5000);//연결 시간 5초
+        factory.setReadTimeout(5000);   //읽기 시간5초
+
         String url = SERVER_URL + "/create_company";
-        log.info(url);
         return restTemplate.postForEntity(url, request, String.class);
     }
 

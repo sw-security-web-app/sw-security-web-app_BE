@@ -78,7 +78,8 @@ dependencies {
 	//PDF
 	implementation 'org.apache.pdfbox:pdfbox:2.0.30'
 
-
+	//WebClient
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 }
 
 tasks.named('test') {
