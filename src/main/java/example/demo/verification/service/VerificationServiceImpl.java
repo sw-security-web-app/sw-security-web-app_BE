@@ -1,5 +1,9 @@
 package example.demo.verification.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import example.demo.config.ResponseDto;
 import example.demo.util.pdf.PdfService;
 import example.demo.domain.member.Member;
@@ -34,6 +38,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -41,7 +47,7 @@ public class VerificationServiceImpl implements VerificationService {
     @Value("${python.server.url}")
     private String SERVER_URL;
     //허용 파일 타입
-    private static final String[] fileType = {".txt", ".csv", ".pdf"};
+    private static final String[] fileType = {"txt", "csv", "pdf"};
     private final JwtUtil jwtUtil;
     private final MemberRepository memberRepository;
     private final PdfService pdfService;
@@ -69,11 +75,13 @@ public class VerificationServiceImpl implements VerificationService {
             throw new RestApiException(VerificationErrorCode.TIME_OUT_ERROR);
         }catch (RestClientException e){
             //회사 생성 중 통신 오류
-            throw new RestApiException(VerificationErrorCode.ERROR_OF_CREATE_COMPANY);
+            log.error(e.toString());
+            throw new  RestApiException(VerificationErrorCode.ERROR_OF_SEND_FILE_COMPANY);
         }
 
         //회사 생성 중 AI서버에서 오류 발생인 경우 예외처리
         if (response.getStatusCode().is4xxClientError()) {
+            log.error(response.toString());
             throw new RestApiException(VerificationErrorCode.ERROR_OF_CREATE_COMPANY);
         }
 
@@ -86,23 +94,25 @@ public class VerificationServiceImpl implements VerificationService {
         SimpleClientHttpRequestFactory factory=new SimpleClientHttpRequestFactory();
         RestTemplate restTemplate=new RestTemplate(factory);
 
-        factory.setConnectTimeout(5000);//연결 시간 5초
-        factory.setReadTimeout(5000);   //읽기 시간5초
+        factory.setConnectTimeout(Duration.ofSeconds(5));//연결 시간 5초
+        factory.setReadTimeout(Duration.ofSeconds(5));   //읽기 시간5초
 
         HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body);
 
-        ResponseEntity<String> request ;
+        ResponseEntity<String> request = null;
 
         try {
-            request=restTemplate.postForEntity(SERVER_URL + "/" + companyId + "/train"
+            request=restTemplate.postForEntity(SERVER_URL + "/api/" + companyId + "/train"
                     , requestEntity
                     , String.class
             );
         }catch (ResourceAccessException e){
             //요청시간 초과 시
+            log.error(e.toString());
             throw new RestApiException(VerificationErrorCode.TIME_OUT_ERROR);
         }catch (RestClientException e){
             //요청 중 오류 발생 시
+            log.error(e.toString());
             throw new RestApiException(VerificationErrorCode.ERROR_OF_SEND_FILE_COMPANY);
         }
 
@@ -110,14 +120,13 @@ public class VerificationServiceImpl implements VerificationService {
          * 전송 성공 유무 처리
          * 성공 - 200 실패 - 422
          * */
-        if (request.getStatusCode().is4xxClientError()) {
-            throw new RestApiException(VerificationErrorCode.ERROR_OF_CREATE_COMPANY);
+        if (request.getStatusCode().is4xxClientError() || request.getStatusCode().is5xxServerError()) {
+            return ResponseDto.of(request.getStatusCode().value(),request.getBody());
         }
         return ResponseDto.of(200, "파일을 성공적으로 업로드하였습니다.");
     }
 
     //유저가 관리자 인지 검사 + 회사 인덱스 반환 메서드
-
     private Long isMemberManager(String token) {
         Long memberId = jwtUtil.getMemberId(token);
         Member member = memberRepository.findById(memberId)
@@ -129,13 +138,12 @@ public class VerificationServiceImpl implements VerificationService {
         return member.getCompany().getCompanyId();
     }
     //확장자 명 추출 함수
-
     private String extractFileType(String originalFileName) {
         int pos = originalFileName.lastIndexOf(".");
+        log.info(originalFileName.substring(pos+1));
         return originalFileName.substring(pos + 1);
     }
     //파이썬 서버 회사 생성
-
     private ResponseEntity<?> createCompany(Long companyId) {
         Map<String, String> json = new HashMap<>();
         json.put("company_name", String.valueOf(companyId));
@@ -148,7 +156,7 @@ public class VerificationServiceImpl implements VerificationService {
         factory.setConnectTimeout(5000);//연결 시간 5초
         factory.setReadTimeout(5000);   //읽기 시간5초
 
-        String url = SERVER_URL + "/create_company";
+        String url = SERVER_URL + "/api/create_company";
         return restTemplate.postForEntity(url, request, String.class);
     }
 
@@ -163,7 +171,7 @@ public class VerificationServiceImpl implements VerificationService {
 
             //pdf 파일인 경우 -> .txt로 변환
             //TODO: pdf파일 컨버터 사용
-            if (extractFileType(extractFileName).equals(".pdf")) {
+            if (extractFileType(extractFileName).equals("pdf")) {
                 ByteArrayResource convertedPdfFile = pdfService.sendToAiServer(multipartFile, companyId);
                 body.add("file", convertedPdfFile);
             } else {
@@ -183,5 +191,4 @@ public class VerificationServiceImpl implements VerificationService {
             body.add("text", requestDto.getContent());
         }
     }
-
 }
