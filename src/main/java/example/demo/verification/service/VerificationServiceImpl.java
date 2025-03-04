@@ -73,12 +73,7 @@ public class VerificationServiceImpl implements VerificationService {
         //JSONObject json=new JSONObject();
         //json.put("company_name", String.valueOf(companyId));
 
-        HttpHeaders headers=new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        //HttpEntity<String> jsonEntity=new HttpEntity<>(json.toString(),headers);
 
-        //log.info("✅"+json);
-        body.add("company_name", String.valueOf(companyId));
 
         //파일 타입 유형 검사
         if (!multipartFile.isEmpty()) {
@@ -91,6 +86,10 @@ public class VerificationServiceImpl implements VerificationService {
             //TODO: pdf파일 컨버터 사용
             if (extractFileType(extractFileName).equals("pdf")) {
                 ByteArrayResource convertedPdfFile = pdfService.sendToAiServer(multipartFile, companyId);
+                log.info("PDF Converter 실행");
+                if(convertedPdfFile==null){
+                    throw new RestApiException(VerificationErrorCode.ERROR_OF_CONVERTING_PDF);
+                }
                 body.add("file", convertedPdfFile);
             } else {
                 ByteArrayResource fileResource = new ByteArrayResource(multipartFile.getBytes()) {
@@ -110,6 +109,9 @@ public class VerificationServiceImpl implements VerificationService {
         else {
             body.add("text", requestDto.getContent());
         }
+        HttpHeaders headers=new HttpHeaders();
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+        body.add("company_name", String.valueOf(companyId));
 
         SimpleClientHttpRequestFactory factory=new SimpleClientHttpRequestFactory();
         RestTemplate restTemplate=new RestTemplate(factory);
@@ -117,14 +119,11 @@ public class VerificationServiceImpl implements VerificationService {
         factory.setConnectTimeout(Duration.ofSeconds(10));//연결 시간 5초
         factory.setReadTimeout(Duration.ofSeconds(10));   //읽기 시간5초
 
-        HttpHeaders totalHeaders=new HttpHeaders();
-        totalHeaders.setContentType(MediaType.MULTIPART_FORM_DATA);
-        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body,totalHeaders);
-
-        ResponseEntity<String> request;
+        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body,headers);
+        ResponseEntity<String> response;
 
         try {
-            request=restTemplate.postForEntity(SERVER_URL + "/api/" + companyId + "/train"
+            response=restTemplate.postForEntity(SERVER_URL + "/api/" + companyId + "/train"
                     , requestEntity
                     , String.class
             );
@@ -145,8 +144,8 @@ public class VerificationServiceImpl implements VerificationService {
          * 전송 성공 유무 처리
          * 성공 - 200 실패 - 422
          * */
-        if (request.getStatusCode().is4xxClientError() || request.getStatusCode().is5xxServerError()) {
-            return ResponseDto.of(request.getStatusCode().value(),request.getBody());
+        if (response.getStatusCode().is4xxClientError() || response.getStatusCode().is5xxServerError()) {
+            return ResponseDto.of(response.getStatusCode().value(),response.getBody());
         }
         return ResponseDto.of(200, "파일을 성공적으로 업로드하였습니다.");
     }
