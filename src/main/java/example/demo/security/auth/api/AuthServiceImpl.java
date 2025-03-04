@@ -17,6 +17,7 @@ import example.demo.security.util.JwtUtil;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AuthServiceImpl implements AuthService {
     private final JwtUtil jwtUtil;
     private final MemberRepository memberRepository;
@@ -128,9 +130,11 @@ public class AuthServiceImpl implements AuthService {
     public void changePassword(String token, ChangePasswordRequestDto requestDto) {
         Member findMember = memberRepository.findById(jwtUtil.getMemberId(token))
                 .orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
+        log.info(requestDto.toString());
         /*
          *유저 아이디와 비밀번호 일치 체크
          */
+
         String newPassword = encoder.encode(requestDto.getNewPassword());
         if (!findMember.getEmail().equals(requestDto.getEmail()) ||
                 !encoder.matches(requestDto.getPassword(), findMember.getPassword())
