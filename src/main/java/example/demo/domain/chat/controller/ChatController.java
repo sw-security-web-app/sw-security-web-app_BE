@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/api/chat")
 public class ChatController {
     private final ChatService chatService;
     //무한 스크롤
@@ -17,7 +18,7 @@ public class ChatController {
      * @param chatRoomId 채팅방 Id
      * @return No offset으로 구현한 최근 채팅 순으로(idex)활용으로 10개씩 대화 내용 리스트
      */
-    @GetMapping("/{chatRoomId}")
+    @GetMapping("/detail/{chatRoomId}")
     public ResponseEntity<?> getChatList(@RequestHeader("Authorization")String token,
                                          @RequestParam(required = false,defaultValue = "1")Long id,
                                          @RequestParam(required = false,defaultValue = "10")int size,
