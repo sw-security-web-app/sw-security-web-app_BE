@@ -11,6 +11,7 @@ import example.demo.domain.member.Member;
 import example.demo.domain.member.MemberErrorCode;
 import example.demo.domain.member.repository.MemberRepository;
 import example.demo.error.RestApiException;
+import example.demo.security.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +26,7 @@ public class ChatServiceImpl implements ChatService {
     private final ChatRepository chatRepository;
     private final MemberRepository memberRepository;
     private final ChatRoomRepository chatRoomRepository;
+    private final JwtUtil jwtUtil;
 
     /**
      * 대화내용 저장
@@ -60,7 +62,16 @@ public class ChatServiceImpl implements ChatService {
 
     @Override
     public List<ChatDetailDto> getDetailChattingContent(Long chatRoomId, String token, Long chatId) {
+        //memberId 추출
+        Long memberId=jwtUtil.getMemberId(token);
+        //채팅방이 없는 경우
+        if(chatRoomRepository.findById(chatRoomId).isEmpty()){
+            throw new RestApiException(ChatRoomErrorCode.CHAT_ROOM_NOT_FOUND);
+        }
 
-        return null;
+        return chatRepository.getSliceOfChatting(chatRoomId,
+                    chatId==null ? 1 : chatId ,
+                    memberId
+        );
     }
 }
