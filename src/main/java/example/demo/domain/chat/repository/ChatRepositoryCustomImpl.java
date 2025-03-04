@@ -31,7 +31,7 @@ public class ChatRepositoryCustomImpl implements ChatRepositoryCustom {
 
 
     @Override
-    public List<ChatDetailDto> getSliceOfChatting(Long chatRoomId, Long chatId,Long memberId) {
+    public List<ChatDetailDto> getSliceOfChatting(Long chatRoomId, Long chatId,Long memberId,int size) {
         List<ChatDetailDto> chatDetailDtoList=queryFactory
                 .select(new QChatDetailDto(
                         chat.chatId,
@@ -42,8 +42,10 @@ public class ChatRepositoryCustomImpl implements ChatRepositoryCustom {
                 .from(chat)
                 .leftJoin(chat.chatRoom,chatRoom)
                 .fetchJoin()
-                .leftJoin(chatRoom.member,member)
+                .innerJoin(chatRoom.member,member)
                 .where(allEq(memberId,chatRoomId,chatId))
+                .orderBy(chat.chatId.desc())
+                .limit(size)
                 .fetch();
 
         return chatDetailDtoList.isEmpty() ? Collections.emptyList() : chatDetailDtoList;

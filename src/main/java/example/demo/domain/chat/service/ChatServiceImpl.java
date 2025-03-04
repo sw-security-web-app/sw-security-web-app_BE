@@ -61,7 +61,7 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
-    public List<ChatDetailDto> getDetailChattingContent(Long chatRoomId, String token, Long chatId) {
+    public List<ChatDetailDto> getDetailChattingContent(Long chatRoomId, String token, Long chatId,int size) {
         //memberId 추출
         Long memberId=jwtUtil.getMemberId(token);
         //채팅방이 없는 경우
@@ -69,9 +69,6 @@ public class ChatServiceImpl implements ChatService {
             throw new RestApiException(ChatRoomErrorCode.CHAT_ROOM_NOT_FOUND);
         }
 
-        return chatRepository.getSliceOfChatting(chatRoomId,
-                    chatId==null ? 1 : chatId ,
-                    memberId
-        );
+        return chatRepository.getSliceOfChatting(chatRoomId, chatId , memberId, size);
     }
 }

@@ -7,5 +7,5 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ChatRepositoryCustom {
-     List<ChatDetailDto> getSliceOfChatting(Long chatRoomId,Long chatId,Long memberId);
+     List<ChatDetailDto> getSliceOfChatting(Long chatRoomId,Long chatId,Long memberId,int size);
 }

@@ -19,8 +19,9 @@ public class ChatController {
      */
     @GetMapping("/{chatRoomId}")
     public ResponseEntity<?> getChatList(@RequestHeader("Authorization")String token,
-                                         @RequestParam(required = false)Long id,
+                                         @RequestParam(required = false,defaultValue = "1")Long id,
+                                         @RequestParam(required = false,defaultValue = "10")int size,
                                          @PathVariable("chatRoomId")Long chatRoomId){
-        return ResponseEntity.ok(chatService.getDetailChattingContent(chatRoomId,token,id));
+        return ResponseEntity.ok(chatService.getDetailChattingContent(chatRoomId,token,id,size));
     }
 }

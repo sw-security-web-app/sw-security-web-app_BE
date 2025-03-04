@@ -11,5 +11,5 @@ public interface ChatService {
 
     void saveChat(Long memberId, ChatDto chatDto, Long chatRoomId);
 
-    List<ChatDetailDto> getDetailChattingContent(Long chatRoomId,String token,Long chatId);
+    List<ChatDetailDto> getDetailChattingContent(Long chatRoomId,String token,Long chatId,int size);
 }
