@@ -2,6 +2,7 @@ package example.demo.domain.chat.repository;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import example.demo.domain.chat.AIModelType;
 import example.demo.domain.chat.ChatRoom;
 import example.demo.domain.chat.QChatRoom;
 import example.demo.domain.chat.dto.*;
@@ -42,8 +43,29 @@ public class ChatRoomRepositoryCustomImpl implements ChatRoomRepositoryCustom {
                 .fetch();
     }
 
+    @Override
+    public List<ChatRoomRequestDto> findByMemberIdAndAiModelType(Long memberId, AIModelType aiModelType) {
+        List<Long> chatRoomIds = queryFactory
+                .select(chat.chatRoom.chatRoomId)
+                .from(chat)
+                .where(memberIdEq(memberId), aiModelTypeEq(aiModelType))
+                .groupBy(chat.chatRoom.chatRoomId)
+                .fetch();
+
+        return queryFactory
+                .select(new QChatRoomRequestDto(chatRoom.chatRoomId, chatRoom.createdAt))
+                .from(chatRoom)
+                .where(chatRoom.chatRoomId.in(chatRoomIds))
+                .orderBy(chatRoom.createdAt.desc())
+                .fetch();
+    }
+
     private BooleanExpression memberIdEq(Long memberId) {
         return memberId != null ? chatRoom.member.memberId.eq(memberId) : null;
+    }
+
+    private BooleanExpression aiModelTypeEq(AIModelType aiModelType) {
+        return aiModelType != null ? chat.modelType.eq(aiModelType) : null;
     }
 
     private static BooleanExpression chatRoomIdEq(Long chatRoomId) {
