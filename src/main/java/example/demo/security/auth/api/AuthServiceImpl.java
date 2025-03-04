@@ -77,6 +77,7 @@ public class AuthServiceImpl implements AuthService {
                 .accessToken(accessToken)
                 .message("토큰 반환 성공")
                 .code(200)
+                .memberName(findMember.getUserName())
                 .build();
     }
 
@@ -122,6 +123,7 @@ public class AuthServiceImpl implements AuthService {
                 .code(200)
                 .accessToken(newAccessToken)
                 .message("엑세스 토큰 재발행 성공")
+                .memberName(member.getUserName())
                 .build();
     }
 
