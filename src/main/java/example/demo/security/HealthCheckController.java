@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class HealthCheckController {
+public class HealthCheckController { // 상태체크를 위한 Controller
 
     @GetMapping("/health-check")
     public ResponseEntity<?> healthCheck() {
