@@ -6,6 +6,7 @@ import example.demo.verification.dto.SecurityFileRequestDto;
 import example.demo.verification.error.VerificationErrorCode;
 import example.demo.verification.service.VerificationService;
 import lombok.RequiredArgsConstructor;
+import org.json.JSONException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,9 +21,9 @@ public class VerificationController {
     @PostMapping("company-send")
     public ResponseEntity<?> postCensorshipData(@RequestHeader("Authorization")String token,
                                                 @RequestPart(value = "requestDto",required = false) SecurityFileRequestDto requestDto,
-                                                @RequestPart(value = "file",required = false) MultipartFile file) throws IOException {
+                                                @RequestPart(value = "file",required = false) MultipartFile file) throws IOException, JSONException {
         //파일이나 텍스트가 없는 경우
-        if(requestDto==null || file.isEmpty()){
+        if(requestDto==null && file.isEmpty()){
             throw new RestApiException(VerificationErrorCode.EMPTY_FILE_OR_TEXT);
         }
         ResponseDto responseDto=verificationService.sendVerificationFileToPythonServer(token,file,requestDto);
