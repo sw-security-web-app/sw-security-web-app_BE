@@ -3,6 +3,7 @@ package example.demo.domain.chat.service;
 import example.demo.domain.chat.Chat;
 import example.demo.domain.chat.ChatRoom;
 import example.demo.domain.chat.ChatRoomErrorCode;
+import example.demo.domain.chat.dto.ChatDetailDto;
 import example.demo.domain.chat.dto.ChatDto;
 import example.demo.domain.chat.repository.ChatRepository;
 import example.demo.domain.chat.repository.ChatRoomRepository;
@@ -13,6 +14,8 @@ import example.demo.error.RestApiException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -53,5 +56,11 @@ public class ChatServiceImpl implements ChatService {
                 .build();
 
         chatRepository.save(chat);
+    }
+
+    @Override
+    public List<ChatDetailDto> getDetailChattingContent(Long chatRoomId, String token, Long chatId) {
+
+        return null;
     }
 }
