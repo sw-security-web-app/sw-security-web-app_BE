@@ -7,7 +7,7 @@ import example.demo.domain.chat.dto.ChatRoomRequestDto;
 import java.util.List;
 
 public interface ChatRoomRepositoryCustom {
-    List<ChatRoomRecentResponseDto> findLatestChatRoomWithLatestAnswer(Long memberId);
+    List<ChatRoomRecentResponseDto> findLatestChatRoomWithLatestAnswer(Long memberId, AIModelType aiModelType);
 
     List<ChatRoomRequestDto> findByMemberOrderByCreatedAtAsc(Long memberId);
 

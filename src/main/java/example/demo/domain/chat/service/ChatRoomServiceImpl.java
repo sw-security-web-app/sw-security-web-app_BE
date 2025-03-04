@@ -55,8 +55,8 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     }
 
     @Override
-    public List<ChatRoomRecentResponseDto> getLatestChatRoom(Long memberId) {
-        List<ChatRoomRecentResponseDto> latestChatRoom = chatRoomRepository.findLatestChatRoomWithLatestAnswer(memberId);
+    public List<ChatRoomRecentResponseDto> getLatestChatRoom(Long memberId, AIModelType aiModelType) {
+        List<ChatRoomRecentResponseDto> latestChatRoom = chatRoomRepository.findLatestChatRoomWithLatestAnswer(memberId, aiModelType);
         if (latestChatRoom.isEmpty()) {
             return Collections.emptyList();
         }

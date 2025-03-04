@@ -23,8 +23,8 @@ public class ChatRoomRepositoryCustomImpl implements ChatRoomRepositoryCustom {
     }
 
     @Override
-    public List<ChatRoomRecentResponseDto> findLatestChatRoomWithLatestAnswer(Long memberId) {
-        List<Long> latestChatRoomIds = getLatestChatRoomIds(memberId);
+    public List<ChatRoomRecentResponseDto> findLatestChatRoomWithLatestAnswer(Long memberId, AIModelType aiModelType) {
+        List<Long> latestChatRoomIds = getLatestChatRoomIds(memberId, aiModelType);
 
         return latestChatRoomIds.stream()
                 .map(this::getChatRoomRecentResponseDto)
@@ -72,12 +72,13 @@ public class ChatRoomRepositoryCustomImpl implements ChatRoomRepositoryCustom {
         return chatRoomId != null ? chat.chatRoom.chatRoomId.eq(chatRoomId) : null;
     }
 
-    private List<Long> getLatestChatRoomIds(Long memberId) {
+    private List<Long> getLatestChatRoomIds(Long memberId, AIModelType aiModelType) {
         return queryFactory
-                .select(chatRoom.chatRoomId)
-                .from(chatRoom)
-                .where(memberIdEq(memberId))
-                .orderBy(chatRoom.createdAt.desc())
+                .select(chat.chatRoom.chatRoomId)
+                .from(chat)
+                .where(memberIdEq(memberId), aiModelTypeEq(aiModelType))
+                .groupBy(chat.chatRoom.chatRoomId)
+                .orderBy(chat.chatRoom.createdAt.desc())
                 .limit(4)
                 .fetch();
     }

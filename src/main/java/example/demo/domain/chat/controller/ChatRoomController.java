@@ -37,9 +37,10 @@ public class ChatRoomController {
     }
 
     @GetMapping("/latest")
-    public ResponseEntity<?> getLatestChatRoom(@RequestHeader("Authorization") String token) {
+    public ResponseEntity<?> getLatestChatRoom(@RequestHeader("Authorization") String token,
+                                               @RequestBody ChatRoomGetRequestDto requestDto) {
         Long memberId = jwtUtil.getMemberId(token);
-        List<ChatRoomRecentResponseDto> latestChatRoom = chatRoomService.getLatestChatRoom(memberId);
+        List<ChatRoomRecentResponseDto> latestChatRoom = chatRoomService.getLatestChatRoom(memberId, requestDto.getAiModelType());
         return ResponseEntity.ok(latestChatRoom);
     }
 }

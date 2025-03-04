@@ -14,5 +14,5 @@ public interface ChatRoomService {
 
     List<ChatRoomGetResponseDto> getChatRoomList(Long memberId, AIModelType aiModelType);
 
-    List<ChatRoomRecentResponseDto> getLatestChatRoom(Long memberId);
+    List<ChatRoomRecentResponseDto> getLatestChatRoom(Long memberId, AIModelType aiModelType);
 }
