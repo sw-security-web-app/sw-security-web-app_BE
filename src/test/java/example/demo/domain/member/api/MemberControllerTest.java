@@ -60,5 +60,4 @@ class MemberControllerTest {
                 .andExpect(jsonPath("$.companyPosition").value("사장"));
     }
 
-
 }
