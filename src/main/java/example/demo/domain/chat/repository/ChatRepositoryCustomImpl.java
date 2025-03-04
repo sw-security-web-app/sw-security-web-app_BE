@@ -11,6 +11,7 @@ import example.demo.domain.chat.dto.QChatDto;
 import example.demo.domain.company.dto.response.QCompanyResponseDto;
 import example.demo.domain.member.QMember;
 import jakarta.persistence.EntityManager;
+import org.springframework.stereotype.Repository;
 
 import java.util.Collections;
 import java.util.List;
@@ -19,7 +20,7 @@ import java.util.Optional;
 import static example.demo.domain.chat.QChat.chat;
 import static example.demo.domain.chat.QChatRoom.*;
 import static example.demo.domain.member.QMember.*;
-
+@Repository
 public class ChatRepositoryCustomImpl implements ChatRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
