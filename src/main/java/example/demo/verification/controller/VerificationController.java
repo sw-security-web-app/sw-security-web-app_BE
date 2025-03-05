@@ -27,4 +27,9 @@ public class VerificationController {
         ResponseDto responseDto=verificationService.sendVerificationFileToPythonServer(token,file,requestDto);
         return ResponseEntity.ok().body(responseDto);
     }
+
+    @GetMapping("company-check")
+    public ResponseEntity<?> checkCompanyAI(@RequestHeader("Authorization")String token){
+        return ResponseEntity.ok(verificationService.checkIsAiCreate(token));
+    }
 }
