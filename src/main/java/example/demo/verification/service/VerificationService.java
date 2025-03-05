@@ -12,4 +12,7 @@ import java.io.IOException;
 public interface VerificationService {
     //파이썬 서버에 파일 전송
     ResponseDto sendVerificationFileToPythonServer(String token, MultipartFile multipartFile, SecurityFileRequestDto requestDto) throws IOException, JSONException;
+
+    ResponseDto checkIsAiCreate(String token,)
+
 }

@@ -43,7 +43,7 @@ public class VerificationServiceImpl implements VerificationService {
     private final PdfService pdfService;
 
     @Override
-    public ResponseDto sendVerificationFileToPythonServer(String token, MultipartFile multipartFile, SecurityFileRequestDto requestDto) throws IOException, JSONException {
+    public void sendVerificationFileToPythonServer(String token, MultipartFile multipartFile, SecurityFileRequestDto requestDto) throws IOException, JSONException {
         //파일이나 텍스트가 없는 경우
         if ((requestDto == null || requestDto.getContent() == null || requestDto.getContent().isEmpty())
                 && (multipartFile == null || multipartFile.isEmpty())) {
