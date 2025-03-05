@@ -1,7 +1,12 @@
 package example.demo.verification.service;
 
 import example.demo.config.ResponseDto;
+import example.demo.domain.company.Company;
+import example.demo.domain.company.CompanyErrorCode;
+import example.demo.domain.company.api.CompanyService;
+import example.demo.domain.company.repository.CompanyRepository;
 import example.demo.error.CommonErrorCode;
+import example.demo.security.auth.AuthErrorCode;
 import example.demo.util.pdf.PdfService;
 import example.demo.domain.member.Member;
 import example.demo.domain.member.MemberErrorCode;
@@ -41,9 +46,10 @@ public class VerificationServiceImpl implements VerificationService {
     private final JwtUtil jwtUtil;
     private final MemberRepository memberRepository;
     private final PdfService pdfService;
+    private final CompanyRepository companyRepository;
 
     @Override
-    public void sendVerificationFileToPythonServer(String token, MultipartFile multipartFile, SecurityFileRequestDto requestDto) throws IOException, JSONException {
+    public ResponseDto sendVerificationFileToPythonServer(String token, MultipartFile multipartFile, SecurityFileRequestDto requestDto) throws IOException, JSONException {
         //파일이나 텍스트가 없는 경우
         if ((requestDto == null || requestDto.getContent() == null || requestDto.getContent().isEmpty())
                 && (multipartFile == null || multipartFile.isEmpty())) {
@@ -151,9 +157,65 @@ public class VerificationServiceImpl implements VerificationService {
          * 성공 - 200 실패 - 422
          * */
         if (response.getStatusCode().is4xxClientError() || response.getStatusCode().is5xxServerError()) {
-            return ResponseDto.of(response.getStatusCode().value(),response.getBody());
+            throw new RestApiException(VerificationErrorCode.ERROR_OF_SEND_FILE_COMPANY);
         }
         return ResponseDto.of(200, "파일을 성공적으로 업로드하였습니다.");
+    }
+
+    @Override
+    public ResponseDto checkIsAiCreate(String token) {
+        Member member=memberRepository.findById(jwtUtil.getMemberId(token))
+                .orElseThrow(()->new RestApiException(AuthErrorCode.NOT_EXIST_MEMBER));
+        //유저가 MANAGER 혹은 EMPLOYEE인 경우에만 체크
+        MemberStatus status=member.getMemberStatus();
+        if(status.equals(MemberStatus.GENERAL)){
+            return ResponseDto.of(200,"SUCCESS");
+        }
+
+        //이미 check된 상태이면 패스
+        Company company=member.getCompany();
+        if(company==null){
+            throw new RestApiException(CompanyErrorCode.NOT_EXIST_COMPANY);
+        }
+        if(company.getCheckCreate()){
+            return ResponseDto.of(200,"SUCCESS");
+        }
+
+        SimpleClientHttpRequestFactory factory=new SimpleClientHttpRequestFactory();
+        RestTemplate restTemplate=new RestTemplate(factory);
+
+        factory.setConnectTimeout(Duration.ofSeconds(20));//연결 시간 20초
+        factory.setReadTimeout(Duration.ofSeconds(20));   //읽기 시간 20초
+
+        ResponseEntity<String> response;
+
+        try {
+            response=restTemplate.getForEntity(SERVER_URL + "/api/" + company.getCompanyId() + "/status",String.class);
+        }catch (ResourceAccessException e){
+            //요청시간 초과 시
+            log.error(e.toString());
+            throw new RestApiException(VerificationErrorCode.TIME_OUT_ERROR);
+        }catch (RestClientException e){
+            //요청 중 오류 발생 시
+            /*
+             * */
+            log.error(e.toString());
+            throw new RestApiException(VerificationErrorCode.ERROR_OF_GET_COMPANY_STATUS);
+        }
+
+        /*
+         * 전송 성공 유무 처리
+         * 성공 - 200 실패 - 422
+         * */
+        if (response.getStatusCode().is4xxClientError() || response.getStatusCode().is5xxServerError()) {
+            throw new RestApiException(VerificationErrorCode.ERROR_OF_GET_COMPANY_STATUS);
+        }
+
+        //회사 검열 AI 생성 여부 변경
+        company.changeCheckCreate();
+        companyRepository.save(company);
+
+        return ResponseDto.of(200, "SUCCESS");
     }
 
     //유저가 관리자 인지 검사 + 회사 인덱스 반환 메서드
