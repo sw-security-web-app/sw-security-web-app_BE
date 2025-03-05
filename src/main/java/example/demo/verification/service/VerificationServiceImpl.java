@@ -69,7 +69,6 @@ public class VerificationServiceImpl implements VerificationService {
 
         //회사가 존재하는 경우 -> 바로 학습 api 전송
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-        String extractFileName = multipartFile.getOriginalFilename();
         //JSONObject json=new JSONObject();
         //json.put("company_name", String.valueOf(companyId));
 
@@ -77,6 +76,7 @@ public class VerificationServiceImpl implements VerificationService {
 
         //파일 타입 유형 검사
         if (!multipartFile.isEmpty()) {
+            String extractFileName = multipartFile.getOriginalFilename();
             if (Arrays.stream(fileType).noneMatch(
                     file -> file.equals(extractFileType(extractFileName)))) {
                 throw new RestApiException(VerificationErrorCode.NO_FILE_TYPE);
