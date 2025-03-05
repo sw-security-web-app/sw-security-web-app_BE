@@ -13,6 +13,7 @@ import example.demo.domain.member.repository.MemberRepository;
 import example.demo.error.RestApiException;
 import example.demo.security.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +21,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 @Transactional(readOnly = true)
 public class ChatServiceImpl implements ChatService {
 
@@ -64,6 +66,7 @@ public class ChatServiceImpl implements ChatService {
     public List<ChatDetailDto> getDetailChattingContent(Long chatRoomId, String token, Long chatId,int size) {
         //memberId 추출
         Long memberId=jwtUtil.getMemberId(token);
+
         //채팅방이 없는 경우
         if(chatRoomRepository.findById(chatRoomId).isEmpty()){
             throw new RestApiException(ChatRoomErrorCode.CHAT_ROOM_NOT_FOUND);

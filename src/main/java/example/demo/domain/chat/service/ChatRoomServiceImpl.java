@@ -38,7 +38,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
                 .member(member)
                 .build();
 
-        chatRoomRepository.save(chatRoom);
+        chatRoom=chatRoomRepository.save(chatRoom);
         limitChatRoomCount(memberId);
 
         return new ChatRoomResponseDto(chatRoom.getChatRoomId());

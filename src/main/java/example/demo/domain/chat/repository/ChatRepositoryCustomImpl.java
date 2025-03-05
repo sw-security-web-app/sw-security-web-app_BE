@@ -40,10 +40,9 @@ public class ChatRepositoryCustomImpl implements ChatRepositoryCustom {
                         chat.createdAt
                 ))
                 .from(chat)
-                .leftJoin(chat.chatRoom,chatRoom)
-                .fetchJoin()
+                .innerJoin(chat.chatRoom,chatRoom)
                 .innerJoin(chatRoom.member,member)
-                .where(allEq(memberId,chatRoomId,chatId))
+                .where(allEq(chatRoomId,chatId,memberId))
                 .orderBy(chat.chatId.desc())
                 .limit(size)
                 .fetch();
@@ -58,13 +57,29 @@ public class ChatRepositoryCustomImpl implements ChatRepositoryCustom {
     private BooleanExpression chatRoomIdEq(Long chatRoomId){
         return chatRoomId == null ? null : chatRoom.chatRoomId.eq(chatRoomId);
     }
-    private BooleanExpression ltChatId(Long chatId){
-        return chatId == null ? null : chat.chatId.lt(chatId);
+    private BooleanExpression gtChatId(Long chatId){
+        return chatId == null ? null : chat.chatId.gt(chatId);
     }
 
-    private BooleanExpression allEq(Long memberId,Long chatRoomId,Long chatId){
-        return memberIdEq(memberId).
-                    and(chatRoomIdEq(chatRoomId)).
-                        and(ltChatId(chatId));
+    private BooleanExpression allEq(Long chatRoomId, Long chatId, Long memberId) {
+        BooleanExpression condition = chatRoomIdEq(chatRoomId);
+        BooleanExpression chatCondition = gtChatId(chatId);
+        BooleanExpression memberCondition = memberIdEq(memberId);
+
+        BooleanExpression result = null;
+
+        if (condition != null) {
+            result = condition;
+        }
+        if (chatCondition != null) {
+            result = (result != null) ? result.and(chatCondition) : chatCondition;
+        }
+        if (memberCondition != null) {
+            result = (result != null) ? result.and(memberCondition) : memberCondition;
+        }
+
+        return result;
     }
+
+
 }
