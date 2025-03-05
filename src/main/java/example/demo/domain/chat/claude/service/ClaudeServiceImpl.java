@@ -11,6 +11,7 @@ import example.demo.domain.chat.repository.ChatRoomRepository;
 import example.demo.domain.chat.service.ChatService;
 import example.demo.error.CommonErrorCode;
 import example.demo.error.RestApiException;
+import example.demo.util.PythonServerUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -45,11 +46,13 @@ public class ClaudeServiceImpl implements ClaudeService {
     private final RestTemplate restTemplate;
     private final ChatRoomRepository chatRoomRepository;
     private final ChatService chatService;
+    private final PythonServerUtil pythonServerUtil;
 
-    public ClaudeServiceImpl(RestTemplate restTemplate, ChatRoomRepository chatRoomRepository, ChatService chatService) {
+    public ClaudeServiceImpl(RestTemplate restTemplate, ChatRoomRepository chatRoomRepository, ChatService chatService, PythonServerUtil pythonServerUtil) {
         this.restTemplate = restTemplate;
         this.chatRoomRepository = chatRoomRepository;
         this.chatService = chatService;
+        this.pythonServerUtil = pythonServerUtil;
     }
 
     @Override
@@ -73,9 +76,9 @@ public class ClaudeServiceImpl implements ClaudeService {
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
                 .orElseThrow(() -> new RestApiException(ChatRoomErrorCode.CHAT_ROOM_NOT_FOUND));
 
-        /*
-         Body와 Content에 대해서 일시적 예외처리 완료
-        */
+        //* 프롬프트 검열
+       // pythonServerUtil.validatePrompt(requestDto.getPrompt());
+
         try {
             ResponseEntity<Map> responseEntity = restTemplate.exchange(claudeApiUrl, HttpMethod.POST, requestEntity, Map.class);
 

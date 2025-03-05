@@ -20,7 +20,7 @@ public interface MemberCustomRepository {
     Long getPhoneNumberCount(String phoneNumber);
 
     //회사Id로 소속 직원 정보 가져오기
-    Page<CompanyEmployeeResponseDto> getCompanyEmployeeInfo(Long companyId, Pageable pageable);
+    Page<CompanyEmployeeResponseDto> getCompanyEmployeeInfo(Long companyId, Pageable pageable,String search);
 
     //회원의 마이페이지 추출을 위한 쿼리
     MemberInfoResponseDto getMemberInfo(Long memberId);

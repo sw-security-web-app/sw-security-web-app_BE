@@ -16,6 +16,7 @@ import example.demo.domain.chat.gpt.dto.ChatRequestMsgDto;
 import example.demo.domain.chat.repository.ChatRoomRepository;
 import example.demo.domain.chat.service.ChatService;
 import example.demo.error.RestApiException;
+import example.demo.util.PythonServerUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -46,6 +47,7 @@ public class ChatGPTServiceImpl implements ChatGPTService {
     private final ChatGPTConfig chatGPTConfig;
     private final ChatService chatService;
     private final ChatRoomRepository chatRoomRepository;
+    private final PythonServerUtil pythonServerUtil;
 
     @Value("${openai.url.prompt}")
     private String promptUrl;
@@ -65,6 +67,10 @@ public class ChatGPTServiceImpl implements ChatGPTService {
 
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
                 .orElseThrow(() -> new RestApiException(ChatRoomErrorCode.CHAT_ROOM_NOT_FOUND));
+
+        //* 프롬프트 검열
+       // pythonServerUtil.validatePrompt(prompt);
+
         List<ChatRequestMsgDto> messages = new ArrayList<>();
         messages.add(ChatRequestMsgDto.builder()
                 .role("user")

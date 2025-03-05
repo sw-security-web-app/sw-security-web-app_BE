@@ -30,8 +30,10 @@ public class MemberController {
     }
 
     @GetMapping("/api/employee-list")
-    public ResponseEntity<?>getEmployees(@RequestHeader("Authorization")String token, @PageableDefault(sort = "name") Pageable pageable){
-        Page<CompanyEmployeeResponseDto> employees=memberService.getAllEmployees(token,pageable);
+    public ResponseEntity<?>getEmployees(@RequestHeader("Authorization")String token,
+                                         @PageableDefault(sort = "name") Pageable pageable,
+                                         @RequestParam(required = false,value = "search")String search){
+        Page<CompanyEmployeeResponseDto> employees=memberService.getAllEmployees(token,pageable,search);
         return ResponseEntity.ok(employees);
     }
   

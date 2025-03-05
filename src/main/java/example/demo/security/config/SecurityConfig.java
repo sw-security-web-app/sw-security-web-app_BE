@@ -1,5 +1,6 @@
 package example.demo.security.config;
 
+import example.demo.data.RedisCustomService;
 import example.demo.domain.member.MemberStatus;
 import example.demo.security.auth.CustomMemberDetailService;
 import example.demo.security.util.JwtAuthFilter;
@@ -29,10 +30,9 @@ import java.util.List;
 @AllArgsConstructor
 public class SecurityConfig {
     private final CustomMemberDetailService customMemberDetailService;
-    private final JwtUtil jwtUtil;
     private final CustomAccessDeniedHandler accessDeniedHandler;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
-
+    private final JwtUtil jwtUtil;
     private static final String[] AUTH_WHITELIST={
             "/api/login","/swagger-ui/**","/api-docs", "/swagger-ui-custom.html",
             "/v3/api-docs/**", "/api-docs/**", "/swagger-ui.html","/api/signup","/api/mail-send",
@@ -78,7 +78,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource(){
         CorsConfiguration corsConfiguration=new CorsConfiguration();
-        corsConfiguration.setAllowedOriginPatterns(Arrays.asList("http://localhost:*","http://172.20.10.2:5173", "http://192.168.189.133:*"));
+        corsConfiguration.setAllowedOriginPatterns(Arrays.asList("http://localhost:*","http://172.20.10.2:5173", "http://192.168.189.133:*","http://172.30.1.3:5173"));
         corsConfiguration.setAllowedMethods(Arrays.asList("GET","POST","DELETE","OPTIONS","PUT"));
         corsConfiguration.setAllowedHeaders(List.of("*"));
         corsConfiguration.setAllowCredentials(true);

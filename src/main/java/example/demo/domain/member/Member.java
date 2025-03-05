@@ -41,7 +41,7 @@ public class Member extends BaseEntity {
     private String companyPosition;
 
     //계정 잠금 여부
-    @Column(name = "account_locked")
+    @Column(name = "account_locked",columnDefinition = "BOOLEAN DEFAULT false")
     private boolean accountLocked;
     //Company랑 양방향
     @ManyToOne(fetch = FetchType.LAZY)
@@ -87,8 +87,10 @@ public class Member extends BaseEntity {
     }
     public void setMemberId(Long memberId){this.memberId=memberId;}
 
+
     //멤버의 Lock여부 변경
     public void changeMemberLock(boolean type){
         this.accountLocked=type;
     }
+
 }

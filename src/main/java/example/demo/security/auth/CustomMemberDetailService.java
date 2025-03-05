@@ -18,8 +18,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class CustomMemberDetailService implements UserDetailsService {
     private final MemberRepository memberRepository;
     @Override
-    public UserDetails loadUserByUsername(String memberId) throws UsernameNotFoundException {
-        Member member=memberRepository.findById(Long.parseLong(memberId))
+    public CustomMemberDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        Member member=memberRepository.findByEmail(email)
                 .orElseThrow(()->new RestApiException(AuthErrorCode.NOT_EXIST_MEMBER));
         //유저의 잠금 상태 확인
         if(member.isAccountLocked()){
