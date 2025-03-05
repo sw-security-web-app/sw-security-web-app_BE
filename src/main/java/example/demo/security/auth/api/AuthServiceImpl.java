@@ -36,6 +36,10 @@ public class AuthServiceImpl implements AuthService {
                 () -> new RestApiException(AuthErrorCode.INVALID_EMAIL_OR_PASSWORD)
         );
 
+        //계정 잠금 여부 확인
+        if(findMember.isAccountLocked()){
+            throw new RestApiException(AuthErrorCode.IS_LOCKED);
+        }
         if (!encoder.matches(password, findMember.getPassword())) {
             throw new RestApiException(AuthErrorCode.INVALID_EMAIL_OR_PASSWORD);
         }
@@ -136,18 +140,26 @@ public class AuthServiceImpl implements AuthService {
 
     //예외 처리 메서드
     private static void validation(Member requestMember, Member lockedMember,String type) {
+        MemberStatus lockedMemberStatus=lockedMember.getMemberStatus();
+        MemberStatus requestMemberStatus=requestMember.getMemberStatus();
+
+        //Lock 당하는 유저가 일반인 인가
+        boolean isGeneralMember=lockedMemberStatus.equals(MemberStatus.GENERAL);
+        if(isGeneralMember){
+            throw new RestApiException(AuthErrorCode.NO_AUTHORITIES);
+        }
         //같은 회사 인가
         boolean isSameCompany= requestMember.getCompany().getCompanyId().equals(lockedMember.getCompany().getCompanyId());
         if (!isSameCompany){
             throw new RestApiException(AuthErrorCode.NO_AUTHORITIES);
         }
         //Lock당하는 유저가 Manager가 아닌가
-        boolean isNotManager= lockedMember.getMemberStatus().equals(MemberStatus.MANAGER);
+        boolean isNotManager= lockedMemberStatus.equals(MemberStatus.MANAGER);
         if (isNotManager){
             throw new RestApiException(AuthErrorCode.CAN_NOT_LOCKED_MANAGER);
         }
         //Lock 요청을 보낸 유저가 MANAGER인가
-        boolean isManagerOfCompany= requestMember.getMemberStatus().equals(MemberStatus.MANAGER);
+        boolean isManagerOfCompany= requestMemberStatus.equals(MemberStatus.MANAGER);
         if (!isManagerOfCompany){
             throw new RestApiException(AuthErrorCode.NO_AUTHORITIES);
         }
@@ -155,6 +167,14 @@ public class AuthServiceImpl implements AuthService {
         boolean isValidationTypeValue= type.equals("true") || type.equals("false");
         if(!isValidationTypeValue){
             throw new RestApiException(AuthErrorCode.INVALID_TYPE_VALUE);
+        }
+       //계정이 잠겨져 있는 상태에서 잠김 요청을 보냈는가
+        if (type.equals("true") && lockedMember.isAccountLocked()){
+            throw new RestApiException(AuthErrorCode.IS_LOCKED);
+        }
+        //계정이 잠겨있지 않은 상태에서 잠김 풀림 요청을 보냈는가
+        if(type.equals("false") && !lockedMember.isAccountLocked()){
+            throw new RestApiException(AuthErrorCode.IS_NOT_LOCKED);
         }
     }
 

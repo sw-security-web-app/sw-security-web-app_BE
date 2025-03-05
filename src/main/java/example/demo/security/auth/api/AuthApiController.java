@@ -47,6 +47,10 @@ public class AuthApiController {
                                                     @RequestParam("memberId")Long memberId,
                                                     @RequestParam("type")String type){
         authService.locking(token,memberId,type);
-        return ResponseEntity.ok("해당 회원의 계정을 잠금 처리했습니다.");
+        if (type.equals("true")){
+            return ResponseEntity.ok("해당 회원의 계정을 잠금 처리했습니다.");
+        }else {
+            return ResponseEntity.ok("해당 회원의 계정을 잠금 해제 처리했습니다.");
+        }
     }
 }
