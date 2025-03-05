@@ -3,6 +3,7 @@ package example.demo.security.auth.api;
 import example.demo.domain.member.Member;
 import example.demo.domain.member.MemberErrorCode;
 import example.demo.domain.member.repository.MemberRepository;
+import example.demo.error.CommonErrorCode;
 import example.demo.error.RestApiException;
 import example.demo.security.auth.AuthErrorCode;
 import example.demo.security.auth.dto.AccessTokenResponseDto;
@@ -105,6 +106,14 @@ public class AuthServiceImpl implements AuthService {
                 .accessToken(newAccessToken)
                 .message("엑세스 토큰 재발행 성공")
                 .build();
+    }
+
+    @Override
+    public void secessionMember(String token) {
+        Long memberId=jwtUtil.getMemberId(token);
+        Member findMember=memberRepository.findById(memberId)
+                .orElseThrow(()->new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
+        memberRepository.delete(findMember);
     }
 
     private static void setRefreshToken(String refreshToken, HttpServletResponse response) {

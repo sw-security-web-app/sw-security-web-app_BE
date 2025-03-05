@@ -35,4 +35,10 @@ public class AuthApiController {
         AccessTokenResponseDto accessTokenResponseDto= authService.refreshAccessToken(refreshToken,response);
         return ResponseEntity.ok(accessTokenResponseDto);
     }
+
+    @DeleteMapping("secession")
+    public ResponseEntity<?> deleteMember(@RequestHeader("Authorization")String token){
+        authService.secessionMember(token);
+        return ResponseEntity.ok("탈퇴가 완료되었습니다.");
+    }
 }

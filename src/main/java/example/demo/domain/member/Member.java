@@ -1,6 +1,7 @@
 package example.demo.domain.member;
 
 import example.demo.domain.BaseEntity;
+import example.demo.domain.chat.ChatRoom;
 import example.demo.domain.company.Company;
 import example.demo.domain.member.dto.request.MemberRequestDto;
 import jakarta.persistence.*;
@@ -8,6 +9,9 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -43,7 +47,6 @@ public class Member extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company_id")
     private Company company;
-
     public Member(String email, String userName, String password, MemberStatus memberStatus, String phoneNumber, String companyPosition,Company company) {
         this.email = email;
         this.userName = userName;
