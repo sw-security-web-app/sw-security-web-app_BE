@@ -77,7 +77,7 @@ public class ClaudeServiceImpl implements ClaudeService {
                 .orElseThrow(() -> new RestApiException(ChatRoomErrorCode.CHAT_ROOM_NOT_FOUND));
 
         //* 프롬프트 검열
-        pythonServerUtil.validatePrompt(requestDto.getPrompt());
+       // pythonServerUtil.validatePrompt(requestDto.getPrompt());
 
         try {
             ResponseEntity<Map> responseEntity = restTemplate.exchange(claudeApiUrl, HttpMethod.POST, requestEntity, Map.class);

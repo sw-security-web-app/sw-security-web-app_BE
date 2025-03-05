@@ -1,9 +1,11 @@
 package example.demo.domain.chat.service;
 
+import example.demo.domain.chat.dto.response.ChatRoomRecentResponseDto;
+import example.demo.domain.chat.dto.request.ChatRoomRequestDto;
+import example.demo.domain.chat.dto.response.ChatRoomResponseDto;
 import example.demo.domain.chat.AIModelType;
 import example.demo.domain.chat.Chat;
 import example.demo.domain.chat.ChatRoom;
-import example.demo.domain.chat.dto.*;
 import example.demo.domain.chat.repository.ChatRepository;
 import example.demo.domain.chat.repository.ChatRoomRepository;
 import example.demo.domain.member.Member;
@@ -37,7 +39,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
                 .member(member)
                 .build();
 
-        chatRoomRepository.save(chatRoom);
+        chatRoom=chatRoomRepository.save(chatRoom);
         limitChatRoomCount(memberId);
 
         return new ChatRoomResponseDto(chatRoom.getChatRoomId());

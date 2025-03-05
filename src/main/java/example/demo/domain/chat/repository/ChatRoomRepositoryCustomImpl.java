@@ -6,11 +6,14 @@ import example.demo.domain.chat.AIModelType;
 import example.demo.domain.chat.ChatRoom;
 import example.demo.domain.chat.QChatRoom;
 import example.demo.domain.chat.dto.*;
+import example.demo.domain.chat.dto.request.ChatRoomRequestDto;
+import example.demo.domain.chat.dto.request.QChatRoomRequestDto;
+import example.demo.domain.chat.dto.response.ChatRoomRecentResponseDto;
 import jakarta.persistence.EntityManager;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import static com.querydsl.jpa.JPAExpressions.*;
+
 import static example.demo.domain.chat.QChat.chat;
 import static example.demo.domain.chat.QChatRoom.*;
 
