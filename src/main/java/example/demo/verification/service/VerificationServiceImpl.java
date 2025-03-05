@@ -44,6 +44,11 @@ public class VerificationServiceImpl implements VerificationService {
 
     @Override
     public ResponseDto sendVerificationFileToPythonServer(String token, MultipartFile multipartFile, SecurityFileRequestDto requestDto) throws IOException, JSONException {
+        //파일이나 텍스트가 없는 경우
+        if ((requestDto == null || requestDto.getContent() == null || requestDto.getContent().isEmpty())
+                && (multipartFile == null || multipartFile.isEmpty())) {
+            throw new RestApiException(VerificationErrorCode.EMPTY_FILE_OR_TEXT);
+        }
         //유저가 관리자 인지 검사
         Long companyId = isMemberManager(token);
 
@@ -69,8 +74,8 @@ public class VerificationServiceImpl implements VerificationService {
 
         //회사가 존재하는 경우 -> 바로 학습 api 전송
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-        //JSONObject json=new JSONObject();
-        //json.put("company_name", String.valueOf(companyId));
+        JSONObject json=new JSONObject();
+        json.put("company_name", String.valueOf(companyId));
 
 
 
@@ -90,6 +95,7 @@ public class VerificationServiceImpl implements VerificationService {
                 if(convertedPdfFile==null){
                     throw new RestApiException(VerificationErrorCode.ERROR_OF_CONVERTING_PDF);
                 }
+                log.info("PDF -> .txt 변환 성공!");
                 body.add("file", convertedPdfFile);
             } else {
                 ByteArrayResource fileResource = new ByteArrayResource(multipartFile.getBytes()) {
@@ -111,13 +117,13 @@ public class VerificationServiceImpl implements VerificationService {
         }
         HttpHeaders headers=new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-        body.add("company_name", String.valueOf(companyId));
+        body.add("company_name", json.toString());
 
         SimpleClientHttpRequestFactory factory=new SimpleClientHttpRequestFactory();
         RestTemplate restTemplate=new RestTemplate(factory);
 
-        factory.setConnectTimeout(Duration.ofSeconds(10));//연결 시간 5초
-        factory.setReadTimeout(Duration.ofSeconds(10));   //읽기 시간5초
+        factory.setConnectTimeout(Duration.ofMinutes(10));//연결 시간 10분
+        factory.setReadTimeout(Duration.ofMinutes(10));   //읽기 시간 10분
 
         HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body,headers);
         ResponseEntity<String> response;
@@ -180,8 +186,8 @@ public class VerificationServiceImpl implements VerificationService {
         SimpleClientHttpRequestFactory factory=new SimpleClientHttpRequestFactory();
         RestTemplate restTemplate=new RestTemplate(factory);
 
-        factory.setConnectTimeout(Duration.ofSeconds(5));//연결 시간 5초
-        factory.setReadTimeout(Duration.ofSeconds(5));   //읽기 시간5초
+        factory.setConnectTimeout(Duration.ofSeconds(30));//연결 시간 30초
+        factory.setReadTimeout(Duration.ofSeconds(30));   //읽기 시간 30초
 
         String url = SERVER_URL + "/api/create_company";
         log.info("Send File Request");
@@ -209,8 +215,8 @@ public class VerificationServiceImpl implements VerificationService {
         SimpleClientHttpRequestFactory factory=new SimpleClientHttpRequestFactory();
         RestTemplate restTemplate=new RestTemplate(factory);
 
-        factory.setConnectTimeout(Duration.ofSeconds(5));//연결 시간 5초
-        factory.setReadTimeout(Duration.ofSeconds(5));   //읽기 시간5초
+        factory.setConnectTimeout(Duration.ofSeconds(15));//연결 시간 10초
+        factory.setReadTimeout(Duration.ofSeconds(15));   //읽기 시간10초
 
         //회사가 존재하면 true 반환
         String url=SERVER_URL+"/api/"+companyId+"/info";

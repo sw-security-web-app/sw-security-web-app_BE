@@ -13,7 +13,7 @@ import org.springframework.data.domain.Pageable;
 public interface MemberService {
     void signup(MemberRequestDto memberRequestDto);
 
-    Page<CompanyEmployeeResponseDto> getAllEmployees(String token, Pageable page);
+    Page<CompanyEmployeeResponseDto> getAllEmployees(String token, Pageable page,String search);
 
 
     MemberInfoResponseDto getMemberInfo(String token);

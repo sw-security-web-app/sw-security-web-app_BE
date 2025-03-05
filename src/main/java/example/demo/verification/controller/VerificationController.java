@@ -24,10 +24,6 @@ public class VerificationController {
     public ResponseEntity<?> postCensorshipData(@RequestHeader("Authorization")String token,
                                                 @RequestPart(value = "requestDto",required = false) SecurityFileRequestDto requestDto,
                                                 @RequestPart(value = "file",required = false) MultipartFile file) throws IOException, JSONException {
-        //파일이나 텍스트가 없는 경우
-        if(requestDto==null && (file!=null &&  file.isEmpty())){
-            throw new RestApiException(VerificationErrorCode.EMPTY_FILE_OR_TEXT);
-        }
         ResponseDto responseDto=verificationService.sendVerificationFileToPythonServer(token,file,requestDto);
         return ResponseEntity.ok().body(responseDto);
     }

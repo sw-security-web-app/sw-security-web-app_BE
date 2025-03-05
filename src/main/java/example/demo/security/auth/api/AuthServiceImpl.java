@@ -74,10 +74,10 @@ public class AuthServiceImpl implements AuthService {
 
         //기존 가지고 있는 사용자 refresh Token제거
         return AccessTokenResponseDto.builder()
+                .userName(findMember.getUserName())
                 .accessToken(accessToken)
                 .message("토큰 반환 성공")
                 .code(200)
-                .memberName(findMember.getUserName())
                 .build();
     }
 
@@ -122,8 +122,9 @@ public class AuthServiceImpl implements AuthService {
                 .builder()
                 .code(200)
                 .accessToken(newAccessToken)
+                .userName(member.getUserName())
                 .message("엑세스 토큰 재발행 성공")
-                .memberName(member.getUserName())
+                .userName(member.getUserName())
                 .build();
     }
 

@@ -1,7 +1,10 @@
 package example.demo.domain.chat.controller;
 
-import example.demo.domain.chat.dto.ChatRoomRecentResponseDto;
-import example.demo.domain.chat.dto.ChatRoomResponseDto;
+import example.demo.domain.chat.dto.response.ChatRoomRecentResponseDto;
+import example.demo.domain.chat.dto.response.ChatRoomResponseDto;
+import example.demo.domain.chat.AIModelType;
+import example.demo.domain.chat.dto.ChatRoomGetRequestDto;
+import example.demo.domain.chat.dto.ChatRoomGetResponseDto;
 import example.demo.domain.chat.service.ChatRoomService;
 import example.demo.security.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
@@ -26,10 +29,19 @@ public class ChatRoomController {
         return ResponseEntity.ok(chatRoom);
     }
 
-    @GetMapping("/latest")
-    public ResponseEntity<?> getLatestChatRoom(@RequestHeader("Authorization") String token) {
+    @GetMapping("/get")
+    public ResponseEntity<?> getChatRoom(@RequestHeader("Authorization") String token,
+                                         @RequestParam("aiModelType") AIModelType aiModelType) {
         Long memberId = jwtUtil.getMemberId(token);
-        List<ChatRoomRecentResponseDto> latestChatRoom = chatRoomService.getLatestChatRoom(memberId);
+        List<ChatRoomGetResponseDto> chatRoomList = chatRoomService.getChatRoomList(memberId, aiModelType);
+        return ResponseEntity.ok(chatRoomList);
+    }
+
+    @GetMapping("/latest")
+    public ResponseEntity<?> getLatestChatRoom(@RequestHeader("Authorization") String token,
+                                               @RequestParam("aiModelType") AIModelType aiModelType) {
+        Long memberId = jwtUtil.getMemberId(token);
+        List<ChatRoomRecentResponseDto> latestChatRoom = chatRoomService.getLatestChatRoom(memberId, aiModelType);
         return ResponseEntity.ok(latestChatRoom);
     }
 }

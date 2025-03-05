@@ -10,5 +10,5 @@ public class AccessTokenResponseDto {
     private String accessToken;
     private String message;
     private Integer code;
-    private String memberName;
+    private String userName;
 }

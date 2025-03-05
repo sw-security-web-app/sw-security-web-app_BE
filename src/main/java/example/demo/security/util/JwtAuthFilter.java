@@ -22,6 +22,13 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     //JWT 토큰 검증 필터
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+
+        // health-check 요청을 위한 Security 관련 부분 패스하기
+        if (request.getRequestURI().equals("/health-check")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         String authorizationHeader=request.getHeader("Authorization");
 
         //JWT헤더가 있는 경우
