@@ -1,5 +1,6 @@
 package example.demo.domain.chat.controller;
 
+import example.demo.domain.chat.AIModelType;
 import example.demo.domain.chat.service.ChatService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +23,8 @@ public class ChatController {
     public ResponseEntity<?> getChatList(@RequestHeader("Authorization")String token,
                                          @RequestParam(required = false,defaultValue = "1")Long id,
                                          @RequestParam(required = false,defaultValue = "10")int size,
+                                         @RequestParam AIModelType type,
                                          @PathVariable("chatRoomId")Long chatRoomId){
-        return ResponseEntity.ok(chatService.getDetailChattingContent(chatRoomId,token,id,size));
+        return ResponseEntity.ok(chatService.getDetailChattingContent(chatRoomId,token,id,size,type));
     }
 }

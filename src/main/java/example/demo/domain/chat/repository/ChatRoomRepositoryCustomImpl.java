@@ -2,14 +2,15 @@ package example.demo.domain.chat.repository;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import example.demo.domain.chat.ChatRoom;
-import example.demo.domain.chat.QChatRoom;
 import example.demo.domain.chat.dto.*;
+import example.demo.domain.chat.dto.request.ChatRoomRequestDto;
+import example.demo.domain.chat.dto.request.QChatRoomRequestDto;
+import example.demo.domain.chat.dto.response.ChatRoomRecentResponseDto;
 import jakarta.persistence.EntityManager;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import static com.querydsl.jpa.JPAExpressions.*;
+
 import static example.demo.domain.chat.QChat.chat;
 import static example.demo.domain.chat.QChatRoom.*;
 

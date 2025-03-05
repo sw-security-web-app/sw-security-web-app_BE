@@ -1,7 +1,6 @@
-package example.demo.domain.chat.dto;
+package example.demo.domain.chat.dto.response;
 
 import com.querydsl.core.annotations.QueryProjection;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -10,7 +9,7 @@ import java.time.format.DateTimeFormatter;
 
 @Getter
 @NoArgsConstructor
-public class ChatDetailDto {
+public class ChatDetailResponseDto {
     private Long chatId;
     private Message message;
     private String createdDate;
@@ -22,7 +21,7 @@ public class ChatDetailDto {
      * @param createdDate 생성된 시간
      */
     @QueryProjection
-    public ChatDetailDto(Long chatId, String question, String answer, LocalDateTime createdDate) {
+    public ChatDetailResponseDto(Long chatId, String question, String answer, LocalDateTime createdDate) {
         this.chatId = chatId;
         this.message = new Message(question, answer);
         this.createdDate = parsedLocalDateTime(createdDate);

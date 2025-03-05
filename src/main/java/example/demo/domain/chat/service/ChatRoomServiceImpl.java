@@ -1,12 +1,9 @@
 package example.demo.domain.chat.service;
 
-import example.demo.domain.chat.Chat;
 import example.demo.domain.chat.ChatRoom;
-import example.demo.domain.chat.dto.ChatDto;
-import example.demo.domain.chat.dto.ChatRoomRecentResponseDto;
-import example.demo.domain.chat.dto.ChatRoomRequestDto;
-import example.demo.domain.chat.dto.ChatRoomResponseDto;
-import example.demo.domain.chat.repository.ChatRepository;
+import example.demo.domain.chat.dto.response.ChatRoomRecentResponseDto;
+import example.demo.domain.chat.dto.request.ChatRoomRequestDto;
+import example.demo.domain.chat.dto.response.ChatRoomResponseDto;
 import example.demo.domain.chat.repository.ChatRoomRepository;
 import example.demo.domain.member.Member;
 import example.demo.domain.member.MemberErrorCode;

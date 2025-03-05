@@ -1,10 +1,12 @@
 package example.demo.domain.chat.service;
 
+import example.demo.domain.chat.AIModelType;
 import example.demo.domain.chat.Chat;
 import example.demo.domain.chat.ChatRoom;
 import example.demo.domain.chat.ChatRoomErrorCode;
-import example.demo.domain.chat.dto.ChatDetailDto;
+import example.demo.domain.chat.dto.response.ChatDetailResponseDto;
 import example.demo.domain.chat.dto.ChatDto;
+import example.demo.domain.chat.dto.response.ChatTotalDetailResponseDto;
 import example.demo.domain.chat.repository.ChatRepository;
 import example.demo.domain.chat.repository.ChatRoomRepository;
 import example.demo.domain.member.Member;
@@ -63,7 +65,7 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
-    public List<ChatDetailDto> getDetailChattingContent(Long chatRoomId, String token, Long chatId,int size) {
+    public ChatTotalDetailResponseDto getDetailChattingContent(Long chatRoomId, String token, Long chatId, int size, AIModelType type) {
         //memberId 추출
         Long memberId=jwtUtil.getMemberId(token);
 
@@ -72,6 +74,6 @@ public class ChatServiceImpl implements ChatService {
             throw new RestApiException(ChatRoomErrorCode.CHAT_ROOM_NOT_FOUND);
         }
 
-        return chatRepository.getSliceOfChatting(chatRoomId, chatId , memberId, size);
+        return chatRepository.getSliceOfChatting(chatRoomId, chatId , memberId, size,type);
     }
 }

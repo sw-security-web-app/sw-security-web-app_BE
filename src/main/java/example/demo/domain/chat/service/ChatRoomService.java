@@ -1,7 +1,7 @@
 package example.demo.domain.chat.service;
 
-import example.demo.domain.chat.dto.ChatRoomRecentResponseDto;
-import example.demo.domain.chat.dto.ChatRoomResponseDto;
+import example.demo.domain.chat.dto.response.ChatRoomRecentResponseDto;
+import example.demo.domain.chat.dto.response.ChatRoomResponseDto;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

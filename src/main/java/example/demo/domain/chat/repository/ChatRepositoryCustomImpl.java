@@ -2,20 +2,18 @@ package example.demo.domain.chat.repository;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import example.demo.domain.chat.Chat;
-import example.demo.domain.chat.QChat;
-import example.demo.domain.chat.QChatRoom;
-import example.demo.domain.chat.dto.ChatDetailDto;
-import example.demo.domain.chat.dto.QChatDetailDto;
-import example.demo.domain.chat.dto.QChatDto;
-import example.demo.domain.company.dto.response.QCompanyResponseDto;
-import example.demo.domain.member.QMember;
+import example.demo.domain.chat.AIModelType;
+import example.demo.domain.chat.dto.response.ChatDetailResponseDto;
+
+import example.demo.domain.chat.dto.response.ChatTotalDetailResponseDto;
+import example.demo.domain.chat.dto.response.QChatDetailResponseDto;
 import jakarta.persistence.EntityManager;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
+
+import static example.demo.domain.chat.QChatRoom.chatRoom;
 
 import static example.demo.domain.chat.QChat.chat;
 import static example.demo.domain.chat.QChatRoom.*;
@@ -31,9 +29,10 @@ public class ChatRepositoryCustomImpl implements ChatRepositoryCustom {
 
 
     @Override
-    public List<ChatDetailDto> getSliceOfChatting(Long chatRoomId, Long chatId,Long memberId,int size) {
-        List<ChatDetailDto> chatDetailDtoList=queryFactory
-                .select(new QChatDetailDto(
+    public ChatTotalDetailResponseDto getSliceOfChatting(Long chatRoomId, Long chatId,Long memberId,int size,AIModelType type) {
+        //채팅 상세 목록 조회
+        List<ChatDetailResponseDto> chatDetailDtoList=queryFactory
+                .select(new QChatDetailResponseDto(
                         chat.chatId,
                         chat.question,
                         chat.answer,
@@ -42,12 +41,26 @@ public class ChatRepositoryCustomImpl implements ChatRepositoryCustom {
                 .from(chat)
                 .innerJoin(chat.chatRoom,chatRoom)
                 .innerJoin(chatRoom.member,member)
-                .where(allEq(chatRoomId,chatId,memberId))
-                .orderBy(chat.chatId.desc())
+                .where(allEq(chatRoomId,chatId,memberId,type))
+                .orderBy(chat.chatId.asc())
                 .limit(size)
                 .fetch();
 
-        return chatDetailDtoList.isEmpty() ? Collections.emptyList() : chatDetailDtoList;
+        // 결과가 비어 있는 경우
+        if (chatDetailDtoList.isEmpty()) {
+            return ChatTotalDetailResponseDto.builder()
+                    .lastChatId(chatId)
+                    .array(Collections.emptyList())
+                    .build();
+        }
+
+        ChatTotalDetailResponseDto responseDto=ChatTotalDetailResponseDto
+                .builder()
+                .lastChatId(chatDetailDtoList.get(chatDetailDtoList.size() - 1).getChatId())
+                .array(chatDetailDtoList)
+                .build();
+
+        return responseDto;
     }
 
     private BooleanExpression memberIdEq(Long memberId){
@@ -58,13 +71,17 @@ public class ChatRepositoryCustomImpl implements ChatRepositoryCustom {
         return chatRoomId == null ? null : chatRoom.chatRoomId.eq(chatRoomId);
     }
     private BooleanExpression gtChatId(Long chatId){
-        return chatId == null ? null : chat.chatId.gt(chatId);
+        return (chatId != null && chatId > 0) ? chat.chatId.gt(chatId) : null;
+    }
+    private BooleanExpression aiTypeEq(AIModelType ai){
+        return ai==null ? null : chat.modelType.eq(ai);
     }
 
-    private BooleanExpression allEq(Long chatRoomId, Long chatId, Long memberId) {
+    private BooleanExpression allEq(Long chatRoomId, Long chatId, Long memberId,AIModelType type) {
         BooleanExpression condition = chatRoomIdEq(chatRoomId);
         BooleanExpression chatCondition = gtChatId(chatId);
         BooleanExpression memberCondition = memberIdEq(memberId);
+        BooleanExpression aiTypeCondition=aiTypeEq(type);
 
         BooleanExpression result = null;
 
@@ -76,6 +93,9 @@ public class ChatRepositoryCustomImpl implements ChatRepositoryCustom {
         }
         if (memberCondition != null) {
             result = (result != null) ? result.and(memberCondition) : memberCondition;
+        }
+        if(aiTypeCondition!=null){
+            return (result!=null) ? result.and(aiTypeCondition) : aiTypeCondition;
         }
 
         return result;
