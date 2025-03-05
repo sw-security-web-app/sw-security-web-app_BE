@@ -8,5 +8,5 @@ public interface AuthService {
     AccessTokenResponseDto loginMember(MemberLoginDto loginDto, HttpServletResponse response);
     AccessTokenResponseDto refreshAccessToken(String refreshToken,HttpServletResponse response);
     void secessionMember(String token);
-    void locking(String token, Long memberId);
+    void locking(String token, Long memberId,String type);
 }

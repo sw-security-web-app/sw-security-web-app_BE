@@ -44,8 +44,9 @@ public class AuthApiController {
 
     @PutMapping("locked")
     public ResponseEntity<?> lockingCompanyEmployee(@RequestHeader("Authorization")String token,
-                                                    @RequestParam("memberId")Long memberId){
-        authService.locking(token,memberId);
+                                                    @RequestParam("memberId")Long memberId,
+                                                    @RequestParam("type")String type){
+        authService.locking(token,memberId,type);
         return ResponseEntity.ok("해당 회원의 계정을 잠금 처리했습니다.");
     }
 }

@@ -118,7 +118,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public void locking(String token, Long memberId) {
+    public void locking(String token, Long memberId,String type) {
         //Lock 요청을 보낸 유저
         Long requestMemberId=jwtUtil.getMemberId(token);
         Member requestMember=memberRepository.findById(requestMemberId)
@@ -128,20 +128,19 @@ public class AuthServiceImpl implements AuthService {
         Member lockedMember=memberRepository.findById(memberId)
                 .orElseThrow(()->new RestApiException(AuthErrorCode.NOT_EXIST_MEMBER));
 
-        validation(requestMember, lockedMember);
+        validation(requestMember, lockedMember,type);
 
-        lockedMember.changeMemberLock(true);
+        lockedMember.changeMemberLock(Boolean.parseBoolean(type));
         memberRepository.save(lockedMember);
     }
 
     //예외 처리 메서드
-    private static void validation(Member requestMember, Member lockedMember) {
+    private static void validation(Member requestMember, Member lockedMember,String type) {
         //같은 회사 인가
         boolean isSameCompany= requestMember.getCompany().getCompanyId().equals(lockedMember.getCompany().getCompanyId());
         if (!isSameCompany){
             throw new RestApiException(AuthErrorCode.NO_AUTHORITIES);
         }
-
         //Lock당하는 유저가 Manager가 아닌가
         boolean isNotManager= lockedMember.getMemberStatus().equals(MemberStatus.MANAGER);
         if (isNotManager){
@@ -151,6 +150,11 @@ public class AuthServiceImpl implements AuthService {
         boolean isManagerOfCompany= requestMember.getMemberStatus().equals(MemberStatus.MANAGER);
         if (!isManagerOfCompany){
             throw new RestApiException(AuthErrorCode.NO_AUTHORITIES);
+        }
+        //올바른 타입값인가
+        boolean isValidationTypeValue= type.equals("true") || type.equals("false");
+        if(!isValidationTypeValue){
+            throw new RestApiException(AuthErrorCode.INVALID_TYPE_VALUE);
         }
     }
 

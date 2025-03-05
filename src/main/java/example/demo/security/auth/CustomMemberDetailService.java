@@ -5,6 +5,7 @@ import example.demo.domain.member.repository.MemberRepository;
 import example.demo.error.RestApiException;
 import example.demo.security.auth.dto.CustomMemberInfoDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -20,6 +21,10 @@ public class CustomMemberDetailService implements UserDetailsService {
     public UserDetails loadUserByUsername(String memberId) throws UsernameNotFoundException {
         Member member=memberRepository.findById(Long.parseLong(memberId))
                 .orElseThrow(()->new RestApiException(AuthErrorCode.NOT_EXIST_MEMBER));
+        //유저의 잠금 상태 확인
+        if(member.isAccountLocked()){
+            throw new LockedException("계정이 잠겨있습니다. 관리자에게 문의해주세요.");
+        }
         CustomMemberInfoDto dto=CustomMemberInfoDto.builder()
                 .email(member.getEmail())
                 .accountLocked(member.isAccountLocked())
