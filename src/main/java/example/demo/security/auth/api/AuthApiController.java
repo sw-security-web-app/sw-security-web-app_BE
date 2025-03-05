@@ -41,4 +41,11 @@ public class AuthApiController {
         authService.secessionMember(token);
         return ResponseEntity.ok("탈퇴가 완료되었습니다.");
     }
+
+    @PutMapping("locked")
+    public ResponseEntity<?> lockingCompanyEmployee(@RequestHeader("Authorization")String token,
+                                                    @RequestParam("memberId")Long memberId){
+        authService.locking(token,memberId);
+        return ResponseEntity.ok("해당 회원의 계정을 잠금 처리했습니다.");
+    }
 }

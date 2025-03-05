@@ -2,6 +2,7 @@ package example.demo.security.auth.api;
 
 import example.demo.domain.member.Member;
 import example.demo.domain.member.MemberErrorCode;
+import example.demo.domain.member.MemberStatus;
 import example.demo.domain.member.repository.MemberRepository;
 import example.demo.error.CommonErrorCode;
 import example.demo.error.RestApiException;
@@ -114,6 +115,43 @@ public class AuthServiceImpl implements AuthService {
         Member findMember=memberRepository.findById(memberId)
                 .orElseThrow(()->new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
         memberRepository.delete(findMember);
+    }
+
+    @Override
+    public void locking(String token, Long memberId) {
+        //Lock 요청을 보낸 유저
+        Long requestMemberId=jwtUtil.getMemberId(token);
+        Member requestMember=memberRepository.findById(requestMemberId)
+                .orElseThrow(()->new RestApiException(AuthErrorCode.NOT_EXIST_MEMBER));
+
+        //Lock이 되는 유저
+        Member lockedMember=memberRepository.findById(memberId)
+                .orElseThrow(()->new RestApiException(AuthErrorCode.NOT_EXIST_MEMBER));
+
+        validation(requestMember, lockedMember);
+
+        lockedMember.changeMemberLock(true);
+        memberRepository.save(lockedMember);
+    }
+
+    //예외 처리 메서드
+    private static void validation(Member requestMember, Member lockedMember) {
+        //같은 회사 인가
+        boolean isSameCompany= requestMember.getCompany().getCompanyId().equals(lockedMember.getCompany().getCompanyId());
+        if (!isSameCompany){
+            throw new RestApiException(AuthErrorCode.NO_AUTHORITIES);
+        }
+
+        //Lock당하는 유저가 Manager가 아닌가
+        boolean isNotManager= lockedMember.getMemberStatus().equals(MemberStatus.MANAGER);
+        if (isNotManager){
+            throw new RestApiException(AuthErrorCode.CAN_NOT_LOCKED_MANAGER);
+        }
+        //Lock 요청을 보낸 유저가 MANAGER인가
+        boolean isManagerOfCompany= requestMember.getMemberStatus().equals(MemberStatus.MANAGER);
+        if (!isManagerOfCompany){
+            throw new RestApiException(AuthErrorCode.NO_AUTHORITIES);
+        }
     }
 
     private static void setRefreshToken(String refreshToken, HttpServletResponse response) {

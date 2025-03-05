@@ -15,7 +15,8 @@ public enum AuthErrorCode implements ErrorCode {
     ACCOUNT_LOCKED(HttpStatus.LOCKED,"계정이 잠겼습니다.관리자에게 문의해주세요."),
     NO_AUTHORITIES(HttpStatus.FORBIDDEN,"권한이 없습니다."),
     NOT_AUTHENTICATED_REQUEST(HttpStatus.UNAUTHORIZED,"인증된 유저가 아닙니다."),
-    INVALID_REFRESH_TOKEN(HttpStatus.BAD_GATEWAY,"유효하지 않은 리프레시 토큰값입니다.");
+    INVALID_REFRESH_TOKEN(HttpStatus.BAD_GATEWAY,"유효하지 않은 리프레시 토큰값입니다."),
+    CAN_NOT_LOCKED_MANAGER(HttpStatus.BAD_REQUEST,"관리자의 계정은 잠금처리할 수 없습니다.");
     private final HttpStatus httpStatus;
     private final String message;
 }

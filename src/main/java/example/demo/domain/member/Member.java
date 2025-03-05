@@ -86,4 +86,9 @@ public class Member extends BaseEntity {
         this.password = password;
     }
     public void setMemberId(Long memberId){this.memberId=memberId;}
+
+    //멤버의 Lock여부 변경
+    public void changeMemberLock(boolean type){
+        this.accountLocked=type;
+    }
 }

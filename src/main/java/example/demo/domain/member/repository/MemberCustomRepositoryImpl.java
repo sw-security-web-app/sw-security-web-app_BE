@@ -69,7 +69,8 @@ public class MemberCustomRepositoryImpl implements MemberCustomRepository {
                 .select(new QCompanyEmployeeResponseDto(
                         member.companyPosition,
                         member.userName,
-                        member.email
+                        member.email,
+                        member.memberId
                 ))
                 .from(member)
                 .leftJoin(member.company, company)
