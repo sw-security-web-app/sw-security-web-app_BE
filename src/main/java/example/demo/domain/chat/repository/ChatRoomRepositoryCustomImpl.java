@@ -45,17 +45,12 @@ public class ChatRoomRepositoryCustomImpl implements ChatRoomRepositoryCustom {
 
     @Override
     public List<ChatRoomRequestDto> findByMemberIdAndAiModelType(Long memberId, AIModelType aiModelType) {
-        List<Long> chatRoomIds = queryFactory
-                .select(chat.chatRoom.chatRoomId)
-                .from(chat)
-                .where(memberIdEq(memberId), aiModelTypeEq(aiModelType))
-                .groupBy(chat.chatRoom.chatRoomId)
-                .fetch();
-
         return queryFactory
                 .select(new QChatRoomRequestDto(chatRoom.chatRoomId, chatRoom.createdAt))
                 .from(chatRoom)
-                .where(chatRoom.chatRoomId.in(chatRoomIds))
+                .leftJoin(chat).on(chat.chatRoom.chatRoomId.eq(chatRoom.chatRoomId))
+                .where(memberIdEq(memberId), aiModelTypeEq(aiModelType))
+                .groupBy(chatRoom.chatRoomId)
                 .orderBy(chatRoom.createdAt.desc())
                 .fetch();
     }
