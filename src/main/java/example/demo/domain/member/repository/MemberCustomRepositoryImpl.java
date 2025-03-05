@@ -59,7 +59,7 @@ public class MemberCustomRepositoryImpl implements MemberCustomRepository {
     }
 
     @Override
-    public Page<CompanyEmployeeResponseDto> getCompanyEmployeeInfo(Long companyId, Pageable pageable) {
+    public Page<CompanyEmployeeResponseDto> getCompanyEmployeeInfo(Long companyId, Pageable pageable, String search) {
         //정렬 추가
         List<OrderSpecifier<?>> orderSpecifiers = QueryDslUtil.getOrderSpecifiers(pageable);
 
@@ -73,7 +73,7 @@ public class MemberCustomRepositoryImpl implements MemberCustomRepository {
                 ))
                 .from(member)
                 .leftJoin(member.company, company)
-                .where(allCompanyIdEq(company.companyId, companyId))
+                .where(allCompanyIdEq(company.companyId, companyId,search))
                 .orderBy(orderSpecifiers.toArray(new OrderSpecifier[0]))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -83,7 +83,7 @@ public class MemberCustomRepositoryImpl implements MemberCustomRepository {
                 .select(member.count())
                 .from(member)
                 .leftJoin(member.company, company)
-                .where(allCompanyIdEq(company.companyId, companyId));
+                .where(allCompanyIdEq(company.companyId, companyId,search));
 
         return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
     }
@@ -97,7 +97,7 @@ public class MemberCustomRepositoryImpl implements MemberCustomRepository {
                         member.company.companyDept,
                         member.companyPosition,
                         member.memberStatus
-                        ))
+                ))
                 .from(member)
                 .leftJoin(member.company, company)
                 .where(member.memberId.eq(memberId))
@@ -121,20 +121,25 @@ public class MemberCustomRepositoryImpl implements MemberCustomRepository {
         return companyId == null ? null : member.company.companyId.eq(companyId);
     }
 
-    private BooleanExpression allCompanyIdEq(NumberPath<Long> companyOfCompanyId, Long inputCompanyId) {
+    private BooleanExpression allCompanyIdEq(NumberPath<Long> companyOfCompanyId, Long inputCompanyId, String memberName) {
         BooleanExpression companyCondition = companyIdEq(inputCompanyId);
         BooleanExpression memberCondition = companyIdOfMemberEq(companyOfCompanyId);
+        BooleanExpression memberNameCondition = memberNameEq(memberName);
 
         if (companyCondition == null) return memberCondition;
         if (memberCondition == null) return companyCondition;
-        return companyCondition.and(memberCondition);
+        if(memberNameCondition == null) return companyCondition.and(memberCondition);
+
+        //이름값이 있는 경우 이름도 같이 검색 조건 추가
+        return companyCondition.and(memberCondition).and(memberNameCondition);
     }
 
-    private BooleanExpression phoneNumberEq(String phoneNumber){
+    private BooleanExpression phoneNumberEq(String phoneNumber) {
         return phoneNumber == null ? null : member.phoneNumber.eq(phoneNumber);
     }
 
-    private BooleanExpression memberNameEq(String name){
+    private BooleanExpression memberNameEq(String name) {
         return name == null ? null : member.userName.eq(name);
     }
+
 }
