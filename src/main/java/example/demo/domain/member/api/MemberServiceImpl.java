@@ -98,7 +98,7 @@ public class MemberServiceImpl implements MemberService {
   
     @Override
     @Transactional(readOnly = true)
-    public Page<CompanyEmployeeResponseDto>  getAllEmployees(String token, Pageable page) {
+    public Page<CompanyEmployeeResponseDto>  getAllEmployees(String token, Pageable page,String search) {
         Member member=memberRepository.findById(jwtUtil.getMemberId(token))
                 .orElseThrow(()->new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
         //MANAGER인지 판단
@@ -106,7 +106,7 @@ public class MemberServiceImpl implements MemberService {
             throw new RestApiException(MemberErrorCode.INVALID_PERMISSION);
         }
         //DTO조립
-        return memberRepository.getCompanyEmployeeInfo(member.getCompany().getCompanyId(),page);
+        return memberRepository.getCompanyEmployeeInfo(member.getCompany().getCompanyId(),page,search);
     }
 
     @Override
