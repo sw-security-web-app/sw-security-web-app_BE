@@ -6,6 +6,7 @@ import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import example.demo.domain.member.Member;
+import example.demo.domain.member.MemberStatus;
 import example.demo.domain.member.QMember;
 import example.demo.domain.member.dto.response.CompanyEmployeeResponseDto;
 import example.demo.domain.member.dto.response.QCompanyEmployeeResponseDto;
@@ -124,7 +125,8 @@ public class MemberCustomRepositoryImpl implements MemberCustomRepository {
     private BooleanExpression allCompanyIdEq(NumberPath<Long> companyOfCompanyId, Long inputCompanyId, String memberName) {
         BooleanExpression companyCondition = companyIdEq(inputCompanyId);
         BooleanExpression memberCondition = companyIdOfMemberEq(companyOfCompanyId);
-        BooleanExpression memberNameCondition = memberNameEq(memberName);
+        BooleanExpression memberNameCondition = memberNameLike(memberName);
+
 
         if (companyCondition == null) return memberCondition;
         if (memberCondition == null) return companyCondition;
@@ -141,5 +143,11 @@ public class MemberCustomRepositoryImpl implements MemberCustomRepository {
     private BooleanExpression memberNameEq(String name) {
         return name == null ? null : member.userName.eq(name);
     }
+
+    private BooleanExpression memberNameLike(String name){
+        return name==null ? null : member.userName.contains(name);
+    }
+
+
 
 }
