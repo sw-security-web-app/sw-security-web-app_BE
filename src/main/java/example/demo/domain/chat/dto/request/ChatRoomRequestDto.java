@@ -1,4 +1,4 @@
-package example.demo.domain.chat.dto;
+package example.demo.domain.chat.dto.request;
 
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.AccessLevel;
@@ -14,14 +14,11 @@ public class ChatRoomRequestDto {
 
     private Long chatRoomId;
     private LocalDateTime createdAt;
-    //최근 대화 미리보기
-    private String preview;
 
     @Builder
     @QueryProjection
-    public ChatRoomRequestDto(Long chatRoomId, LocalDateTime createdAt,String preview) {
+    public ChatRoomRequestDto(Long chatRoomId, LocalDateTime createdAt) {
         this.chatRoomId = chatRoomId;
         this.createdAt = createdAt;
-        this.preview=preview;
     }
 }

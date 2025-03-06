@@ -1,4 +1,4 @@
-package example.demo.domain.chat.dto;
+package example.demo.domain.chat.dto.request;
 
 import com.querydsl.core.annotations.QueryProjection;
 import example.demo.domain.chat.AIModelType;

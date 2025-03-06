@@ -2,7 +2,7 @@
 //
 //import example.demo.domain.chat.AIModelType;
 //import example.demo.domain.chat.Chat;
-//import example.demo.domain.chat.dto.ChatDto;
+//import example.demo.domain.chat.dto.request.ChatDto;
 //import example.demo.domain.chat.repository.ChatRepository;
 //import example.demo.domain.member.Member;
 //import example.demo.domain.member.MemberStatus;
