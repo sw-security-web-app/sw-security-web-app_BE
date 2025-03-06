@@ -145,7 +145,7 @@ public class AuthServiceImpl implements AuthService {
             throw new RestApiException(AuthErrorCode.INVALID_EMAIL_OR_PASSWORD);
         }
 
-        findMember.setPassword(newPassword);
+        findMember.changePassword(newPassword);
         memberRepository.save(findMember);
     }
 

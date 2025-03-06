@@ -92,7 +92,7 @@ public class MemberServiceImpl implements MemberService {
                 throw new RestApiException(MemberErrorCode.INVALID_MEMBER_STATUS);
         }
         //비밀번호 암호화
-        newMember.setPassword(passwordEncoder.encode(newMember.getPassword()));
+        newMember.changePassword(passwordEncoder.encode(newMember.getPassword()));
         memberRepository.save(newMember);
     }
   

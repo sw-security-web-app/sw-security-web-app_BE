@@ -79,8 +79,8 @@ public class Member extends BaseEntity {
         this.company=company;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void changePassword(String newPassword) {
+        this.password = newPassword;
     }
     public void setMemberId(Long memberId){this.memberId=memberId;}
 
