@@ -50,13 +50,8 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 
     @Override
     public List<ChatRoomGetResponseDto> getChatRoomList(Long memberId, AIModelType aiModelType) {
-        List<ChatRoomRequestDto> chatRoomList = chatRoomRepository.findByMemberIdAndAiModelType(memberId, aiModelType);
-        if (chatRoomList.isEmpty()) {
-            return Collections.emptyList();
-        }
-        return chatRoomList.stream()
-                .map(chatRoom -> new ChatRoomGetResponseDto(chatRoom.getChatRoomId()))
-                .collect(Collectors.toList());
+        List<ChatRoomGetResponseDto> chatRoomList = chatRoomRepository.findByMemberIdAndAiModelType(memberId, aiModelType);
+        return chatRoomList;
     }
 
     @Override
@@ -69,9 +64,9 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     }
 
     private void limitChatRoomCount(Long memberId) {
-        List<ChatRoomRequestDto> chatRoomList = chatRoomRepository.findByMemberOrderByCreatedAtAsc(memberId);
+        List<ChatRoomGetResponseDto> chatRoomList = chatRoomRepository.findByMemberOrderByCreatedAtAsc(memberId);
         if (chatRoomList.size() > MAX_CHAT_ROOM_COUNT) {
-            ChatRoomRequestDto result = chatRoomList.get(0);
+            ChatRoomGetResponseDto result = chatRoomList.get(0);
             deleteChatRoomAndChatList(result.getChatRoomId());
         }
     }

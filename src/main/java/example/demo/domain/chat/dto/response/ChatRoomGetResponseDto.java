@@ -1,13 +1,26 @@
 package example.demo.domain.chat.dto.response;
 
-import lombok.AllArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.querydsl.core.annotations.QueryProjection;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
 public class ChatRoomGetResponseDto {
 
     private Long chatRoomId;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    private LocalDateTime createdAt;
+
+    @Builder
+    @QueryProjection
+    public ChatRoomGetResponseDto(Long chatRoomId, LocalDateTime createdAt) {
+        this.chatRoomId = chatRoomId;
+        this.createdAt = createdAt;
+    }
 }
