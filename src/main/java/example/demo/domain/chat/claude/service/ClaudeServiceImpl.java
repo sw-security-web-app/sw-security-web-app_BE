@@ -11,7 +11,7 @@ import example.demo.domain.chat.repository.ChatRoomRepository;
 import example.demo.domain.chat.service.ChatService;
 import example.demo.error.CommonErrorCode;
 import example.demo.error.RestApiException;
-import example.demo.util.PythonServerUtil;
+import example.demo.verification.util.PythonServerUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;

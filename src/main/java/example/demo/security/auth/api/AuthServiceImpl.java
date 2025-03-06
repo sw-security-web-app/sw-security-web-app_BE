@@ -19,6 +19,7 @@ import example.demo.security.util.JwtUtil;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AuthServiceImpl implements AuthService {
     private final JwtUtil jwtUtil;
     private final MemberRepository memberRepository;
@@ -79,6 +81,7 @@ public class AuthServiceImpl implements AuthService {
 
         //기존 가지고 있는 사용자 refresh Token제거
         return AccessTokenResponseDto.builder()
+                .userName(findMember.getUserName())
                 .accessToken(accessToken)
                 .message("토큰 반환 성공")
                 .code(200)
@@ -126,7 +129,9 @@ public class AuthServiceImpl implements AuthService {
                 .builder()
                 .code(200)
                 .accessToken(newAccessToken)
+                .userName(member.getUserName())
                 .message("엑세스 토큰 재발행 성공")
+                .userName(member.getUserName())
                 .build();
     }
 
@@ -161,9 +166,11 @@ public class AuthServiceImpl implements AuthService {
     public void changePassword(String token, ChangePasswordRequestDto requestDto) {
         Member findMember = memberRepository.findById(jwtUtil.getMemberId(token))
                 .orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
+        log.info(requestDto.toString());
         /*
          *유저 아이디와 비밀번호 일치 체크
          */
+
         String newPassword = encoder.encode(requestDto.getNewPassword());
         if (!findMember.getEmail().equals(requestDto.getEmail()) ||
                 !encoder.matches(requestDto.getPassword(), findMember.getPassword())
