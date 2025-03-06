@@ -7,6 +7,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +30,10 @@ public class Company extends BaseEntity {
     @Column(name = "invitaion_code")
     private String invitationCode;
 
+    //AI 생성 유무
+    @Column(name = "check_create",columnDefinition = "boolean default false")
+    private Boolean checkCreate;
+
     //Member랑 양방향
     @OneToMany(mappedBy = "company",cascade = CascadeType.ALL,orphanRemoval = true)
     private List<Member> members=new ArrayList<>();
@@ -39,12 +44,17 @@ public class Company extends BaseEntity {
         this.companyName = companyName;
         this.companyDept = companyDept;
         this.invitationCode = invitationCode;
+        this.checkCreate=false;
     }
     public void addMember(Member member){
         members.add(member);
     }
     public void setCompanyId(Long companyId){
         this.companyId=companyId;
+    }
+
+    public void changeCheckCreate(){
+        this.checkCreate=true;
     }
 
 }

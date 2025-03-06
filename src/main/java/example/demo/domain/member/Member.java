@@ -1,6 +1,7 @@
 package example.demo.domain.member;
 
 import example.demo.domain.BaseEntity;
+import example.demo.domain.chat.ChatRoom;
 import example.demo.domain.company.Company;
 import example.demo.domain.member.dto.request.MemberRequestDto;
 import jakarta.persistence.*;
@@ -8,6 +9,9 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -37,13 +41,12 @@ public class Member extends BaseEntity {
     private String companyPosition;
 
     //계정 잠금 여부
-    @Column(name = "account_locked")
+    @Column(name = "account_locked",columnDefinition = "BOOLEAN DEFAULT false")
     private boolean accountLocked;
     //Company랑 양방향
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company_id")
     private Company company;
-
     public Member(String email, String userName, String password, MemberStatus memberStatus, String phoneNumber, String companyPosition,Company company) {
         this.email = email;
         this.userName = userName;
@@ -83,4 +86,11 @@ public class Member extends BaseEntity {
         this.password = password;
     }
     public void setMemberId(Long memberId){this.memberId=memberId;}
+
+
+    //멤버의 Lock여부 변경
+    public void changeMemberLock(boolean type){
+        this.accountLocked=type;
+    }
+
 }

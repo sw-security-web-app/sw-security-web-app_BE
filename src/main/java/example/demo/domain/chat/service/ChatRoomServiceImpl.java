@@ -1,12 +1,15 @@
 package example.demo.domain.chat.service;
 
-import example.demo.domain.chat.Chat;
+
+import example.demo.domain.chat.dto.response.ChatRoomRecentResponseDto;
+
+import example.demo.domain.chat.dto.request.ChatRoomRequestDto;
+import example.demo.domain.chat.dto.response.ChatRoomGetResponseDto;
+import example.demo.domain.chat.dto.response.ChatRoomRecentResponseDto;
+
+import example.demo.domain.chat.dto.response.ChatRoomResponseDto;
+import example.demo.domain.chat.AIModelType;
 import example.demo.domain.chat.ChatRoom;
-import example.demo.domain.chat.dto.ChatDto;
-import example.demo.domain.chat.dto.ChatRoomRecentResponseDto;
-import example.demo.domain.chat.dto.ChatRoomRequestDto;
-import example.demo.domain.chat.dto.ChatRoomResponseDto;
-import example.demo.domain.chat.repository.ChatRepository;
 import example.demo.domain.chat.repository.ChatRoomRepository;
 import example.demo.domain.member.Member;
 import example.demo.domain.member.MemberErrorCode;
@@ -26,7 +29,6 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 
     private final ChatRoomRepository chatRoomRepository;
     private final MemberRepository memberRepository;
-    private static final int MAX_CHAT_ROOM_COUNT = 7;
 
     @Transactional
     @Override
@@ -38,32 +40,23 @@ public class ChatRoomServiceImpl implements ChatRoomService {
                 .member(member)
                 .build();
 
-        chatRoomRepository.save(chatRoom);
-        limitChatRoomCount(memberId);
-
+        chatRoom=chatRoomRepository.save(chatRoom);
         return new ChatRoomResponseDto(chatRoom.getChatRoomId());
     }
 
     @Override
-    public List<ChatRoomRecentResponseDto> getLatestChatRoom(Long memberId) {
-        List<ChatRoomRecentResponseDto> latestChatRoom = chatRoomRepository.findLatestChatRoomWithLatestAnswer(memberId);
+    public List<ChatRoomGetResponseDto> getChatRoomList(Long memberId, AIModelType aiModelType) {
+        List<ChatRoomGetResponseDto> chatRoomList = chatRoomRepository.findByMemberIdAndAiModelType(memberId, aiModelType);
+        return chatRoomList;
+    }
+
+    @Override
+    public List<ChatRoomRecentResponseDto> getLatestChatRoom(Long memberId, AIModelType aiModelType) {
+        List<ChatRoomRecentResponseDto> latestChatRoom = chatRoomRepository.findLatestChatRoomWithLatestAnswer(memberId, aiModelType);
         if (latestChatRoom.isEmpty()) {
             return Collections.emptyList();
         }
         return latestChatRoom;
     }
 
-    private void limitChatRoomCount(Long memberId) {
-        List<ChatRoomRequestDto> chatRoomList = chatRoomRepository.findByMemberOrderByCreatedAtAsc(memberId);
-        if (chatRoomList.size() > MAX_CHAT_ROOM_COUNT) {
-            ChatRoomRequestDto result = chatRoomList.get(0);
-            deleteChatRoomAndChatList(result.getChatRoomId());
-        }
-    }
-
-    private void deleteChatRoomAndChatList(Long chatRoomId) {
-        ChatRoom result = chatRoomRepository.findById(chatRoomId)
-                .orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
-        chatRoomRepository.delete(result);
-    }
 }

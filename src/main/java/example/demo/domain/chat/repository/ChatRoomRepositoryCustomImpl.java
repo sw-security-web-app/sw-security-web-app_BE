@@ -2,14 +2,21 @@ package example.demo.domain.chat.repository;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import example.demo.domain.chat.AIModelType;
 import example.demo.domain.chat.ChatRoom;
 import example.demo.domain.chat.QChatRoom;
-import example.demo.domain.chat.dto.*;
+import example.demo.domain.chat.dto.request.ChatRoomRequestDto;
+import example.demo.domain.chat.dto.request.QChatRoomRequestDto;
+import example.demo.domain.chat.dto.response.ChatRoomGetResponseDto;
+import example.demo.domain.chat.dto.response.ChatRoomRecentResponseDto;
+
+import example.demo.domain.chat.dto.response.QChatRoomGetResponseDto;
+import example.demo.domain.chat.dto.response.QChatRoomRecentResponseDto;
 import jakarta.persistence.EntityManager;
 
 import java.util.List;
-import java.util.stream.Collectors;
-import static com.querydsl.jpa.JPAExpressions.*;
+
+import static com.querydsl.jpa.JPAExpressions.select;
 import static example.demo.domain.chat.QChat.chat;
 import static example.demo.domain.chat.QChatRoom.*;
 
@@ -22,23 +29,42 @@ public class ChatRoomRepositoryCustomImpl implements ChatRoomRepositoryCustom {
     }
 
     @Override
-    public List<ChatRoomRecentResponseDto> findLatestChatRoomWithLatestAnswer(Long memberId) {
-        List<Long> latestChatRoomIds = getLatestChatRoomIds(memberId);
-
-        return latestChatRoomIds.stream()
-                .map(this::getChatRoomRecentResponseDto)
-                .collect(Collectors.toList());
+    public List<ChatRoomRecentResponseDto> findLatestChatRoomWithLatestAnswer(Long memberId, AIModelType aiModelType) {
+        return queryFactory
+                .select(new QChatRoomRecentResponseDto(
+                        chat.chatRoom.chatRoomId,
+                        chat.answer,
+                        chat.createdAt
+                ))
+                .from(chat)
+                .where(memberIdEq(memberId), aiModelTypeEq(aiModelType), chat.chatId.in(
+                        select(chat.chatId.max())
+                                .from(chat)
+                                .where(memberIdEq(memberId), aiModelTypeEq(aiModelType))
+                                .groupBy(chat.chatRoom.chatRoomId)
+                ))
+                .orderBy(chat.createdAt.desc())
+                .limit(4)
+                .fetch();
     }
 
     @Override
-    public List<ChatRoomRequestDto> findByMemberOrderByCreatedAtAsc(Long memberId) {
+    public List<ChatRoomGetResponseDto> findByMemberIdAndAiModelType(Long memberId, AIModelType aiModelType) {
         return queryFactory
-                .select(new QChatRoomRequestDto(chatRoom.chatRoomId,
-                        chatRoom.createdAt)
-                )
+                .select(new QChatRoomGetResponseDto(
+                        chatRoom.chatRoomId,
+                        chat.question,
+                        chatRoom.createdAt
+                ))
                 .from(chatRoom)
-                .where(memberIdEq(memberId))
-                .orderBy(chatRoom.createdAt.asc())
+                .leftJoin(chat).on(chat.chatRoom.chatRoomId.eq(chatRoom.chatRoomId))
+                .where(memberIdEq(memberId), aiModelTypeEq(aiModelType), chat.chatId.in(
+                        select(chat.chatId.max())
+                                .from(chat)
+                                .where(memberIdEq(memberId), aiModelTypeEq(aiModelType))
+                                .groupBy(chat.chatRoom.chatRoomId)
+                ))
+                .orderBy(chatRoom.createdAt.desc())
                 .fetch();
     }
 
@@ -46,32 +72,8 @@ public class ChatRoomRepositoryCustomImpl implements ChatRoomRepositoryCustom {
         return memberId != null ? chatRoom.member.memberId.eq(memberId) : null;
     }
 
-    private static BooleanExpression chatRoomIdEq(Long chatRoomId) {
-        return chatRoomId != null ? chat.chatRoom.chatRoomId.eq(chatRoomId) : null;
+    private BooleanExpression aiModelTypeEq(AIModelType aiModelType) {
+        return aiModelType != null ? chat.modelType.eq(aiModelType) : null;
     }
 
-    private List<Long> getLatestChatRoomIds(Long memberId) {
-        return queryFactory
-                .select(chatRoom.chatRoomId)
-                .from(chatRoom)
-                .where(memberIdEq(memberId))
-                .orderBy(chatRoom.createdAt.desc())
-                .limit(4)
-                .fetch();
-    }
-
-    private ChatRoomRecentResponseDto getChatRoomRecentResponseDto(Long chatRoomId) {
-        String latestAnswer = getLatestAnswer(chatRoomId);
-        return new ChatRoomRecentResponseDto(chatRoomId, latestAnswer);
-    }
-
-    private String getLatestAnswer(Long chatRoomId) {
-        return queryFactory
-                .select(chat.answer)
-                .from(chat)
-                .where(chatRoomIdEq(chatRoomId))
-                .orderBy(chat.createdAt.desc())
-                .limit(1)
-                .fetchOne();
-    }
 }
