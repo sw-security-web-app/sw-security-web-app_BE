@@ -42,9 +42,9 @@ public class ChatRoomRepositoryCustomImpl implements ChatRoomRepositoryCustom {
     }
 
     @Override
-    public List<ChatRoomRequestDto> findByMemberOrderByCreatedAtAsc(Long memberId) {
+    public List<ChatRoomGetResponseDto> findByMemberOrderByCreatedAtAsc(Long memberId) {
         return queryFactory
-                .select(new QChatRoomRequestDto(chatRoom.chatRoomId,
+                .select(new QChatRoomGetResponseDto(chatRoom.chatRoomId,
                         chatRoom.createdAt)
                 )
                 .from(chatRoom)
@@ -54,9 +54,9 @@ public class ChatRoomRepositoryCustomImpl implements ChatRoomRepositoryCustom {
     }
 
     @Override
-    public List<ChatRoomRequestDto> findByMemberIdAndAiModelType(Long memberId, AIModelType aiModelType) {
+    public List<ChatRoomGetResponseDto> findByMemberIdAndAiModelType(Long memberId, AIModelType aiModelType) {
         return queryFactory
-                .select(new QChatRoomRequestDto(chatRoom.chatRoomId, chatRoom.createdAt))
+                .select(new QChatRoomGetResponseDto(chatRoom.chatRoomId, chatRoom.createdAt))
                 .from(chatRoom)
                 .leftJoin(chat).on(chat.chatRoom.chatRoomId.eq(chatRoom.chatRoomId))
                 .where(memberIdEq(memberId), aiModelTypeEq(aiModelType))
