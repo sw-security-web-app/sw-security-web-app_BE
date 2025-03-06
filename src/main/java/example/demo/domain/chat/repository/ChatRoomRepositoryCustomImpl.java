@@ -49,25 +49,21 @@ public class ChatRoomRepositoryCustomImpl implements ChatRoomRepositoryCustom {
     }
 
     @Override
-    public List<ChatRoomGetResponseDto> findByMemberOrderByCreatedAtAsc(Long memberId) {
-        return queryFactory
-                .select(new QChatRoomGetResponseDto(chatRoom.chatRoomId,
-                        chatRoom.createdAt)
-                )
-                .from(chatRoom)
-                .where(memberIdEq(memberId))
-                .orderBy(chatRoom.createdAt.asc())
-                .fetch();
-    }
-
-    @Override
     public List<ChatRoomGetResponseDto> findByMemberIdAndAiModelType(Long memberId, AIModelType aiModelType) {
         return queryFactory
-                .select(new QChatRoomGetResponseDto(chatRoom.chatRoomId, chatRoom.createdAt))
+                .select(new QChatRoomGetResponseDto(
+                        chatRoom.chatRoomId,
+                        chat.question,
+                        chatRoom.createdAt
+                ))
                 .from(chatRoom)
                 .leftJoin(chat).on(chat.chatRoom.chatRoomId.eq(chatRoom.chatRoomId))
-                .where(memberIdEq(memberId), aiModelTypeEq(aiModelType))
-                .groupBy(chatRoom.chatRoomId)
+                .where(memberIdEq(memberId), aiModelTypeEq(aiModelType), chat.chatId.in(
+                        select(chat.chatId.max())
+                                .from(chat)
+                                .where(memberIdEq(memberId), aiModelTypeEq(aiModelType))
+                                .groupBy(chat.chatRoom.chatRoomId)
+                ))
                 .orderBy(chatRoom.createdAt.desc())
                 .fetch();
     }
@@ -78,10 +74,6 @@ public class ChatRoomRepositoryCustomImpl implements ChatRoomRepositoryCustom {
 
     private BooleanExpression aiModelTypeEq(AIModelType aiModelType) {
         return aiModelType != null ? chat.modelType.eq(aiModelType) : null;
-    }
-
-    private static BooleanExpression chatRoomIdEq(Long chatRoomId) {
-        return chatRoomId != null ? chat.chatRoom.chatRoomId.eq(chatRoomId) : null;
     }
 
 }

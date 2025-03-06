@@ -14,13 +14,16 @@ public class ChatRoomGetResponseDto {
 
     private Long chatRoomId;
 
+    private String previewQuestion;
+
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDateTime createdAt;
 
     @Builder
     @QueryProjection
-    public ChatRoomGetResponseDto(Long chatRoomId, LocalDateTime createdAt) {
+    public ChatRoomGetResponseDto(Long chatRoomId, String previewQuestion, LocalDateTime createdAt) {
         this.chatRoomId = chatRoomId;
+        this.previewQuestion = previewQuestion;
         this.createdAt = createdAt;
     }
 }
