@@ -38,6 +38,25 @@ public class AuthApiController {
         return ResponseEntity.ok(accessTokenResponseDto);
     }
 
+
+    @DeleteMapping("secession")
+    public ResponseEntity<?> deleteMember(@RequestHeader("Authorization")String token){
+        authService.secessionMember(token);
+        return ResponseEntity.ok("탈퇴가 완료되었습니다.");
+    }
+
+    @PutMapping("locked")
+    public ResponseEntity<?> lockingCompanyEmployee(@RequestHeader("Authorization")String token,
+                                                    @RequestParam("memberId")Long memberId,
+                                                    @RequestParam("type")String type){
+        authService.locking(token,memberId,type);
+        if (type.equals("true")){
+            return ResponseEntity.ok("해당 회원의 계정을 잠금 처리했습니다.");
+        }else {
+            return ResponseEntity.ok("해당 회원의 계정을 잠금 해제 처리했습니다.");
+        }
+    }
+
     @PutMapping("change-password")
     public ResponseEntity<?> changePassword(@Validated(ValidationSequence.class) @RequestBody ChangePasswordRequestDto requestDto,
                                             @RequestHeader("Authorization")String token){
