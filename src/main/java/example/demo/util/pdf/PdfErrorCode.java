@@ -1,4 +1,4 @@
-package example.demo.domain.chatting.api;
+package example.demo.util.pdf;
 
 import example.demo.error.ErrorCode;
 import lombok.Getter;

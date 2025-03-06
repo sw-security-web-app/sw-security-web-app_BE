@@ -16,7 +16,7 @@ import example.demo.domain.chat.gpt.dto.ChatRequestMsgDto;
 import example.demo.domain.chat.repository.ChatRoomRepository;
 import example.demo.domain.chat.service.ChatService;
 import example.demo.error.RestApiException;
-import example.demo.util.PythonServerUtil;
+import example.demo.verification.util.PythonServerUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;

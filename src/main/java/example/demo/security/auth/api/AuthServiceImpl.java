@@ -3,7 +3,9 @@ package example.demo.security.auth.api;
 import example.demo.common.ResponseDto;
 import example.demo.domain.member.Member;
 import example.demo.domain.member.MemberErrorCode;
+import example.demo.domain.member.MemberStatus;
 import example.demo.domain.member.repository.MemberRepository;
+import example.demo.error.CommonErrorCode;
 import example.demo.error.RestApiException;
 import example.demo.security.auth.AuthErrorCode;
 import example.demo.security.auth.dto.AccessTokenResponseDto;
@@ -17,6 +19,7 @@ import example.demo.security.util.JwtUtil;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -24,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AuthServiceImpl implements AuthService {
     private final JwtUtil jwtUtil;
     private final MemberRepository memberRepository;
@@ -38,6 +42,11 @@ public class AuthServiceImpl implements AuthService {
         Member findMember = memberRepository.findByEmail(email).orElseThrow(
                 () -> new RestApiException(AuthErrorCode.INVALID_EMAIL_OR_PASSWORD)
         );
+
+        //계정 잠금 여부 확인
+        if(findMember.isAccountLocked()){
+            throw new RestApiException(AuthErrorCode.IS_LOCKED);
+        }
 
         customAuthenticationFailureHandler.filteringLoginAttempts(email);
 
@@ -127,14 +136,42 @@ public class AuthServiceImpl implements AuthService {
                 .build();
     }
 
+
+    @Override
+    public void secessionMember(String token) {
+        Long memberId=jwtUtil.getMemberId(token);
+        Member findMember=memberRepository.findById(memberId)
+                .orElseThrow(()->new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
+        memberRepository.delete(findMember);
+    }
+
+    @Override
+    public void locking(String token, Long memberId,String type) {
+        //Lock 요청을 보낸 유저
+        Long requestMemberId=jwtUtil.getMemberId(token);
+        Member requestMember=memberRepository.findById(requestMemberId)
+                .orElseThrow(()->new RestApiException(AuthErrorCode.NOT_EXIST_MEMBER));
+
+        //Lock이 되는 유저
+        Member lockedMember=memberRepository.findById(memberId)
+                .orElseThrow(()->new RestApiException(AuthErrorCode.NOT_EXIST_MEMBER));
+
+        validation(requestMember, lockedMember,type);
+
+        lockedMember.changeMemberLock(Boolean.parseBoolean(type));
+        memberRepository.save(lockedMember);
+    }
+
     @Transactional
     @Override
     public void changePassword(String token, ChangePasswordRequestDto requestDto) {
         Member findMember = memberRepository.findById(jwtUtil.getMemberId(token))
                 .orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
+        log.info(requestDto.toString());
         /*
          *유저 아이디와 비밀번호 일치 체크
          */
+
         String newPassword = encoder.encode(requestDto.getNewPassword());
         if (!findMember.getEmail().equals(requestDto.getEmail()) ||
                 !encoder.matches(requestDto.getPassword(), findMember.getPassword())
@@ -144,6 +181,7 @@ public class AuthServiceImpl implements AuthService {
 
         findMember.setPassword(newPassword);
         memberRepository.save(findMember);
+
     }
 
     private static void setRefreshToken(String refreshToken, HttpServletResponse response) {
@@ -158,6 +196,45 @@ public class AuthServiceImpl implements AuthService {
         if (Boolean.FALSE.equals(jwtUtil.validateToken(refreshToken))) {
             throw new RestApiException(SecurityErrorCode.INVALID_TOKEN);
 
+        }
+    }
+      //예외 처리 메서드
+    private static void validation(Member requestMember, Member lockedMember,String type) {
+        MemberStatus lockedMemberStatus=lockedMember.getMemberStatus();
+        MemberStatus requestMemberStatus=requestMember.getMemberStatus();
+
+        //Lock 당하는 유저가 일반인 인가
+        boolean isGeneralMember=lockedMemberStatus.equals(MemberStatus.GENERAL);
+        if(isGeneralMember){
+            throw new RestApiException(AuthErrorCode.NO_AUTHORITIES);
+        }
+        //같은 회사 인가
+        boolean isSameCompany= requestMember.getCompany().getCompanyId().equals(lockedMember.getCompany().getCompanyId());
+        if (!isSameCompany){
+            throw new RestApiException(AuthErrorCode.NO_AUTHORITIES);
+        }
+        //Lock당하는 유저가 Manager가 아닌가
+        boolean isNotManager= lockedMemberStatus.equals(MemberStatus.MANAGER);
+        if (isNotManager){
+            throw new RestApiException(AuthErrorCode.CAN_NOT_LOCKED_MANAGER);
+        }
+        //Lock 요청을 보낸 유저가 MANAGER인가
+        boolean isManagerOfCompany= requestMemberStatus.equals(MemberStatus.MANAGER);
+        if (!isManagerOfCompany){
+            throw new RestApiException(AuthErrorCode.NO_AUTHORITIES);
+        }
+        //올바른 타입값인가
+        boolean isValidationTypeValue= type.equals("true") || type.equals("false");
+        if(!isValidationTypeValue){
+            throw new RestApiException(AuthErrorCode.INVALID_TYPE_VALUE);
+        }
+       //계정이 잠겨져 있는 상태에서 잠김 요청을 보냈는가
+        if (type.equals("true") && lockedMember.isAccountLocked()){
+            throw new RestApiException(AuthErrorCode.IS_LOCKED);
+        }
+        //계정이 잠겨있지 않은 상태에서 잠김 풀림 요청을 보냈는가
+        if(type.equals("false") && !lockedMember.isAccountLocked()){
+            throw new RestApiException(AuthErrorCode.IS_NOT_LOCKED);
         }
     }
 }

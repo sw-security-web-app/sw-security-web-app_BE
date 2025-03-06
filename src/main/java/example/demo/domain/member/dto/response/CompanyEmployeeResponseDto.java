@@ -9,12 +9,14 @@ public class CompanyEmployeeResponseDto {
     private String companyPosition;
     private String name;
     private String email;
+    private Long memberId;
 
     @QueryProjection
     @Builder
-    public CompanyEmployeeResponseDto(String companyPosition, String name, String email) {
+    public CompanyEmployeeResponseDto(String companyPosition, String name, String email,Long memberId) {
         this.companyPosition = companyPosition;
         this.name = name;
         this.email = email;
+        this.memberId=memberId;
     }
 }

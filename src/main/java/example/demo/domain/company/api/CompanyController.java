@@ -24,5 +24,4 @@ public class CompanyController {
         CompanyResponseDto companyInfo = companyService.getCompanyInfo(token);
         return ResponseEntity.ok(companyInfo);
     }
-
 }

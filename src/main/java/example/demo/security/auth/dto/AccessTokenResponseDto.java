@@ -13,4 +13,5 @@ public class AccessTokenResponseDto {
     private Integer code;
     private String userName;
     private MemberStatus role;
+
 }

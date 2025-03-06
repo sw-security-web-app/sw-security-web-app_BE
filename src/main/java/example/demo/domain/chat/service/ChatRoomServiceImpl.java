@@ -1,5 +1,8 @@
 package example.demo.domain.chat.service;
 
+
+import example.demo.domain.chat.dto.response.ChatRoomRecentResponseDto;
+
 import example.demo.domain.chat.dto.request.ChatRoomRequestDto;
 import example.demo.domain.chat.dto.response.ChatRoomGetResponseDto;
 import example.demo.domain.chat.dto.response.ChatRoomRecentResponseDto;

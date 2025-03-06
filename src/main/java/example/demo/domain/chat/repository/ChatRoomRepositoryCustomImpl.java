@@ -43,7 +43,8 @@ public class ChatRoomRepositoryCustomImpl implements ChatRoomRepositoryCustom {
                         )
                 )
                 .from(chatRoom)
-                .leftJoin(chat.chatRoom,chatRoom)
+                .leftJoin(chat)
+                .on(chat.chatRoom.eq(chatRoom))
                 .where(memberIdEq(memberId))
                 .orderBy(chatRoom.createdAt.asc())
                 .fetch();
