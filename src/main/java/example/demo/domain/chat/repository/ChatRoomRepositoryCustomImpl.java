@@ -5,6 +5,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import example.demo.domain.chat.ChatRoom;
 import example.demo.domain.chat.QChatRoom;
 import example.demo.domain.chat.dto.*;
+import example.demo.domain.chat.dto.request.QChatRoomRequestDto;
 import jakarta.persistence.EntityManager;
 
 import java.util.List;
@@ -32,11 +33,15 @@ public class ChatRoomRepositoryCustomImpl implements ChatRoomRepositoryCustom {
 
     @Override
     public List<ChatRoomRequestDto> findByMemberOrderByCreatedAtAsc(Long memberId) {
-        return queryFactory
-                .select(new QChatRoomRequestDto(chatRoom.chatRoomId,
-                        chatRoom.createdAt)
+        return  queryFactory
+                .select(new QChatRoomRequestDto(
+                        chatRoom.chatRoomId,
+                        chatRoom.createdAt,
+                        chat.question
+                        )
                 )
                 .from(chatRoom)
+                .leftJoin(chat.chatRoom,chatRoom)
                 .where(memberIdEq(memberId))
                 .orderBy(chatRoom.createdAt.asc())
                 .fetch();
