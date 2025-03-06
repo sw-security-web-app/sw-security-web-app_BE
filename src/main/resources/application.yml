@@ -2,7 +2,7 @@ spring:
   config:
     import: application-secret.yml
   profiles:
-    default: local
+    active: secret
 
   datasource:
     url: jdbc:log4jdbc:mysql://localhost:3306/securityInfoWeb

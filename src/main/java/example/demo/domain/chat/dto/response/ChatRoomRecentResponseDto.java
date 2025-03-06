@@ -1,4 +1,4 @@
-package example.demo.domain.chat.dto;
+package example.demo.domain.chat.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.querydsl.core.annotations.QueryProjection;

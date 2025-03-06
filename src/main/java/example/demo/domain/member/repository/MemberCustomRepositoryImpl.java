@@ -6,6 +6,8 @@ import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import example.demo.domain.member.Member;
+import example.demo.domain.member.MemberStatus;
+import example.demo.domain.member.QMember;
 import example.demo.domain.member.dto.response.CompanyEmployeeResponseDto;
 import example.demo.domain.member.dto.response.QCompanyEmployeeResponseDto;
 import example.demo.util.QueryDslUtil;
@@ -58,7 +60,7 @@ public class MemberCustomRepositoryImpl implements MemberCustomRepository {
     }
 
     @Override
-    public Page<CompanyEmployeeResponseDto> getCompanyEmployeeInfo(Long companyId, Pageable pageable) {
+    public Page<CompanyEmployeeResponseDto> getCompanyEmployeeInfo(Long companyId, Pageable pageable, String search) {
         //정렬 추가
         List<OrderSpecifier<?>> orderSpecifiers = QueryDslUtil.getOrderSpecifiers(pageable);
 
@@ -68,11 +70,12 @@ public class MemberCustomRepositoryImpl implements MemberCustomRepository {
                 .select(new QCompanyEmployeeResponseDto(
                         member.companyPosition,
                         member.userName,
-                        member.email
+                        member.email,
+                        member.memberId
                 ))
                 .from(member)
                 .leftJoin(member.company, company)
-                .where(allCompanyIdEq(company.companyId, companyId))
+                .where(allCompanyIdEq(company.companyId, companyId,search))
                 .orderBy(orderSpecifiers.toArray(new OrderSpecifier[0]))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -82,26 +85,9 @@ public class MemberCustomRepositoryImpl implements MemberCustomRepository {
                 .select(member.count())
                 .from(member)
                 .leftJoin(member.company, company)
-                .where(allCompanyIdEq(company.companyId, companyId));
+                .where(allCompanyIdEq(company.companyId, companyId,search));
 
         return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
-    }
-
-    private BooleanExpression companyIdEq(Long companyId) {
-        return companyId == null ? null : company.companyId.eq(companyId);
-    }
-
-    private BooleanExpression companyIdOfMemberEq(NumberPath<Long> companyId) {
-        return companyId == null ? null : member.company.companyId.eq(companyId);
-    }
-
-    private BooleanExpression allCompanyIdEq(NumberPath<Long> companyOfCompanyId, Long inputCompanyId) {
-        BooleanExpression companyCondition = companyIdEq(inputCompanyId);
-        BooleanExpression memberCondition = companyIdOfMemberEq(companyOfCompanyId);
-
-        if (companyCondition == null) return memberCondition;
-        if (memberCondition == null) return companyCondition;
-        return companyCondition.and(memberCondition);
     }
 
     public MemberInfoResponseDto getMemberInfo(Long memberId) {
@@ -113,11 +99,56 @@ public class MemberCustomRepositoryImpl implements MemberCustomRepository {
                         member.company.companyDept,
                         member.companyPosition,
                         member.memberStatus
-                        ))
+                ))
                 .from(member)
                 .leftJoin(member.company, company)
                 .where(member.memberId.eq(memberId))
                 .fetchOne();
 
     }
+
+    @Override
+    public Optional<Member> findMemberByNameAndPhoneNumber(String name, String phoneNumber) {
+        return Optional.ofNullable(queryFactory
+                .selectFrom(member)
+                .where(phoneNumberEq(phoneNumber).and(memberNameEq(name)))
+                .fetchOne());
+    }
+
+    private BooleanExpression companyIdEq(Long companyId) {
+        return companyId == null ? null : company.companyId.eq(companyId);
+    }
+
+    private BooleanExpression companyIdOfMemberEq(NumberPath<Long> companyId) {
+        return companyId == null ? null : member.company.companyId.eq(companyId);
+    }
+
+    private BooleanExpression allCompanyIdEq(NumberPath<Long> companyOfCompanyId, Long inputCompanyId, String memberName) {
+        BooleanExpression companyCondition = companyIdEq(inputCompanyId);
+        BooleanExpression memberCondition = companyIdOfMemberEq(companyOfCompanyId);
+        BooleanExpression memberNameCondition = memberNameLike(memberName);
+
+
+        if (companyCondition == null) return memberCondition;
+        if (memberCondition == null) return companyCondition;
+        if(memberNameCondition == null) return companyCondition.and(memberCondition);
+
+        //이름값이 있는 경우 이름도 같이 검색 조건 추가
+        return companyCondition.and(memberCondition).and(memberNameCondition);
+    }
+
+    private BooleanExpression phoneNumberEq(String phoneNumber) {
+        return phoneNumber == null ? null : member.phoneNumber.eq(phoneNumber);
+    }
+
+    private BooleanExpression memberNameEq(String name) {
+        return name == null ? null : member.userName.eq(name);
+    }
+
+    private BooleanExpression memberNameLike(String name){
+        return name==null ? null : member.userName.contains(name);
+    }
+
+
+
 }

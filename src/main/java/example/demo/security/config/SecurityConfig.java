@@ -1,5 +1,6 @@
 package example.demo.security.config;
 
+import example.demo.data.RedisCustomService;
 import example.demo.domain.member.MemberStatus;
 import example.demo.security.auth.CustomMemberDetailService;
 import example.demo.security.util.JwtAuthFilter;
@@ -7,6 +8,7 @@ import example.demo.security.util.JwtUtil;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -28,46 +30,45 @@ import java.util.List;
 @AllArgsConstructor
 public class SecurityConfig {
     private final CustomMemberDetailService customMemberDetailService;
-    private final JwtUtil jwtUtil;
     private final CustomAccessDeniedHandler accessDeniedHandler;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
-
+    private final JwtUtil jwtUtil;
     private static final String[] AUTH_WHITELIST={
             "/api/login","/swagger-ui/**","/api-docs", "/swagger-ui-custom.html",
             "/v3/api-docs/**", "/api-docs/**", "/swagger-ui.html","/api/signup","/api/mail-send",
             "/api/mail-check","/api/send-password","/api/sms-certification/send","/api/sms-certification/confirm",
-            "/api/find-email","/api/**"
+            "/api/find-email","/api/**", "/health-check"
     };
   /*
   TODO:White List /api/** 삭제
    */
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         //CSRF,CORS
         http.csrf(AbstractHttpConfigurer::disable);
         http.cors(cors -> cors.configurationSource(corsConfigurationSource()));
         //세션 관리 상태 없음 구성,
-        http.sessionManagement(sessionManagement->sessionManagement.sessionCreationPolicy(
+        http.sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(
                 SessionCreationPolicy.STATELESS
         ));
 
         //FormLogin,BasicHttp 비활성화
-        http.formLogin((form)->form.disable());
+        http.formLogin((form) -> form.disable());
         http.httpBasic(AbstractHttpConfigurer::disable);
 
         //JWT Filter를 UsernamePasswordAuthenticationFilter 앞에 추가
-        http.addFilterBefore(new JwtAuthFilter(customMemberDetailService,jwtUtil), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(new JwtAuthFilter(customMemberDetailService, jwtUtil), UsernamePasswordAuthenticationFilter.class);
 
-        http.exceptionHandling((exceptionHandling)->exceptionHandling
+        http.exceptionHandling((exceptionHandling) -> exceptionHandling
                 .authenticationEntryPoint(customAuthenticationEntryPoint)
                 .accessDeniedHandler(accessDeniedHandler));
 
         //권한 규칙 생성
-        http.authorizeHttpRequests(authorize->authorize
+        http.authorizeHttpRequests(authorize -> authorize
                 .requestMatchers(AUTH_WHITELIST).permitAll()
                 //@PreAuthorization을 사용
                 //회사 관리자만 직원 삭제 가능
-                .requestMatchers(HttpMethod.DELETE,"/user").hasRole(MemberStatus.MANAGER.getText())
+                .requestMatchers(HttpMethod.DELETE, "/user").hasRole(MemberStatus.MANAGER.getText())
                 .anyRequest().authenticated());
 
         return http.build();
@@ -77,7 +78,8 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource(){
         CorsConfiguration corsConfiguration=new CorsConfiguration();
-        corsConfiguration.setAllowedOriginPatterns(Arrays.asList("http://localhost:*","http://172.20.10.2:5173", "http://192.168.189.133:*"));
+        corsConfiguration.setAllowedOriginPatterns(Arrays.asList("http://localhost:*","http://172.20.10.2:5173", "http://192.168.189.133:*",
+                "http://172.30.1.36:*"));
         corsConfiguration.setAllowedMethods(Arrays.asList("GET","POST","DELETE","OPTIONS","PUT"));
         corsConfiguration.setAllowedHeaders(List.of("*"));
         corsConfiguration.setAllowCredentials(true);

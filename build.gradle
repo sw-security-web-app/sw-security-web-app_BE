@@ -77,8 +77,9 @@ dependencies {
 
 	//PDF
 	implementation 'org.apache.pdfbox:pdfbox:2.0.30'
-
-
+	implementation group: 'org.json', name: 'json', version: '20090211'
+	//WebClient
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 }
 
 tasks.named('test') {

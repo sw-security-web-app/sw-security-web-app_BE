@@ -8,4 +8,5 @@ public interface RedisCustomService {
     void deleteRedisData(String key);
     boolean hasKey(String key);
     Set<String> getKeysByPattern(String pattern);
+    Long getRemainingTime(String key);
 }
