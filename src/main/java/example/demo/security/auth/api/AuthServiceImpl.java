@@ -202,7 +202,7 @@ public class AuthServiceImpl implements AuthService {
                 .sameSite("None")
                 .build();
 
-        response.addHeader("refreshToken",cookie.toString());
+        response.addHeader("Set-Cookie",cookie.toString());
     }
 
 

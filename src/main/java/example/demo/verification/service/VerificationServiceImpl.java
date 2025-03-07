@@ -205,8 +205,8 @@ public class VerificationServiceImpl implements VerificationService {
          * 전송 성공 유무 처리
          * 성공 - 200 실패 - 422
          * */
-        if (response.getStatusCode().is4xxClientError() || response.getStatusCode().is5xxServerError()) {
-            throw new RestApiException(VerificationErrorCode.ERROR_OF_GET_COMPANY_STATUS);
+        if (response.getStatusCode().isSameCodeAs(HttpStatusCode.valueOf(422)) || response.getStatusCode().is5xxServerError()) {
+            throw new RestApiException(VerificationErrorCode.NOT_CREATED_COMPANY);
         }
 
         //회사 검열 AI 생성 여부 변경
