@@ -80,7 +80,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource(){
         CorsConfiguration corsConfiguration=new CorsConfiguration();
-        corsConfiguration.setAllowedOriginPatterns(Arrays.asList("https://d1ujq2bm8j3hx9.cloudfront.net","http://localhost:8080"));
+        corsConfiguration.setAllowedOriginPatterns(Arrays.asList("https://d1ujq2bm8j3hx9.cloudfront.net","http://localhost:5173","http://192.168.0.12:5173"));
         corsConfiguration.setAllowedMethods(Arrays.asList("GET","POST","DELETE","OPTIONS","PUT"));
         corsConfiguration.setAllowedHeaders(List.of("*"));
         corsConfiguration.setAllowCredentials(true);
