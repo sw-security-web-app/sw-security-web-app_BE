@@ -37,7 +37,7 @@ public class SecurityConfig {
             "/api/auth/login","/swagger-ui/**","/api-docs", "/swagger-ui-custom.html",
             "/v3/api-docs/**", "/api-docs/**", "/swagger-ui.html","/api/signup","/api/mail-send",
             "/api/mail-check","/api/send-password","/api/sms-certification/send","/api/sms-certification/confirm",
-            "/api/find-email", "/health-check","/api/auth/refresh"
+            "/api/find-email", "/health-check","/api/auth/refresh","/api/**"
     };
   /*
   TODO:White List /api/** 삭제
