@@ -9,7 +9,7 @@ import example.demo.domain.chat.dto.request.ChatRoomRequestDto;
 import example.demo.domain.chat.dto.request.QChatRoomRequestDto;
 import example.demo.domain.chat.dto.response.ChatRoomGetResponseDto;
 import example.demo.domain.chat.dto.response.ChatRoomRecentResponseDto;
-
+import static com.querydsl.core.types.dsl.Expressions.stringTemplate;
 import example.demo.domain.chat.dto.response.QChatRoomGetResponseDto;
 import example.demo.domain.chat.dto.response.QChatRoomRecentResponseDto;
 import jakarta.persistence.EntityManager;
@@ -53,7 +53,7 @@ public class ChatRoomRepositoryCustomImpl implements ChatRoomRepositoryCustom {
         return queryFactory
                 .select(new QChatRoomGetResponseDto(
                         chatRoom.chatRoomId,
-                        chat.question,
+                        stringTemplate("CAST({0} AS STRING)",chat.question).substring(0,10),
                         chatRoom.createdAt
                 ))
                 .from(chatRoom)

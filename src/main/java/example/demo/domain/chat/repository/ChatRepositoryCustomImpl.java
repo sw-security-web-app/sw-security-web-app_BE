@@ -42,7 +42,7 @@ public class ChatRepositoryCustomImpl implements ChatRepositoryCustom {
                 .innerJoin(chat.chatRoom,chatRoom)
                 .innerJoin(chatRoom.member,member)
                 .where(allEq(chatRoomId,chatId,memberId,type))
-                .orderBy(chat.chatId.asc())
+                .orderBy(chat.chatId.desc())
                 .limit(size)
                 .fetch();
 
@@ -56,7 +56,7 @@ public class ChatRepositoryCustomImpl implements ChatRepositoryCustom {
 
         ChatTotalDetailResponseDto responseDto=ChatTotalDetailResponseDto
                 .builder()
-                .lastChatId(chatDetailDtoList.get(chatDetailDtoList.size() - 1).getChatId())
+                .lastChatId(chatDetailDtoList.get(chatDetailDtoList.size()-1).getChatId())
                 .array(chatDetailDtoList)
                 .build();
 
@@ -71,7 +71,7 @@ public class ChatRepositoryCustomImpl implements ChatRepositoryCustom {
         return chatRoomId == null ? null : chatRoom.chatRoomId.eq(chatRoomId);
     }
     private BooleanExpression gtChatId(Long chatId){
-        return (chatId != null && chatId > 0) ? chat.chatId.gt(chatId) : null;
+        return (chatId != null && chatId > 0) ? chat.chatId.lt(chatId) : null;
     }
     private BooleanExpression aiTypeEq(AIModelType ai){
         return ai==null ? null : chat.modelType.eq(ai);

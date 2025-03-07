@@ -86,7 +86,7 @@ public class VerificationServiceImpl implements VerificationService {
 
 
         //파일 타입 유형 검사
-        if (!multipartFile.isEmpty()) {
+        if (multipartFile!=null && !multipartFile.isEmpty()) {
             String extractFileName = multipartFile.getOriginalFilename();
             if (Arrays.stream(fileType).noneMatch(
                     file -> file.equals(extractFileType(extractFileName)))) {
@@ -118,8 +118,8 @@ public class VerificationServiceImpl implements VerificationService {
         }
         //텍스트만 존재하는 경우
         //TODO
-        else {
-            body.add("text", requestDto.getContent());
+        else if (requestDto!=null){
+            body.add("string", requestDto.getContent());
         }
         HttpHeaders headers=new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
@@ -177,9 +177,6 @@ public class VerificationServiceImpl implements VerificationService {
         if(company==null){
             throw new RestApiException(CompanyErrorCode.NOT_EXIST_COMPANY);
         }
-        if(company.getCheckCreate()){
-            return ResponseDto.of(200,"SUCCESS");
-        }
 
         SimpleClientHttpRequestFactory factory=new SimpleClientHttpRequestFactory();
         RestTemplate restTemplate=new RestTemplate(factory);
@@ -217,6 +214,45 @@ public class VerificationServiceImpl implements VerificationService {
         companyRepository.save(company);
 
         return ResponseDto.of(200, "SUCCESS");
+    }
+
+    @Override
+    public void checkIsAiCreateByCompanyId(Long companyId) {
+        //이미 check된 상태이면 패스
+        SimpleClientHttpRequestFactory factory=new SimpleClientHttpRequestFactory();
+        RestTemplate restTemplate=new RestTemplate(factory);
+
+        factory.setConnectTimeout(Duration.ofSeconds(20));//연결 시간 20초
+        factory.setReadTimeout(Duration.ofSeconds(20));   //읽기 시간 20초
+
+        ResponseEntity<String> response;
+
+        try {
+            response=restTemplate.getForEntity(SERVER_URL + "/api/" + companyId + "/status",String.class);
+            log.info("✅Check Company Info");
+        }catch (ResourceAccessException e){
+            //요청시간 초과 시
+            log.error(e.toString());
+            throw new RestApiException(VerificationErrorCode.TIME_OUT_ERROR);
+        }catch (RestClientException e){
+            //요청 중 오류 발생 시
+            /*
+             * */
+            log.error(e.toString());
+            throw new RestApiException(VerificationErrorCode.ERROR_OF_GET_COMPANY_STATUS);
+        }
+
+        /*
+         * 전송 성공 유무 처리
+         * 성공 - 200 실패 - 422
+         * */
+        if(response.getStatusCode().isSameCodeAs(HttpStatus.BAD_REQUEST)){
+            throw new RestApiException(VerificationErrorCode.NOT_CREATED_COMPANY);
+        }
+        if (response.getStatusCode().is4xxClientError() || response.getStatusCode().is5xxServerError()) {
+            throw new RestApiException(VerificationErrorCode.ERROR_OF_GET_COMPANY_STATUS);
+        }
+
     }
 
     //유저가 관리자 인지 검사 + 회사 인덱스 반환 메서드

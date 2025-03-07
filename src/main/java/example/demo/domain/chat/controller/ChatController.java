@@ -21,7 +21,7 @@ public class ChatController {
      */
     @GetMapping("/detail/{chatRoomId}")
     public ResponseEntity<?> getChatList(@RequestHeader("Authorization")String token,
-                                         @RequestParam(required = false,defaultValue = "1")Long id,
+                                         @RequestParam(required = false,defaultValue = "922337203685477580")Long id,
                                          @RequestParam(required = false,defaultValue = "10")int size,
                                          @RequestParam AIModelType type,
                                          @PathVariable("chatRoomId")Long chatRoomId){

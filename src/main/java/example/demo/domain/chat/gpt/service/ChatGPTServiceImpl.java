@@ -15,6 +15,10 @@ import example.demo.domain.chat.gpt.dto.ChatGPTResponseDto;
 import example.demo.domain.chat.gpt.dto.ChatRequestMsgDto;
 import example.demo.domain.chat.repository.ChatRoomRepository;
 import example.demo.domain.chat.service.ChatService;
+import example.demo.domain.company.Company;
+import example.demo.domain.member.Member;
+import example.demo.domain.member.MemberErrorCode;
+import example.demo.domain.member.repository.MemberRepository;
 import example.demo.error.RestApiException;
 import example.demo.verification.util.PythonServerUtil;
 import lombok.RequiredArgsConstructor;
@@ -48,7 +52,7 @@ public class ChatGPTServiceImpl implements ChatGPTService {
     private final ChatService chatService;
     private final ChatRoomRepository chatRoomRepository;
     private final PythonServerUtil pythonServerUtil;
-
+    private final MemberRepository memberRepository;
     @Value("${openai.url.prompt}")
     private String promptUrl;
 
@@ -68,8 +72,19 @@ public class ChatGPTServiceImpl implements ChatGPTService {
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
                 .orElseThrow(() -> new RestApiException(ChatRoomErrorCode.CHAT_ROOM_NOT_FOUND));
 
+        Member member=memberRepository.findById(memberId)
+                .orElseThrow(()->new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
+
+        //멤버 유형
+        Company company=member.getCompany();
+        Long companyId;
+        if(company==null){
+            companyId=0L;
+        }else{
+            companyId=company.getCompanyId();
+        }
         //* 프롬프트 검열
-       // pythonServerUtil.validatePrompt(prompt);
+        pythonServerUtil.validatePrompt(requestDto.getPrompt(), companyId);
 
         List<ChatRequestMsgDto> messages = new ArrayList<>();
         messages.add(ChatRequestMsgDto.builder()

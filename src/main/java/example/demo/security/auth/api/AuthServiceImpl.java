@@ -1,6 +1,7 @@
 package example.demo.security.auth.api;
 
 import example.demo.common.ResponseDto;
+import example.demo.data.RedisCustomService;
 import example.demo.domain.member.Member;
 import example.demo.domain.member.MemberErrorCode;
 import example.demo.domain.member.MemberStatus;
@@ -34,6 +35,8 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder encoder;
     private final RefreshToken refresh;
     private final CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
+    private final RedisCustomService redisCustomService;
+    private final String PREFIX="login :";
 
     @Override
     public AccessTokenResponseDto loginMember(MemberLoginDto loginDto, HttpServletResponse response) {
@@ -78,6 +81,12 @@ public class AuthServiceImpl implements AuthService {
         setRefreshToken(refreshToken, response);
 
         refresh.putRefreshToken(refreshToken, infoDto.getMemberId());
+
+
+        //로그인 초과 기록 삭제
+        if (redisCustomService.hasKey(PREFIX+email)){
+            redisCustomService.deleteRedisData(PREFIX+email);
+        }
 
         //기존 가지고 있는 사용자 refresh Token제거
         return AccessTokenResponseDto.builder()
