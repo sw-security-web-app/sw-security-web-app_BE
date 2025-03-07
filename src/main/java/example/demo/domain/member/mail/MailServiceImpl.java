@@ -83,7 +83,7 @@ public class MailServiceImpl implements MailService {
         );
 
         String subject="[Vero AI]임시비밀번호";
-        String uuid=CreateRandom.createShortUuid();
+        String uuid=CreateRandom.createNewPassword();
         findMember.setPassword(passwordEncoder.encode(uuid));
         memberRepository.save(findMember);
         String body="<h3>"+"임시 비밀번호입니다."+"</h3>"+
