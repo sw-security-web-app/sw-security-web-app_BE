@@ -246,7 +246,7 @@ public class VerificationServiceImpl implements VerificationService {
          * 전송 성공 유무 처리
          * 성공 - 200 실패 - 422
          * */
-        if(response.getStatusCode().isSameCodeAs(HttpStatus.BAD_REQUEST)){
+        if(response.getStatusCode().isSameCodeAs(HttpStatusCode.valueOf(422))){
             throw new RestApiException(VerificationErrorCode.NOT_CREATED_COMPANY);
         }
         if (response.getStatusCode().is4xxClientError() || response.getStatusCode().is5xxServerError()) {
