@@ -21,7 +21,7 @@ public class ChatRoom extends BaseEntity {
     @Column(name = "chat_room_id")
     private Long chatRoomId;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     @OnDelete(action = OnDeleteAction.SET_NULL)
     private Member member;
