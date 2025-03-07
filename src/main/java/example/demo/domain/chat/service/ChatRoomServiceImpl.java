@@ -1,13 +1,15 @@
 package example.demo.domain.chat.service;
 
-import example.demo.domain.chat.dto.ChatRoomGetResponseDto;
+
 import example.demo.domain.chat.dto.response.ChatRoomRecentResponseDto;
+
 import example.demo.domain.chat.dto.request.ChatRoomRequestDto;
+import example.demo.domain.chat.dto.response.ChatRoomGetResponseDto;
+import example.demo.domain.chat.dto.response.ChatRoomRecentResponseDto;
+
 import example.demo.domain.chat.dto.response.ChatRoomResponseDto;
 import example.demo.domain.chat.AIModelType;
-import example.demo.domain.chat.Chat;
 import example.demo.domain.chat.ChatRoom;
-import example.demo.domain.chat.repository.ChatRepository;
 import example.demo.domain.chat.repository.ChatRoomRepository;
 import example.demo.domain.member.Member;
 import example.demo.domain.member.MemberErrorCode;
@@ -19,7 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -28,7 +29,6 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 
     private final ChatRoomRepository chatRoomRepository;
     private final MemberRepository memberRepository;
-    private static final int MAX_CHAT_ROOM_COUNT = 7;
 
     @Transactional
     @Override
@@ -41,8 +41,6 @@ public class ChatRoomServiceImpl implements ChatRoomService {
                 .build();
 
         chatRoom=chatRoomRepository.save(chatRoom);
-        limitChatRoomCount(memberId);
-
         return new ChatRoomResponseDto(chatRoom.getChatRoomId());
     }
 
@@ -61,17 +59,4 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         return latestChatRoom;
     }
 
-    private void limitChatRoomCount(Long memberId) {
-        List<ChatRoomGetResponseDto> chatRoomList = chatRoomRepository.findByMemberOrderByCreatedAtAsc(memberId);
-        if (chatRoomList.size() > MAX_CHAT_ROOM_COUNT) {
-            ChatRoomGetResponseDto result = chatRoomList.get(0);
-            deleteChatRoomAndChatList(result.getChatRoomId());
-        }
-    }
-
-    private void deleteChatRoomAndChatList(Long chatRoomId) {
-        ChatRoom result = chatRoomRepository.findById(chatRoomId)
-                .orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
-        chatRoomRepository.delete(result);
-    }
 }

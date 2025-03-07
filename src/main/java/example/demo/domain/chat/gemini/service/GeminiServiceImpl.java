@@ -1,17 +1,22 @@
 package example.demo.domain.chat.gemini.service;
 
+import com.fasterxml.classmate.MemberResolver;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import example.demo.domain.chat.AIModelType;
 import example.demo.domain.chat.ChatRoom;
 import example.demo.domain.chat.ChatRoomErrorCode;
-import example.demo.domain.chat.dto.ChatDto;
+import example.demo.domain.chat.dto.request.ChatDto;
 import example.demo.domain.chat.gemini.GeminiErrorCode;
 import example.demo.domain.chat.gemini.dto.GeminiRequestDto;
 import example.demo.domain.chat.gemini.dto.GeminiResponseDto;
 import example.demo.domain.chat.repository.ChatRoomRepository;
 import example.demo.domain.chat.service.ChatService;
+import example.demo.domain.company.Company;
+import example.demo.domain.member.Member;
+import example.demo.domain.member.MemberErrorCode;
+import example.demo.domain.member.repository.MemberRepository;
 import example.demo.error.RestApiException;
 import example.demo.verification.util.PythonServerUtil;
 import org.springframework.beans.factory.annotation.Value;
@@ -43,12 +48,18 @@ public class GeminiServiceImpl implements GeminiService {
     private final ChatService chatService;
     private final ChatRoomRepository chatRoomRepository;
     private final PythonServerUtil pythonServerUtil;
+    private final MemberRepository memberRepository;
 
-    public GeminiServiceImpl(Builder webClient, ChatService chatService, ChatRoomRepository chatRoomRepository, PythonServerUtil pythonServerUtil) {
+    public GeminiServiceImpl(Builder webClient,
+                             ChatService chatService,
+                             ChatRoomRepository chatRoomRepository,
+                             PythonServerUtil pythonServerUtil,
+                             MemberRepository memberRepository) {
         this.webClient = webClient.build();
         this.chatService = chatService;
         this.chatRoomRepository = chatRoomRepository;
         this.pythonServerUtil = pythonServerUtil;
+        this.memberRepository=memberRepository;
     }
 
     @Override
@@ -58,8 +69,19 @@ public class GeminiServiceImpl implements GeminiService {
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
                 .orElseThrow(() -> new RestApiException(ChatRoomErrorCode.CHAT_ROOM_NOT_FOUND));
 
+        Member member=memberRepository.findById(memberId)
+                .orElseThrow(()->new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
+
+        //멤버 유형
+        Company company=member.getCompany();
+        Long companyId;
+        if(company==null){
+            companyId=0L;
+        }else{
+            companyId=company.getCompanyId();
+        }
         //* 프롬프트 검열
-       // pythonServerUtil.validatePrompt(requestDto.getPrompt());
+        pythonServerUtil.validatePrompt(requestDto.getPrompt(), companyId);
 
         // Construct the request payload
         Map<String, Object> requestBody = Map.of(

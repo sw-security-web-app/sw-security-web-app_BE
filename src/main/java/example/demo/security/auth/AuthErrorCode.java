@@ -18,7 +18,7 @@ public enum AuthErrorCode implements ErrorCode {
     CAN_NOT_LOCKED_MANAGER(HttpStatus.BAD_REQUEST,"관리자의 계정은 잠금처리할 수 없습니다."),
     INVALID_TYPE_VALUE(HttpStatus.BAD_REQUEST,"올바르지 않은 타입 값입니다."),
     IS_LOCKED(HttpStatus.BAD_REQUEST,"해당 계정이 잠긴 상태입니다."),
-    IS_NOT_LOCKED(HttpStatus.BAD_REQUEST,"해당 계정은 잠긴 상태가 아닙니다.");
+    IS_NOT_LOCKED(HttpStatus.BAD_REQUEST,"해당 계정은 잠긴 상태가 아닙니다."),
     LOCKED_ACCOUT(HttpStatus.LOCKED,"로그인 5회 초과로 계정이 잠겼습니다. \n관리자에게 문의하세요.");
 
     private final HttpStatus httpStatus;

@@ -19,7 +19,8 @@ public enum MemberErrorCode implements ErrorCode {
 
     EMPTY_PHONENUMBER(HttpStatus.BAD_REQUEST,"휴대폰 번호를 입력해주세요."),
     INVALID_PHONENUMBER(HttpStatus.BAD_REQUEST,"올바르지 않은 휴대폰 형식입니다."),
-    INVALID_PHONE_CERTIFICATION_NUMBER(HttpStatus.UNAUTHORIZED,"휴대폰 인증번호가 유효하지 않습니다.");
+    INVALID_PHONE_CERTIFICATION_NUMBER(HttpStatus.UNAUTHORIZED,"휴대폰 인증번호가 유효하지 않습니다."),
+    DUPLICATED_PHONENUMBER(HttpStatus.BAD_REQUEST,"중복된 휴대폰 번호입니다.");
 
   
 

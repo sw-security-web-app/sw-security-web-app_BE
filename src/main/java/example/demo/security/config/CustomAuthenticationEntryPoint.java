@@ -26,7 +26,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
 
         //계정이 잠긴 경우
         if(authException instanceof LockedException){
-            throw new RestApiException(AuthErrorCode.ACCOUNT_LOCKED);
+            throw new RestApiException(AuthErrorCode.LOCKED_ACCOUT);
         }
     }
 }

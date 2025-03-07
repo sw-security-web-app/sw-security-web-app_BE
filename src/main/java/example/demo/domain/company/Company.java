@@ -7,6 +7,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +31,7 @@ public class Company extends BaseEntity {
     private String invitationCode;
 
     //AI 생성 유무
-    @Column(name = "check_create")
+    @Column(name = "check_create",columnDefinition = "boolean default false")
     private Boolean checkCreate;
 
     //Member랑 양방향

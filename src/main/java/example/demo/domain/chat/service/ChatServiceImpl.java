@@ -4,8 +4,7 @@ import example.demo.domain.chat.AIModelType;
 import example.demo.domain.chat.Chat;
 import example.demo.domain.chat.ChatRoom;
 import example.demo.domain.chat.ChatRoomErrorCode;
-import example.demo.domain.chat.dto.response.ChatDetailResponseDto;
-import example.demo.domain.chat.dto.ChatDto;
+import example.demo.domain.chat.dto.request.ChatDto;
 import example.demo.domain.chat.dto.response.ChatTotalDetailResponseDto;
 import example.demo.domain.chat.repository.ChatRepository;
 import example.demo.domain.chat.repository.ChatRoomRepository;
@@ -18,8 +17,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
