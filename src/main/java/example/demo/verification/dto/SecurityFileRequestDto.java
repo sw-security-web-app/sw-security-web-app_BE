@@ -1,11 +1,11 @@
 package example.demo.verification.dto;
 
-import lombok.Builder;
-import lombok.Data;
-import lombok.Getter;
+import lombok.*;
 
 @Getter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class SecurityFileRequestDto {
     private String content;
 }

@@ -37,7 +37,7 @@ public class SecurityConfig {
             "/api/login","/swagger-ui/**","/api-docs", "/swagger-ui-custom.html",
             "/v3/api-docs/**", "/api-docs/**", "/swagger-ui.html","/api/signup","/api/mail-send",
             "/api/mail-check","/api/send-password","/api/sms-certification/send","/api/sms-certification/confirm",
-            "/api/find-email","/api/**", "/health-check"
+            "/api/find-email", "/health-check","/api/auth/refresh"
     };
   /*
   TODO:White List /api/** 삭제
@@ -69,6 +69,8 @@ public class SecurityConfig {
                 //@PreAuthorization을 사용
                 //회사 관리자만 직원 삭제 가능
                 .requestMatchers(HttpMethod.DELETE, "/user").hasRole(MemberStatus.MANAGER.getText())
+                .requestMatchers(HttpMethod.PUT,"/api/auth/locked").hasRole(MemberStatus.MANAGER.getText())
+                .requestMatchers(HttpMethod.GET,"/api/employee-list").hasRole(MemberStatus.MANAGER.getText())
                 .anyRequest().authenticated());
 
         return http.build();
@@ -78,8 +80,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource(){
         CorsConfiguration corsConfiguration=new CorsConfiguration();
-        corsConfiguration.setAllowedOriginPatterns(Arrays.asList("http://localhost:*","http://172.20.10.2:5173", "http://192.168.189.133:*",
-                "http://172.30.1.36:*"));
+        corsConfiguration.setAllowedOriginPatterns(Arrays.asList("https://d1ujq2bm8j3hx9.cloudfront.net"));
         corsConfiguration.setAllowedMethods(Arrays.asList("GET","POST","DELETE","OPTIONS","PUT"));
         corsConfiguration.setAllowedHeaders(List.of("*"));
         corsConfiguration.setAllowCredentials(true);

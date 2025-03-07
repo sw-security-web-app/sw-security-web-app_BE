@@ -15,4 +15,6 @@ public interface VerificationService {
 
     ResponseDto checkIsAiCreate(String token);
 
+    void checkIsAiCreateByCompanyId(Long companyId);
+
 }
