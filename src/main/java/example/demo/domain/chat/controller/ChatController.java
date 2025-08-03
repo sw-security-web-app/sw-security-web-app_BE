@@ -1,7 +1,9 @@
 package example.demo.domain.chat.controller;
 
 import example.demo.domain.chat.AIModelType;
+import example.demo.domain.chat.dto.request.ChatDto;
 import example.demo.domain.chat.service.ChatService;
+import example.demo.security.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/chat")
 public class ChatController {
     private final ChatService chatService;
+    private final JwtUtil jwtUtil;
     //무한 스크롤
     /**
      *
@@ -26,5 +29,13 @@ public class ChatController {
                                          @RequestParam AIModelType type,
                                          @PathVariable("chatRoomId")Long chatRoomId){
         return ResponseEntity.ok(chatService.getDetailChattingContent(chatRoomId,token,id,size,type));
+    }
+
+    @PostMapping("/test")
+    public ResponseEntity<?> makeChat(@RequestHeader("Authorization")String token,
+                                      @RequestParam(required = true,name = "chatRoomId")Long chatRoomId,
+                                      @RequestBody(required = true)ChatDto chatDto){
+        chatService.saveChat(jwtUtil.getMemberId(token),chatDto,chatRoomId);
+        return ResponseEntity.ok("대화 생성 완료");
     }
 }

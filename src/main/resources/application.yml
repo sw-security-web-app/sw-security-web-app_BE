@@ -5,16 +5,24 @@ spring:
     active: secret
 
   datasource:
-    url: jdbc:log4jdbc:mysql://localhost:3306/securityInfoWeb
-    driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+    url: jdbc:mysql://localhost:3306/vero
+    driver-class-name: com.mysql.jdbc.Driver
     username: root
     password: rlaehdus00
 
   jpa:
     hibernate:
-      ddl-auto: create
-    show-sql: true
+      ddl-auto: update
 
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true  # SQL 포맷팅 (선택)
+
+logging:
+  level:
+    org.hibernate.SQL: debug                # SQL 쿼리 로그
+    org.hibernate.orm.jdbc.bind: trace      # 바인딩값 로그
 ## Testing 환경
 ---
 

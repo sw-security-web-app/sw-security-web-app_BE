@@ -12,7 +12,7 @@ import java.util.List;
 public interface ChatRoomService {
     ChatRoomResponseDto createChatRoom(Long memberId);
 
-    List<ChatRoomGetResponseDto> getChatRoomList(Long memberId, AIModelType aiModelType);
+    List<Long> getChatRoomList(Long memberId, AIModelType aiModelType);
 
     List<ChatRoomRecentResponseDto> getLatestChatRoom(Long memberId, AIModelType aiModelType);
 }

@@ -43,5 +43,10 @@ public class MemberController {
 
     }
 
+    @PostMapping("/api/test/user")
+    public ResponseEntity<String> makeTestUser(@RequestBody MemberRequestDto memberRequestDto){
+        String jwt= memberService.makeTestUser(memberRequestDto);
+        return ResponseEntity.ok(jwt);
+    }
 
 }

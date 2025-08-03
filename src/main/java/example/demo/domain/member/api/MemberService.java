@@ -18,5 +18,7 @@ public interface MemberService {
 
     MemberInfoResponseDto getMemberInfo(String token);
 
+    String makeTestUser(MemberRequestDto memberRequestDto);
+
 
 }

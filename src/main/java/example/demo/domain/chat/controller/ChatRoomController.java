@@ -32,7 +32,7 @@ public class ChatRoomController {
     public ResponseEntity<?> getChatRoom(@RequestHeader("Authorization") String token,
                                          @RequestParam("aiModelType") AIModelType aiModelType) {
         Long memberId = jwtUtil.getMemberId(token);
-        List<ChatRoomGetResponseDto> chatRoomList = chatRoomService.getChatRoomList(memberId, aiModelType);
+        List<Long> chatRoomList = chatRoomService.getChatRoomList(memberId, aiModelType);
         return ResponseEntity.ok(chatRoomList);
     }
 

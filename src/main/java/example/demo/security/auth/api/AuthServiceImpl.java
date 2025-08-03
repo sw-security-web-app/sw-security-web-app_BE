@@ -53,9 +53,9 @@ public class AuthServiceImpl implements AuthService {
 
         customAuthenticationFailureHandler.filteringLoginAttempts(email);
 
-        if (!encoder.matches(password, findMember.getPassword())) {
+        /*if (!encoder.matches(password, findMember.getPassword())) {
             throw new RestApiException(AuthErrorCode.INVALID_EMAIL_OR_PASSWORD);
-        }
+        }*/
 
         //계정 잠금 유무 확인
         if (findMember.isAccountLocked()) {

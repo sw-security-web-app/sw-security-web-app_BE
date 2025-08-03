@@ -45,8 +45,8 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     }
 
     @Override
-    public List<ChatRoomGetResponseDto> getChatRoomList(Long memberId, AIModelType aiModelType) {
-        List<ChatRoomGetResponseDto> chatRoomList = chatRoomRepository.findByMemberIdAndAiModelType(memberId, aiModelType);
+    public List<Long> getChatRoomList(Long memberId, AIModelType aiModelType) {
+        List<Long> chatRoomList = chatRoomRepository.getChatRoomByChatRoomId(memberId, aiModelType);
         return chatRoomList;
     }
 

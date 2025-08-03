@@ -12,6 +12,7 @@ import example.demo.domain.member.MemberStatus;
 import example.demo.domain.member.dto.response.CompanyEmployeeResponseDto;
 
 import example.demo.domain.member.dto.response.MemberInfoResponseDto;
+import example.demo.security.auth.dto.CustomMemberInfoDto;
 import example.demo.security.auth.dto.MemberLoginDto;
 import example.demo.domain.member.repository.MemberRepository;
 import example.demo.domain.member.dto.request.MemberRequestDto;
@@ -121,9 +122,27 @@ public class MemberServiceImpl implements MemberService {
         return memberInfo;
     }
 
+    @Override
+    public String makeTestUser(MemberRequestDto memberRequestDto) {
+        smsAndMailValidation(memberRequestDto.getEmail(),memberRequestDto.getPhoneNumber());
+        Member member=Member.createGeneral(memberRequestDto);
+        member=memberRepository.save(member);
+        String jwt=jwtUtil.createAccessToken(CustomMemberInfoDto.builder()
+                .memberId(member.getMemberId())
+                .memberStatus(MemberStatus.GENERAL)
+                .email(member.getEmail())
+                .password(member.getPassword())
+                .build()
+        );
+
+        return jwt;
+    }
+
 
     private boolean smsAndMailValidation(String email,String phoneNumber){
-        if (isTestMode()) {
+        //부하 테스트를 위한 수정
+        return false;
+        /*if (isTestMode()) {
             return false; // 테스트 모드일 때 항상 false
         }
         String VALIDATION_PREFIX = "cer: ";
@@ -131,7 +150,7 @@ public class MemberServiceImpl implements MemberService {
                     redisCustomService.hasKey(VALIDATION_PREFIX +phoneNumber)&&
                         redisCustomService.getRedisData(VALIDATION_PREFIX +email).equals("TRUE")&&
                             redisCustomService.getRedisData(VALIDATION_PREFIX +phoneNumber).equals("TRUE")
-        ));
+        ));*/
     }
 
     //test를 위한 메서드
